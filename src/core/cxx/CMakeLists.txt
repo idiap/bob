@@ -14,7 +14,6 @@ endif()
 # This defines the list of source files inside this package.
 set(src
     "logging.cc"
-    "array_exception.cc"
     "array_type.cc"
     "array.cc"
     "blitz_array.cc"

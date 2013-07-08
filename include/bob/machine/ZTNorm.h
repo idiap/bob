@@ -33,7 +33,7 @@ namespace bob { namespace machine {
 /**
  * Normalise raw scores with ZT-Norm
  *
- * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
+ * @exception std::runtime_error matrix sizes are not consistent
  * 
  * @param rawscores_probes_vs_models
  * @param rawscores_zprobes_vs_models
@@ -55,7 +55,7 @@ void ztNorm(const blitz::Array<double, 2>& rawscores_probes_vs_models,
  * Normalise raw scores with ZT-Norm.
  * Assume that znorm and tnorm have no common subject id.
  *
- * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
+ * @exception std::runtime_error matrix sizes are not consistent
  *
  * @param rawscores_probes_vs_models
  * @param rawscores_zprobes_vs_models
@@ -74,7 +74,7 @@ void ztNorm(const blitz::Array<double,2>& rawscores_probes_vs_models,
 /**
  * Normalise raw scores with T-Norm.
  *
- * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
+ * @exception std::runtime_error matrix sizes are not consistent
  *
  * @param rawscores_probes_vs_models
  * @param rawscores_probes_vs_tmodels
@@ -89,7 +89,7 @@ void tNorm(const blitz::Array<double,2>& rawscores_probes_vs_models,
 /**
  * Normalise raw scores with Z-Norm.
  *
- * @exception bob::core::UnexpectedShapeError matrix sizes are not consistent
+ * @exception std::runtime_error matrix sizes are not consistent
  *
  * @param rawscores_probes_vs_models
  * @param rawscores_zprobes_vs_models

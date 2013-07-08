@@ -28,8 +28,9 @@
 #define BOB_CORE_ARRAY_CONVERT_H
 
 #include <limits>
+#include <stdexcept>
+#include <boost/format.hpp>
 #include <blitz/array.h>
-#include <bob/core/array_exception.h>
 #include <bob/core/assert.h>
 
 namespace bob { namespace core { namespace array {
@@ -49,14 +50,20 @@ blitz::Array<T,1> convert(const blitz::Array<U,1>& src,
   bob::core::array::assertZeroBase(src);
   blitz::Array<T,1> dst( src.extent(0) );
   if (src_min == src_max)
-    throw bob::core::array::ConvertZeroInputRange();
+    throw std::runtime_error("cannot convert an array with a zero width input range.");
   double src_ratio = 1. / ( src_max - src_min);
   T dst_diff = dst_max - dst_min;
   for (int i=0; i<src.extent(0); ++i) {
-    if (src(i) < src_min)
-      throw bob::core::array::ConvertInputBelowMinRange(src(i), src_min);
-    if (src(i) > src_max)
-      throw bob::core::array::ConvertInputAboveMaxRange(src(i), src_max);
+    if (src(i) < src_min) {
+      boost::format m("src[%d] = %f is below the minimum %f of input range");
+      m % i % src(i) % src_min;
+      throw std::runtime_error(m.str());
+    }
+    if (src(i) > src_max) {
+      boost::format m("src[%d] = %f is above the maximum %f of input range");
+      m % i % src(i) % src_max;
+      throw std::runtime_error(m.str());
+    }
     // If the destination is an integer-like type, we need to add 0.5 s.t.
     // the round done by the implicit conversion is correct
     dst(i) = dst_min + (((src(i)-src_min)*src_ratio) * 
@@ -76,15 +83,21 @@ blitz::Array<T,2> convert(const blitz::Array<U,2>& src,
   bob::core::array::assertZeroBase(src);
   blitz::Array<T,2> dst( src.extent(0), src.extent(1) );
   if (src_min == src_max)
-    throw bob::core::array::ConvertZeroInputRange();
+    throw std::runtime_error("cannot convert an array with a zero width input range.");
   double src_ratio = 1. / ( src_max - src_min);
   T dst_diff = dst_max - dst_min;
   for (int i=0; i<src.extent(0); ++i) 
     for (int j=0; j<src.extent(1); ++j) {
-      if (src(i,j) < src_min)
-        throw bob::core::array::ConvertInputBelowMinRange(src(i,j), src_min); 
-      if (src(i,j) > src_max )
-        throw bob::core::array::ConvertInputAboveMaxRange(src(i,j), src_max);
+      if (src(i,j) < src_min) {
+        boost::format m("src[%d,%d] = %f is below the minimum %f of input range");
+        m % i % j % src(i,j) % src_min;
+        throw std::runtime_error(m.str());
+      }
+      if (src(i,j) > src_max ) {
+        boost::format m("src[%d,%d] = %f is above the maximum %f of input range");
+        m % i % j % src(i,j) % src_max;
+        throw std::runtime_error(m.str());
+      }
       // If the destination is an integer-like type, we need to add 0.5 
       // s.t. the round done by the implicit conversion is correct
       dst(i,j) = dst_min + (((src(i,j)-src_min)*src_ratio) * 
@@ -104,16 +117,22 @@ blitz::Array<T,3> convert(const blitz::Array<U,3>& src,
   bob::core::array::assertZeroBase(src);
   blitz::Array<T,3> dst( src.extent(0), src.extent(1), src.extent(2) );
   if (src_min == src_max)
-    throw bob::core::array::ConvertZeroInputRange();
+    throw std::runtime_error("cannot convert an array with a zero width input range.");
   double src_ratio = 1. / ( src_max - src_min);
   T dst_diff = dst_max - dst_min;
   for (int i=0; i<src.extent(0); ++i)
     for (int j=0; j<src.extent(1); ++j) 
       for (int k=0; k<src.extent(2); ++k) {
-        if (src(i,j,k) < src_min)
-          throw bob::core::array::ConvertInputBelowMinRange(src(i,j,k), src_min); 
-        if (src(i,j,k) > src_max )
-          throw bob::core::array::ConvertInputAboveMaxRange(src(i,j,k), src_max);
+        if (src(i,j,k) < src_min) {
+          boost::format m("src[%d,%d,%d] = %f is below the minimum %f of input range");
+          m % i % j % k % src(i,j,k) % src_min;
+          throw std::runtime_error(m.str());
+        }
+        if (src(i,j,k) > src_max ) {
+          boost::format m("src[%d,%d,%d] = %f is above the maximum %f of input range");
+          m % i % j % k % src(i,j,k) % src_max;
+          throw std::runtime_error(m.str());
+        }
         // If the destination is an integer-like type, we need to add 0.5 
         // s.t. the round done by the implicit conversion is correct
         dst(i,j,k) = dst_min + (((src(i,j,k)-src_min)*src_ratio) * 
@@ -134,17 +153,23 @@ blitz::Array<T,4> convert(const blitz::Array<U,4>& src,
   blitz::Array<T,4> dst( src.extent(0), src.extent(1), src.extent(2),
     src.extent(3) );
   if (src_min == src_max)
-    throw bob::core::array::ConvertZeroInputRange();
+    throw std::runtime_error("cannot convert an array with a zero width input range.");
   double src_ratio = 1. / ( src_max - src_min);
   T dst_diff = dst_max - dst_min;
   for (int i=0; i<src.extent(0); ++i)
     for (int j=0; j<src.extent(1); ++j) 
       for (int k=0; k<src.extent(2); ++k)
         for (int l=0; l<src.extent(3); ++l) {
-          if (src(i,j,k,l) < src_min)
-            throw bob::core::array::ConvertInputBelowMinRange(src(i,j,k,l), src_min); 
-          if (src(i,j,k,l) > src_max )
-            throw bob::core::array::ConvertInputAboveMaxRange(src(i,j,k,l), src_max);
+          if (src(i,j,k,l) < src_min) {
+            boost::format m("src[%d,%d,%d,%d] = %f is below the minimum %f of input range");
+            m % i % j % k % l % src(i,j,k,l) % src_min;
+            throw std::runtime_error(m.str());
+          }
+          if (src(i,j,k,l) > src_max ) {
+            boost::format m("src[%d,%d,%d,%d] = %f is above the maximum %f of input range");
+            m % i % j % k % l % src(i,j,k,l) % src_max;
+            throw std::runtime_error(m.str());
+          }
           // If the destination is an integer-like type, we need to add 0.5
           // s.t. the round done by the implicit conversion is correct
           dst(i,j,k,l) = dst_min + (((src(i,j,k,l)-src_min)*src_ratio) *

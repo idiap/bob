@@ -20,6 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdexcept>
 #include <bob/core/blitz_array.h>
 #include <bob/core/logging.h>
 

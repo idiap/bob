@@ -25,8 +25,9 @@
 #ifndef BOB_CORE_ARRAY_REPMAT_H
 #define BOB_CORE_ARRAY_REPMAT_H
 
+#include <stdexcept>
+#include <boost/format.hpp>
 #include <blitz/array.h>
-#include <bob/core/array_exception.h>
 #include <bob/core/assert.h>
 
 namespace bob { namespace core { namespace array {
@@ -74,10 +75,14 @@ void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
   if(dst.extent(0) % src.extent(0) != 0) {
-    throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+    boost::format m("dst.shape[0] (%d) is not a multiple of src.shape[0] (%d)");
+    m % dst.extent(0) % src.extent(0);
+    throw std::runtime_error(m.str());
   }
   if(dst.extent(1) % src.extent(1) != 0) {
-    throw bob::core::array::RepmatNonMultipleLength(src.extent(1), dst.extent(1));
+    boost::format m("dst.shape[1] (%d) is not a multiple of src.shape[1] (%d)");
+    m % dst.extent(1) % src.extent(1);
+    throw std::runtime_error(m.str());
   }
   repmat_(src, dst);
 }
@@ -142,13 +147,17 @@ void repmat(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
   if(row_vector_src)
   {
     if(dst.extent(1) % src.extent(0) != 0) {
-      throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(1));
+      boost::format m("dst.shape[1] (%d) is not a multiple of src.shape[0] (%d)");
+      m % dst.extent(1) % src.extent(0);
+      throw std::runtime_error(m.str());
     }
   }
   else // src is a column vector
   {
     if(dst.extent(0) % src.extent(0) != 0) {
-      throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+      boost::format m("dst.shape[0] (%d) is not a multiple of src.shape[0] (%d)");
+      m % dst.extent(0) % src.extent(0);
+      throw std::runtime_error(m.str());
     }
   }
   repmat_(src, dst, row_vector_src);
@@ -189,7 +198,9 @@ void repvec(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
   if(dst.extent(0) % src.extent(0) != 0) {
-    throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+    boost::format m("dst.shape[0] (%d) is not a multiple of src.shape[0] (%d)");
+    m % dst.extent(0) % src.extent(0);
+    throw std::runtime_error(m.str());
   }
   repvec_(src,dst);
 }
@@ -231,7 +242,9 @@ void repelem(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
   if(dst.extent(0) % src.extent(0) != 0) {
-    throw bob::core::array::RepmatNonMultipleLength(src.extent(0), dst.extent(0));
+    boost::format m("dst.shape[0] (%d) is not a multiple of src.shape[0] (%d)");
+    m % dst.extent(0) % src.extent(0);
+    throw std::runtime_error(m.str());
   }
   repelem_(src,dst);
 }

@@ -29,7 +29,6 @@
 #include <boost/format.hpp>
 #include <blitz/array.h>
 #include <bob/core/assert.h>
-#include <bob/core/array_exception.h>
 
 namespace bob { namespace core { namespace array {
 /**
