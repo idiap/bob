@@ -83,12 +83,12 @@ struct PythonLoggingOutputDevice: public bob::core::OutputDevice {
 #if   ((BOOST_VERSION / 100) % 1000) > 35
       boost::lock_guard<boost::mutex> lock(mutex);
 #endif
-      bob::python::gil gil;
       if (TPY_ISNONE(m_callable)) return 0;
       std::string value(s);
       if (std::isspace(value[n-1])) { //remove accidental newlines in the end
         value = value.substr(0, n-1);
       }
+      bob::python::gil gil;
       m_callable(value);
       return n;
     }
@@ -103,7 +103,7 @@ struct message_info_t {
   bool exit;
 };
 
-void* log_message_inner(void* cookie) {
+static void* log_message_inner(void* cookie) {
   unsigned int thread_id = (unsigned int)pthread_self();
   if (PyEval_ThreadsInitialized()) {
     printf("(0x%x) python threads initialized\n", thread_id);
