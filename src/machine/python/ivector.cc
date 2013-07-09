@@ -26,36 +26,16 @@
 
 using namespace boost::python;
 
-static object py_iv_getT(const bob::machine::IVectorMachine& machine)
-{
-  const blitz::Array<double,2> Tm = machine.getT();
-  bob::python::ndarray T(bob::core::array::t_float64, Tm.extent(0), Tm.extent(1));
-  blitz::Array<double,2> T_ = T.bz<double,2>();
-  T_ = Tm;
-  return T.self();
-}
-
 static void py_iv_setT(bob::machine::IVectorMachine& machine,
   bob::python::const_ndarray T)
 {
-  const blitz::Array<double,2> T_ = T.bz<double,2>();
-  machine.setT(T_);
-}
-
-static object py_iv_getSigma(const bob::machine::IVectorMachine& machine)
-{
-  const blitz::Array<double,1> sigmam = machine.getSigma();
-  bob::python::ndarray sigma(bob::core::array::t_float64, sigmam.extent(0));
-  blitz::Array<double,1> sigma_ = sigma.bz<double,1>();
-  sigma_ = sigmam;
-  return sigma.self();
+  machine.setT(T.bz<double,2>());
 }
 
 static void py_iv_setSigma(bob::machine::IVectorMachine& machine,
   bob::python::const_ndarray sigma)
 {
-  const blitz::Array<double,1> sigma_ = sigma.bz<double,1>();
-  machine.setSigma(sigma_);
+  machine.setSigma(sigma.bz<double,1>());
 }
 
 static void py_computeIdTtSigmaInvT1(const bob::machine::IVectorMachine& machine,
@@ -117,10 +97,10 @@ static object py_iv_forward2(const bob::machine::IVectorMachine& machine,
 void bind_machine_ivector()
 {
   // TODO: reuse binding from generic machine
-  class_<bob::machine::IVectorMachine, boost::shared_ptr<bob::machine::IVectorMachine> >("IVectorMachine", "An IVectorMachine to extract i-vector (TODO: references)", init<boost::shared_ptr<bob::machine::GMMMachine>, optional<const size_t, const size_t> >((arg("ubm"), arg("rt")=1, arg("variance_threshold")=1e-10), "Builds a new IVectorMachine."))
-    .def(init<>("Constructs a new empty IVectorMachine."))
-    .def(init<bob::io::HDF5File&>((arg("config")), "Constructs a new IVectorMachine from a configuration file."))
-    .def(init<const bob::machine::IVectorMachine&>((arg("machine")), "Copy constructs an IVectorMachine"))
+  class_<bob::machine::IVectorMachine, boost::shared_ptr<bob::machine::IVectorMachine> >("IVectorMachine", "An IVectorMachine to extract i-vector (TODO: references)", init<boost::shared_ptr<bob::machine::GMMMachine>, optional<const size_t, const size_t> >((arg("self"), arg("ubm"), arg("rt")=1, arg("variance_threshold")=1e-10), "Builds a new IVectorMachine."))
+    .def(init<>((arg("self")), "Constructs a new empty IVectorMachine."))
+    .def(init<bob::io::HDF5File&>((arg("self"), arg("config")), "Constructs a new IVectorMachine from a configuration file."))
+    .def(init<const bob::machine::IVectorMachine&>((arg("self"), arg("machine")), "Copy constructs an IVectorMachine"))
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::machine::IVectorMachine::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this IVectorMachine with the 'other' one to be approximately the same.")
@@ -128,8 +108,8 @@ void bind_machine_ivector()
     .def("save", &bob::machine::IVectorMachine::save, (arg("self"), arg("config")), "Saves the configuration parameters to a configuration file.")
     .def("resize", &bob::machine::IVectorMachine::resize, (arg("self"), arg("rt")), "Reset the dimensionality of the Total Variability subspace T.")
     .add_property("ubm", &bob::machine::IVectorMachine::getUbm, &bob::machine::IVectorMachine::setUbm)
-    .add_property("t", &py_iv_getT, &py_iv_setT)
-    .add_property("sigma", &py_iv_getSigma, &py_iv_setSigma)
+    .add_property("t", make_function(&bob::machine::IVectorMachine::getT, return_value_policy<copy_const_reference>()), &py_iv_setT)
+    .add_property("sigma", make_function(&bob::machine::IVectorMachine::getSigma, return_value_policy<copy_const_reference>()), &py_iv_setSigma)
     .add_property("variance_threshold", &bob::machine::IVectorMachine::getVarianceThreshold, &bob::machine::IVectorMachine::setVarianceThreshold)
     .add_property("dim_c", &bob::machine::IVectorMachine::getDimC)
     .add_property("dim_d", &bob::machine::IVectorMachine::getDimD)
