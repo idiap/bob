@@ -149,6 +149,8 @@ class GMMMachineTest(unittest.TestCase):
     self.assertTrue( (gmm.update_gaussian(1).variance == newVariances[1,:]).all() )
 
     # Checks resize
+    gmm.shape = (5,6)
+    self.assertTrue( gmm.shape == (5,6) )
     gmm.resize(4,5)
     self.assertTrue( gmm.dim_c == 4 )
     self.assertTrue( gmm.dim_d == 5 )
