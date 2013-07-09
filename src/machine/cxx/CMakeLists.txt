@@ -10,7 +10,6 @@ set(src
   "KMeansMachine.cc"
   "Gaussian.cc"
   "GMMMachine.cc"
-  "GMMLLRMachine.cc"
   "GMMStats.cc"
   "LinearMachine.cc"
   "MLP.cc"

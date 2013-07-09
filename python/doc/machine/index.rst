@@ -46,7 +46,6 @@ Resources for projecting, estimating probabilities or classifying data.
 
    Activation
    BICMachine
-   GMMLLRMachine
    GMMMachine
    GMMStats
    GaborGraphMachine

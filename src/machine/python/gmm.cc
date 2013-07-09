@@ -21,7 +21,6 @@
 #include <boost/concept_check.hpp>
 #include <bob/machine/GMMStats.h>
 #include <bob/machine/GMMMachine.h>
-#include <bob/machine/GMMLLRMachine.h>
 #include <blitz/array.h>
 
 #include <bob/python/ndarray.h>
@@ -293,23 +292,4 @@ void bind_machine_gmm()
     .def(self_ns::str(self_ns::self))
   ;
 
-  class_<bob::machine::GMMLLRMachine, bases<bob::machine::Machine<blitz::Array<double,1>, double> > >("GMMLLRMachine",
-       "This class implements computes log likelihood ratio, given a client and a UBM GMM.\n",
-        no_init)
-    .def(init<bob::machine::GMMLLRMachine&>())
-    .def(init<bob::io::HDF5File&>(args("config")))
-    .def(init<bob::io::HDF5File&,bob::io::HDF5File&>(args("client", "ubm")))
-    .def(init<bob::machine::GMMMachine&,bob::machine::GMMMachine&>(args("client", "ubm")))
-    .def(self == self)
-    .def("get_gmm_client",
-         &bob::machine::GMMLLRMachine::getGMMClient, return_value_policy<reference_existing_object>(),
-         "Get a pointer to the client GMM")
-    .def("get_gmm_ubm",
-         &bob::machine::GMMLLRMachine::getGMMUBM, return_value_policy<reference_existing_object>(),
-         "Get a pointer to the UBM GMM")
-    .add_property("n_inputs", &bob::machine::GMMMachine::getNInputs, "The feature dimensionality")
-    .def("load", &bob::machine::GMMLLRMachine::load, "Load from a Configuration")
-    .def("save", &bob::machine::GMMLLRMachine::save, "Save to a Configuration")
-    .def(self_ns::str(self_ns::self))
-  ;
 }
