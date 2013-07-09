@@ -104,20 +104,22 @@ struct message_info_t {
 };
 
 static void* log_message_inner(void* cookie) {
-  unsigned int thread_id = (unsigned int)pthread_self();
+  //unsigned int thread_id = (unsigned int)pthread_self();
+  /**
   if (PyEval_ThreadsInitialized()) {
     printf("(0x%x) python threads initialized\n", thread_id);
   }
   else {
     printf("(0x%x) python threads NOT initialized\n", thread_id);
   }
+  **/
   message_info_t* mi = (message_info_t*)cookie;
   mi->s << "\"" << mi->message << "\"" << std::endl;
   if (mi->exit) {
-    printf("(0x%x) exiting thread\n", thread_id);
+    //printf("(0x%x) exiting thread\n", thread_id);
     pthread_exit(0);
   }
-  printf("(0x%x) returning 0\n", thread_id);
+  //printf("(0x%x) returning 0\n", thread_id);
   return 0;
 }
 
@@ -126,10 +128,10 @@ static void* log_message_inner(void* cookie) {
  */
 static void log_message(bob::core::OutputStream& s, const char* message) {
   bob::python::no_gil unlock;
-  unsigned int thread_id = (unsigned int)pthread_self();
+  //unsigned int thread_id = (unsigned int)pthread_self();
   message_info_t mi = {s, message, false};
   log_message_inner((void*)&mi);
-  printf("(0x%x) returning to caller\n", thread_id);
+  //printf("(0x%x) returning to caller\n", thread_id);
 }
 
 /**
@@ -137,30 +139,30 @@ static void log_message(bob::core::OutputStream& s, const char* message) {
  */
 static void log_message_mt(unsigned int nthreads, bob::core::OutputStream& s, const char* message) {
   bob::python::no_gil unlock;
-  unsigned int thread_id = (unsigned int)pthread_self();
+  //unsigned int thread_id = (unsigned int)pthread_self();
 
-  printf("(0x%x) writing message sample\n", thread_id);
+  //printf("(0x%x) writing message sample\n", thread_id);
   message_info_t mi_sample = {s, message, false};
   log_message_inner((void*)&mi_sample);
-  printf("(0x%x) sampled - now launching %u thread(s)\n", thread_id, nthreads);
+  //printf("(0x%x) sampled - now launching %u thread(s)\n", thread_id, nthreads);
 
   boost::shared_array<pthread_t> threads(new pthread_t[nthreads]);
   message_info_t mi = {s, message, true};
-  printf("(0x%x) launching %u thread(s)\n", thread_id, nthreads);
+  //printf("(0x%x) launching %u thread(s)\n", thread_id, nthreads);
 
   for (unsigned int i=0; i<nthreads; ++i) {
-    printf("(0x%x) launch thread %d: `%s'\n", thread_id, i, mi.message.c_str());
+    //printf("(0x%x) launch thread %d: `%s'\n", thread_id, i, mi.message.c_str());
     pthread_create(&threads[i], NULL, &log_message_inner, (void*)&mi);
-    printf("(0x%x) thread %d = 0x%x launched\n", thread_id, i, (unsigned int)threads[i]);
+    //printf("(0x%x) thread %d = 0x%x launched\n", thread_id, i, (unsigned int)threads[i]);
   }
 
   void* status;
-  printf("(0x%x) waiting %u thread(s)\n", thread_id, nthreads);
+  //printf("(0x%x) waiting %u thread(s)\n", thread_id, nthreads);
   for (unsigned int i=0; i<nthreads; ++i) {
     pthread_join(threads[i], &status);
-    printf("(0x%x) waiting on thread 0x%x\n", thread_id, (unsigned int)threads[i]);
+    //printf("(0x%x) waiting on thread 0x%x\n", thread_id, (unsigned int)threads[i]);
   }
-  printf("(0x%x) returning to caller\n", thread_id);
+  //printf("(0x%x) returning to caller\n", thread_id);
 }
 
 /**
