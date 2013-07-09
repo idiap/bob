@@ -86,6 +86,8 @@ class GaussianMachineTest(unittest.TestCase):
     self.assertTrue( equals(g.forward(sample3), ref3, eps) )
 
     # Check resize and assignment
+    g.shape = (6,)
+    self.assertTrue( g.shape == (6,) )
     g.resize(5)
     self.assertTrue( g.dim_d == 5 )
     g2 = bob.machine.Gaussian()
