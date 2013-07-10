@@ -18,47 +18,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <boost/python.hpp>
+#include <bob/python/ndarray.h>
 #include <boost/shared_ptr.hpp>
 #include <bob/machine/LinearScoring.h>
+#include <boost/python/stl_iterator.hpp>
 #include <vector>
 
-#include <bob/python/ndarray.h>
 
 using namespace boost::python;
 
-static void convertGMMMeanList(list models, std::vector<blitz::Array<double,1> >& models_c) {
-  int size_models = len(models);
-  for(int i=0; i<size_models; ++i) {
-    models_c.push_back(extract<blitz::Array<double,1> >(models[i]));
-  }
+static void convertGMMMeanList(object models, std::vector<blitz::Array<double,1> >& models_c) {
+  stl_input_iterator<bob::python::const_ndarray> dbegin(models), dend;
+  std::vector<bob::python::const_ndarray> vmodels(dbegin, dend);
+
+  for(std::vector<bob::python::const_ndarray>::iterator it=vmodels.begin(); 
+      it!=vmodels.end(); ++it)
+    models_c.push_back(it->bz<double,1>());
 }
 
-static void convertGMMStatsList(list test_stats, std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats_c) {
-  int size_test_stats = len(test_stats);
-  for(int i=0; i<size_test_stats; ++i) {
-    boost::shared_ptr<bob::machine::GMMStats> gs = extract<boost::shared_ptr<bob::machine::GMMStats> >(test_stats[i]);
-    test_stats_c.push_back(gs);
-  }
+static void convertGMMStatsList(object test_stats, std::vector<boost::shared_ptr<const bob::machine::GMMStats> >& test_stats_c) {
+  stl_input_iterator<boost::shared_ptr<bob::machine::GMMStats> > dbegin(test_stats), dend;
+  test_stats_c.assign(dbegin, dend);
 }
 
-static void convertChannelOffsetList(list test_channelOffset, std::vector<blitz::Array<double,1> >& test_channelOffset_c) {
-  int size_test_channelOffset = len(test_channelOffset);
-  for(int i=0; i<size_test_channelOffset; ++i) {
-    test_channelOffset_c.push_back(extract<blitz::Array<double,1> >(test_channelOffset[i]));
-  }
+static void convertChannelOffsetList(object test_channelOffset, std::vector<blitz::Array<double,1> >& test_channelOffset_c) {
+  stl_input_iterator<bob::python::const_ndarray> dbegin(test_channelOffset), dend;
+  std::vector<bob::python::const_ndarray> vtest_channelOffset(dbegin, dend);
+
+  for(std::vector<bob::python::const_ndarray>::iterator it=vtest_channelOffset.begin(); 
+      it!=vtest_channelOffset.end(); ++it)
+    test_channelOffset_c.push_back(it->bz<double,1>());
 }
 
-static void convertGMMMachineList(list models, std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models_c) {
-  int size_models = len(models);
-  for(int i=0; i<size_models; ++i) {
-    boost::shared_ptr<bob::machine::GMMMachine> gm = extract<boost::shared_ptr<bob::machine::GMMMachine> >(models[i]);
-    models_c.push_back(gm);
-  }
+static void convertGMMMachineList(object models, std::vector<boost::shared_ptr<const bob::machine::GMMMachine> >& models_c) {
+  stl_input_iterator<boost::shared_ptr<bob::machine::GMMMachine> > dbegin(models), dend;
+  models_c.assign(dbegin, dend);
 }
 
-static blitz::Array<double, 2> linearScoring1(list models,
+static object linearScoring1(object models,
     bob::python::const_ndarray ubm_mean, bob::python::const_ndarray ubm_variance,
-    list test_stats, list test_channelOffset = list(), // Empty list
+    object test_stats, object test_channelOffset = list(), // Empty list
     bool frame_length_normalisation = false) 
 {
   blitz::Array<double,1> ubm_mean_ = ubm_mean.bz<double,1>();
@@ -70,22 +69,23 @@ static blitz::Array<double, 2> linearScoring1(list models,
   std::vector<boost::shared_ptr<const bob::machine::GMMStats> > test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
-  blitz::Array<double, 2> ret(len(models), len(test_stats));
-  if (len(test_channelOffset) == 0) { //list is empty
-    bob::machine::linearScoring(models_c, ubm_mean_, ubm_variance_, test_stats_c, frame_length_normalisation, ret);
+  bob::python::ndarray ret(bob::core::array::t_float64, models_c.size(), test_stats_c.size());
+  blitz::Array<double,2> ret_ = ret.bz<double,2>();
+  if (test_channelOffset.ptr() == Py_None || len(test_channelOffset) == 0) { //list is empty
+    bob::machine::linearScoring(models_c, ubm_mean_, ubm_variance_, test_stats_c, frame_length_normalisation, ret_);
   }
   else { 
     std::vector<blitz::Array<double,1> > test_channelOffset_c;
     convertChannelOffsetList(test_channelOffset, test_channelOffset_c);
-    bob::machine::linearScoring(models_c, ubm_mean_, ubm_variance_, test_stats_c, test_channelOffset_c, frame_length_normalisation, ret);
+    bob::machine::linearScoring(models_c, ubm_mean_, ubm_variance_, test_stats_c, test_channelOffset_c, frame_length_normalisation, ret_);
   }
  
-  return ret;
+  return ret.self();
 }
 
-static blitz::Array<double, 2> linearScoring2(list models,
+static object linearScoring2(object models,
     bob::machine::GMMMachine& ubm,
-    list test_stats, list test_channelOffset = list(), // Empty list
+    object test_stats, object test_channelOffset = list(), // Empty list
     bool frame_length_normalisation = false) 
 {
   std::vector<boost::shared_ptr<const bob::machine::GMMMachine> > models_c;
@@ -94,17 +94,18 @@ static blitz::Array<double, 2> linearScoring2(list models,
   std::vector<boost::shared_ptr<const bob::machine::GMMStats> > test_stats_c;
   convertGMMStatsList(test_stats, test_stats_c);
 
-  blitz::Array<double, 2> ret(len(models), len(test_stats));
-  if (len(test_channelOffset) == 0) { //list is empty
-    bob::machine::linearScoring(models_c, ubm, test_stats_c, frame_length_normalisation, ret);
+  bob::python::ndarray ret(bob::core::array::t_float64, models_c.size(), test_stats_c.size());
+  blitz::Array<double,2> ret_ = ret.bz<double,2>();
+  if (test_channelOffset.ptr() == Py_None || len(test_channelOffset) == 0) { //list is empty
+    bob::machine::linearScoring(models_c, ubm, test_stats_c, frame_length_normalisation, ret_);
   }
   else { 
     std::vector<blitz::Array<double,1> > test_channelOffset_c;
     convertChannelOffsetList(test_channelOffset, test_channelOffset_c);
-    bob::machine::linearScoring(models_c, ubm, test_stats_c, test_channelOffset_c, frame_length_normalisation, ret);
+    bob::machine::linearScoring(models_c, ubm, test_stats_c, test_channelOffset_c, frame_length_normalisation, ret_);
   }
   
-  return ret;
+  return ret.self();
 }
 
 static double linearScoring3(bob::python::const_ndarray model,

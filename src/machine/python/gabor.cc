@@ -30,15 +30,13 @@
 
 static void bob_extract(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray input_jet_image, bob::python::ndarray output_graph){
   if (output_graph.type().nd == 2){
-    const blitz::Array<double,3> jet_image = input_jet_image.bz<double,3>();
     blitz::Array<double,2> graph = output_graph.bz<double,2>();
-    self.extract(jet_image, graph);
+    self.extract(input_jet_image.bz<double,3>(), graph);
   } else if (output_graph.type().nd == 3){
-    const blitz::Array<double,4> jet_image = input_jet_image.bz<double,4>();
     blitz::Array<double,3> graph = output_graph.bz<double,3>();
-    self.extract(jet_image, graph);
+    self.extract(input_jet_image.bz<double,4>(), graph);
   } else {
-    PYTHON_ERROR(RuntimeError, "parameter `output_graph' should be 2 or 3 dimensional, but you passed %s", output_graph.type().str().c_str());
+    PYTHON_ERROR(RuntimeError, "parameter `output_graph' should be 2 or 3 dimensional, but you passed a " SIZE_T_FMT " dimensional array.", output_graph.type().nd);
   }
 }
 
@@ -56,14 +54,13 @@ static bob::python::ndarray bob_extract2(bob::machine::GaborGraphMachine& self, 
     self.extract(jet_image, graph);
     return output_graph;
   } else {
-    PYTHON_ERROR(RuntimeError, "parameter `input_jet_image' should be 3 or 4 dimensional, but you passed %s", input_jet_image.type().str().c_str());
+    PYTHON_ERROR(RuntimeError, "parameter `input_jet_image' should be 3 or 4 dimensional, but you passed a " SIZE_T_FMT " dimensional array.", input_jet_image.type().nd);
   }
 }
 
 static void bob_average(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray many_graph_jets, bob::python::ndarray averaged_graph_jets){
-  const blitz::Array<double,4> graph_set = many_graph_jets.bz<double,4>();
   blitz::Array<double,3> graph = averaged_graph_jets.bz<double,3>();
-  self.average(graph_set, graph);
+  self.average(many_graph_jets.bz<double,4>(), graph);
 }
 
 static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python::const_ndarray model_graph, bob::python::ndarray probe_graph, const bob::machine::GaborJetSimilarity& similarity_function){
@@ -72,15 +69,13 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
       blitz::Array<double,2> probe = probe_graph.bz<double,2>();
       switch (model_graph.type().nd){
         case 2:{
-          const blitz::Array<double,2> model = model_graph.bz<double,2>();
-          return self.similarity(model, probe, similarity_function);
+          return self.similarity(model_graph.bz<double,2>(), probe, similarity_function);
         }
         case 3:{
-          const blitz::Array<double,3> model = model_graph.bz<double,3>();
-          return self.similarity(model, probe, similarity_function);
+          return self.similarity(model_graph.bz<double,3>(), probe, similarity_function);
         }
         default:
-          PYTHON_ERROR(RuntimeError, "parameter `model_graph' should be 2 or 3 dimensional (because `probe_graph' is 2D), but you passed %s", model_graph.type().str().c_str());
+          PYTHON_ERROR(RuntimeError, "parameter `model_graph' should be 2 or 3 dimensional (because `probe_graph' is 2D), but you passed a " SIZE_T_FMT " dimensional array.", model_graph.type().nd);
       }
     }
 
@@ -88,35 +83,31 @@ static double bob_similarity(bob::machine::GaborGraphMachine& self, bob::python:
       blitz::Array<double,3> probe = probe_graph.bz<double,3>();
       switch (model_graph.type().nd){
         case 3:{
-          const blitz::Array<double,3> model = model_graph.bz<double,3>();
-          return self.similarity(model, probe, similarity_function);
+          return self.similarity(model_graph.bz<double,3>(), probe, similarity_function);
         }
         case 4:{
-          const blitz::Array<double,4> model = model_graph.bz<double,4>();
-          return self.similarity(model, probe, similarity_function);
+          return self.similarity(model_graph.bz<double,4>(), probe, similarity_function);
         }
         default:
-          PYTHON_ERROR(RuntimeError, "parameter `model_graph' should be 3 or 4 dimensional (because `probe_graph' is 3D), but you passed %s", model_graph.type().str().c_str());
+          PYTHON_ERROR(RuntimeError, "parameter `model_graph' should be 3 or 4 dimensional (because `probe_graph' is 3D), but you passed a " SIZE_T_FMT " dimensional array.", model_graph.type().nd);
       }
     }
 
     default: // unknown graph shape
-      PYTHON_ERROR(RuntimeError, "parameter `probe_graph' should be 2 or 3 dimensional, but you passed %s", probe_graph.type().str().c_str());
+      PYTHON_ERROR(RuntimeError, "parameter `probe_graph' should be 2 or 3 dimensional, but you passed a " SIZE_T_FMT " dimensional array.", probe_graph.type().nd);
   }
 }
 
 static double bob_jet_sim(const bob::machine::GaborJetSimilarity& self, bob::python::const_ndarray jet1, bob::python::const_ndarray jet2){
   switch (jet1.type().nd){
     case 1:{
-      const blitz::Array<double,1> j1 = jet1.bz<double,1>(), j2 = jet2.bz<double,1>();
-      return self(j1, j2);
+      return self(jet1.bz<double,1>(), jet2.bz<double,1>());
     }
     case 2:{
-      const blitz::Array<double,2> j1 = jet1.bz<double,2>(), j2 = jet2.bz<double,2>();
-      return self(j1, j2);
+      return self(jet1.bz<double,2>(), jet2.bz<double,2>());
     }
     default:
-      PYTHON_ERROR(RuntimeError, "parameter `jet1' should be 1 or 2 dimensional, but you passed %s", jet1.type().str().c_str());
+      PYTHON_ERROR(RuntimeError, "parameter `jet1' should be 1 or 2 dimensional, but you passed a " SIZE_T_FMT " dimensional array.", jet1.type().nd);
   }
 }
 
@@ -132,6 +123,7 @@ void bind_machine_gabor(){
     .def(
       boost::python::init<bob::machine::GaborJetSimilarity::SimilarityType, const bob::ip::GaborWaveletTransform&>(
         (
+          boost::python::arg("self"),
           boost::python::arg("type"),
           boost::python::arg("gwt") = bob::ip::GaborWaveletTransform()
         ),
@@ -142,18 +134,21 @@ void bind_machine_gabor(){
     .def(
       "save",
       &bob::machine::GaborJetSimilarity::save,
+      (boost::python::arg("self"), boost::python::arg("config")),
       "Saves the parameterization of this Gabor jet similarity function to HDF5 file."
     )
 
     .def(
       "load",
       &bob::machine::GaborJetSimilarity::load,
+      (boost::python::arg("self"), boost::python::arg("config")),
       "Loads the parameterization of this Gabor jet similarity function from HDF5 file."
     )
 
     .def(
       "disparity",
       &bob::machine::GaborJetSimilarity::disparity,
+      (boost::python::arg("self")),
       "Returns the disparity computed by the latest call. Only valid for disparity-like similarity function types."
     )
 
@@ -189,6 +184,7 @@ void bind_machine_gabor(){
 
     .def(
       boost::python::init<const bob::machine::GaborGraphMachine&>(
+          (boost::python::arg("self"), boost::python::arg("other")),
           "Constructs a GaborGraphMachine from the one by doing a deep copy."
       )
     )
@@ -214,12 +210,14 @@ void bind_machine_gabor(){
     .def(
       "save",
       &bob::machine::GaborGraphMachine::save,
+      (boost::python::arg("self"), boost::python::arg("config")),
       "Saves the parameterization of this Gabor graph extractor to HDF5 file."
     )
 
     .def(
       "load",
       &bob::machine::GaborGraphMachine::load,
+      (boost::python::arg("self"), boost::python::arg("config")),
       "Loads the parameterization of this Gabor graph extractor from HDF5 file."
     )
 

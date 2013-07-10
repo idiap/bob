@@ -45,9 +45,6 @@ static object forward1(bob::machine::MLP& m, bob::python::const_ndarray input) {
 
   const bob::core::array::typeinfo& info = input.type();
 
-  if (info.dtype != bob::core::array::t_float64)
-    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
-
   switch(info.nd) {
     case 1:
       {
@@ -66,16 +63,13 @@ static object forward1(bob::machine::MLP& m, bob::python::const_ndarray input) {
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "cannot forward arrays of dimensionality " SIZE_T_FMT ". Only 1D and 2D arrays are supported.", info.nd);
   }
 }
 
 static void forward2(bob::machine::MLP& m, bob::python::const_ndarray input,
     bob::python::ndarray output) {
   const bob::core::array::typeinfo& info = input.type();
-
-  if (info.dtype != bob::core::array::t_float64)
-    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
 
   switch(info.nd) {
     case 1:
@@ -91,16 +85,13 @@ static void forward2(bob::machine::MLP& m, bob::python::const_ndarray input,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "cannot forward arrays of dimensionality " SIZE_T_FMT ". Only 1D and 2D arrays are supported.", info.nd);
   }
 }
 
 static void forward2_(bob::machine::MLP& m, bob::python::const_ndarray input,
     bob::python::ndarray output) {
   const bob::core::array::typeinfo& info = input.type();
-
-  if (info.dtype != bob::core::array::t_float64)
-    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
 
   switch(info.nd) {
     case 1:
@@ -116,7 +107,7 @@ static void forward2_(bob::machine::MLP& m, bob::python::const_ndarray input,
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "cannot forward arrays of dimensionality " SIZE_T_FMT ". Only 1D and 2D arrays are supported.", info.nd);
   }
 }
 
@@ -131,8 +122,11 @@ static void set_input_sub(bob::machine::MLP& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
-    m.setInputSubtraction(val);
+    extract<bob::python::const_ndarray> array_check(o);
+    if (!array_check.check())
+      PYTHON_ERROR(TypeError, "Cannot extract an array from this Python object");
+    bob::python::const_ndarray ar = array_check();
+    m.setInputSubtraction(ar.bz<double,1>());
   }
 }
 
@@ -147,8 +141,11 @@ static void set_input_div(bob::machine::MLP& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
-    m.setInputDivision(val);
+    extract<bob::python::const_ndarray> array_check(o);
+    if (!array_check.check())
+      PYTHON_ERROR(TypeError, "Cannot extract an array from this Python object");
+    bob::python::const_ndarray ar = array_check();
+    m.setInputDivision(ar.bz<double,1>());
   }
 }
 
@@ -172,9 +169,13 @@ static void set_weight(bob::machine::MLP& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    stl_input_iterator<blitz::Array<double,2> > begin(o), end;
-    std::vector<blitz::Array<double,2> > vec(begin, end);
-    m.setWeights(vec);
+    stl_input_iterator<bob::python::const_ndarray> begin(o), end;
+    std::vector<bob::python::const_ndarray> ndata(begin, end);
+    std::vector<blitz::Array<double,2> > vdata;
+    for(std::vector<bob::python::const_ndarray>::iterator it=ndata.begin(); 
+      it!=ndata.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
+    m.setWeights(vdata);
   }
 }
 
@@ -198,9 +199,13 @@ static void set_bias(bob::machine::MLP& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    stl_input_iterator<blitz::Array<double,1> > begin(o), end;
-    std::vector<blitz::Array<double,1> > vec(begin, end);
-    m.setBiases(vec);
+    stl_input_iterator<bob::python::const_ndarray> begin(o), end;
+    std::vector<bob::python::const_ndarray> ndata(begin, end);
+    std::vector<blitz::Array<double,1> > vdata;
+    for(std::vector<bob::python::const_ndarray>::iterator it=ndata.begin(); 
+      it!=ndata.end(); ++it)
+    vdata.push_back(it->bz<double,1>());
+    m.setBiases(vdata);
   }
 }
 
@@ -232,8 +237,8 @@ void bind_machine_mlp() {
   class_<bob::machine::MLP, boost::shared_ptr<bob::machine::MLP> >("MLP", "An MLP object is a representation of a Multi-Layer Perceptron. This implementation is feed-forward and fully-connected. The implementation allows setting of input normalization values and a global activation function. References to fully-connected feed-forward networks: Bishop's Pattern Recognition and Machine Learning, Chapter 5. Figure 5.1 shows what we mean.\n\nMLPs normally are multi-layered systems, with 1 or more hidden layers. As a special case, this implementation also supports connecting the input directly to the output by means of a single weight matrix. This is equivalent of a LinearMachine, with the advantage it can be trained by MLP trainers.", no_init)
     .def(init<const bob::machine::MLP&>((arg("self"), arg("other")), "Initializes a **new** MLP copying data from another instance"))
     .def("__init__", make_constructor(&mlp_from_shape, default_call_policies(), (arg("shape"))), "Builds a new MLP with a shape containing the number of inputs (first element), number of outputs (last element) and the number of neurons in each hidden layer (elements between the first and last element of given tuple). The default activation function will be set to hyperbolic tangent.")
-    .def(init<bob::io::HDF5File&>((arg("config")), "Constructs a new MLP from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
-    .def(init<const bob::machine::MLP&>((arg("machine")), "Copy constructs an MLP machine"))
+    .def(init<bob::io::HDF5File&>((arg("self"), arg("config")), "Constructs a new MLP from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
+    .def(init<const bob::machine::MLP&>((arg("self"), arg("machine")), "Copy constructs an MLP machine"))
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::machine::MLP::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this MLP with the 'other' one to be approximately the same.")

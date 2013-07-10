@@ -42,20 +42,40 @@ static void unroll1(const bob::machine::MLP& m, bob::python::ndarray vec)
 
 static void unroll2(object w, object b, bob::python::ndarray vec)
 {
-  stl_input_iterator<blitz::Array<double,2> > wbegin(w), wend;
-  std::vector<blitz::Array<double,2> > w_(wbegin, wend);
-  stl_input_iterator<blitz::Array<double,1> > bbegin(b), bend;
-  std::vector<blitz::Array<double,1> > b_(bbegin, bend);
+  stl_input_iterator<bob::python::const_ndarray> wbegin(w), wend;
+  std::vector<bob::python::const_ndarray> wv(wbegin, wend);
+  std::vector<blitz::Array<double,2> > w_;
+  for(std::vector<bob::python::const_ndarray>::iterator it=wv.begin(); 
+      it!=wv.end(); ++it)
+    w_.push_back(it->bz<double,2>());
+
+  stl_input_iterator<bob::python::const_ndarray> bbegin(b), bend;
+  std::vector<bob::python::const_ndarray> bv(bbegin, bend);
+  std::vector<blitz::Array<double,1> > b_;
+  for(std::vector<bob::python::const_ndarray>::iterator it=bv.begin(); 
+      it!=bv.end(); ++it)
+    b_.push_back(it->bz<double,1>());
+
   blitz::Array<double,1> vec_ = vec.bz<double,1>();
   bob::machine::unroll(w_, b_, vec_);
 }
 
 static object unroll3(object w, object b)
 {
-  stl_input_iterator<blitz::Array<double,2> > wbegin(w), wend;
-  std::vector<blitz::Array<double,2> > w_(wbegin, wend);
-  stl_input_iterator<blitz::Array<double,1> > bbegin(b), bend;
-  std::vector<blitz::Array<double,1> > b_(bbegin, bend);
+  stl_input_iterator<bob::python::const_ndarray> wbegin(w), wend;
+  std::vector<bob::python::const_ndarray> wv(wbegin, wend);
+  std::vector<blitz::Array<double,2> > w_;
+  for(std::vector<bob::python::const_ndarray>::iterator it=wv.begin(); 
+      it!=wv.end(); ++it)
+    w_.push_back(it->bz<double,2>());
+
+  stl_input_iterator<bob::python::const_ndarray> bbegin(b), bend;
+  std::vector<bob::python::const_ndarray> bv(bbegin, bend);
+  std::vector<blitz::Array<double,1> > b_;
+  for(std::vector<bob::python::const_ndarray>::iterator it=bv.begin(); 
+      it!=bv.end(); ++it)
+    b_.push_back(it->bz<double,1>());
+
   bob::python::ndarray vec(bob::core::array::t_float64, 
     bob::machine::detail::getNbParameters(w_, b_));
   blitz::Array<double,1> vec_ = vec.bz<double,1>();
@@ -65,16 +85,25 @@ static object unroll3(object w, object b)
 
 static void roll1(bob::machine::MLP& m, bob::python::const_ndarray vec)
 {
-  blitz::Array<double,1> vec_ = vec.bz<double,1>();
-  bob::machine::roll(m, vec_);
+  bob::machine::roll(m, vec.bz<double,1>());
 }
 
-static void roll2(list w, list b, bob::python::const_ndarray vec)
+static void roll2(object w, object b, bob::python::const_ndarray vec)
 {
-  stl_input_iterator<blitz::Array<double,2> > wbegin(w), wend;
-  std::vector<blitz::Array<double,2> > w_(wbegin, wend);
-  stl_input_iterator<blitz::Array<double,1> > bbegin(b), bend;
-  std::vector<blitz::Array<double,1> > b_(bbegin, bend);
+  stl_input_iterator<bob::python::ndarray> wbegin(w), wend;
+  std::vector<bob::python::ndarray> wv(wbegin, wend);
+  std::vector<blitz::Array<double,2> > w_;
+  for(std::vector<bob::python::ndarray>::iterator it=wv.begin(); 
+      it!=wv.end(); ++it)
+    w_.push_back(it->bz<double,2>());
+
+  stl_input_iterator<bob::python::ndarray> bbegin(b), bend;
+  std::vector<bob::python::ndarray> bv(bbegin, bend);
+  std::vector<blitz::Array<double,1> > b_;
+  for(std::vector<bob::python::ndarray>::iterator it=bv.begin(); 
+      it!=bv.end(); ++it)
+    b_.push_back(it->bz<double,1>());
+
   bob::machine::roll(w_, b_, vec.bz<double,1>());
 }
 

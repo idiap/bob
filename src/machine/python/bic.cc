@@ -55,13 +55,14 @@ void bind_machine_bic(){
       ".. [1] Marcio Luis Teixeira. The Bayesian intrapersonal/extrapersonal classifier. Colorado State University, 2003.\n"
       ".. [2] Manuel Guenther and Rolf P. Wuertz. Face detection and recognition using maximum likelihood classifiers on Gabor graphs. International Journal of Pattern Recognition and Artificial Intelligence, 23(3):433-461, 2009.",
       boost::python::init<bool>(
-          (boost::python::arg("use_dffs") = false),
+          (boost::python::arg("self"), boost::python::arg("use_dffs") = false),
           "Initializes an empty BICMachine. The optional boolean parameter specifies whether to use the DFFS in the BIC implementation. \n\n.. warning :: Use this flag with care, the default value 'False' is usually the best choice!"
       )
     )
 
     .def(
       boost::python::init<const bob::machine::BICMachine&>(
+          (boost::python::arg("self")),
           "Constructs one BICMachine from another one by doing a deep copy."
       )
     )

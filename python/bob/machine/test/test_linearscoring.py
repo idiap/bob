@@ -79,6 +79,10 @@ class LinearScoringTest(unittest.TestCase):
     # 1/b/ Without test_channelOffset, with frame-length normalisation
     scores = bob.machine.linear_scoring([model1, model2], ubm, [stats1, stats2, stats3], [], True)
     self.assertTrue((abs(scores - ref_scores_01) < 1e-7).all())
+    scores = bob.machine.linear_scoring([model1, model2], ubm, [stats1, stats2, stats3], (), True)
+    self.assertTrue((abs(scores - ref_scores_01) < 1e-7).all())
+    scores = bob.machine.linear_scoring([model1, model2], ubm, [stats1, stats2, stats3], None, True)
+    self.assertTrue((abs(scores - ref_scores_01) < 1e-7).all())
 
     # 1/c/ With test_channelOffset, without frame-length normalisation
     scores = bob.machine.linear_scoring([model1, model2], ubm, [stats1, stats2, stats3], test_channeloffset)
