@@ -44,8 +44,12 @@ static object rprop_get_delta_bias(const bob::trainer::MLPRPropTrainer& t) {
 static void rprop_set_delta(bob::trainer::MLPRPropTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   t.setDeltas(vdata_ref);
 }
 
@@ -58,8 +62,12 @@ static void rprop_set_delta2(bob::trainer::MLPRPropTrainer& t,
 static void rprop_set_delta_bias(bob::trainer::MLPRPropTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,1> > dbegin(data), dend;
-  std::vector<blitz::Array<double,1> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,1> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,1>());
   t.setBiasDeltas(vdata_ref);
 }
 
@@ -86,8 +94,12 @@ static object rprop_get_prev_deriv_bias(const bob::trainer::MLPRPropTrainer& t) 
 static void rprop_set_prev_deriv(bob::trainer::MLPRPropTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   t.setPreviousDerivatives(vdata_ref);
 }
 
@@ -100,8 +112,12 @@ static void rprop_set_prev_deriv2(bob::trainer::MLPRPropTrainer& t,
 static void rprop_set_prev_deriv_bias(bob::trainer::MLPRPropTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,1> > dbegin(data), dend;
-  std::vector<blitz::Array<double,1> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,1> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,1>());
   t.setPreviousBiasDerivatives(vdata_ref);
 }
 
@@ -203,9 +219,9 @@ void bind_trainer_rprop() {
           "\n"
           ))
  
-    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("batch_size"), arg("cost"), arg("machine")), "Initializes a new MLPRPropTrainer trainer according to a given machine settings and a training batch size. Good values for batch sizes are tens of samples. RProp is a 'batch' training algorithm. Do not try to set batch_size to a too-low value."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost>, const bob::machine::MLP&>((arg("self"), arg("batch_size"), arg("cost"), arg("machine")), "Initializes a new MLPRPropTrainer trainer according to a given machine settings and a training batch size. Good values for batch sizes are tens of samples. RProp is a 'batch' training algorithm. Do not try to set batch_size to a too-low value."))
     
-    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("batch_size"), arg("cost")), "Creates a MLPRPropTrainer."))
+    .def(init<size_t, boost::shared_ptr<bob::trainer::Cost> >((arg("self"), arg("batch_size"), arg("cost")), "Creates a MLPRPropTrainer."))
     
     .def("reset", &bob::trainer::MLPRPropTrainer::reset, (arg("self")), "Re-initializes the whole training apparatus to start training a new machine. This will effectively reset all Delta matrices to their initial values and set the previous derivatives to zero as described on the section II.C of the RProp paper.")
     

@@ -30,17 +30,14 @@ using namespace boost::python;
 static double mlpbase_cost1(bob::trainer::MLPBaseTrainer& t, 
   bob::python::const_ndarray target)
 {
-  const blitz::Array<double,2> target_ = target.bz<double,2>();
-  return t.cost(target_);
+  return t.cost(target.bz<double,2>());
 }
 
 static double mlpbase_cost2(bob::trainer::MLPBaseTrainer& t,
   const bob::machine::MLP& m, bob::python::const_ndarray input,
   bob::python::const_ndarray target)
 {
-  const blitz::Array<double,2> input_ = input.bz<double,2>();
-  const blitz::Array<double,2> target_ = target.bz<double,2>();
-  return t.cost(m, input_, target_);
+  return t.cost(m, input.bz<double,2>(), target.bz<double,2>());
 }
 
 static object mlpbase_get_error(const bob::trainer::MLPBaseTrainer& t) {
@@ -82,8 +79,7 @@ static void mlpbase_set_error(bob::trainer::MLPBaseTrainer& t,
 static void mlpbase_set_error2(bob::trainer::MLPBaseTrainer& t, 
   bob::python::const_ndarray v, const size_t k)
 {
-  const blitz::Array<double,2> v_ = v.bz<double,2>();
-  t.setError(v_, k);
+  t.setError(v.bz<double,2>(), k);
 }
 
 static void mlpbase_set_output(bob::trainer::MLPBaseTrainer& t, 

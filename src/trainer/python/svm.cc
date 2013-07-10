@@ -28,23 +28,32 @@ using namespace boost::python;
 
 static boost::shared_ptr<bob::machine::SupportVector> train1 
 (const bob::trainer::SVMTrainer& trainer, object data) {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata_ref(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata_ref.begin(); 
+      it!=vdata_ref.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
   return trainer.train(vdata);
 }
 
 static boost::shared_ptr<bob::machine::SupportVector> train2
 (const bob::trainer::SVMTrainer& trainer, object data, bob::python::const_ndarray sub,
  bob::python::const_ndarray div) {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata_ref(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata_ref.begin(); 
+      it!=vdata_ref.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
   return trainer.train(vdata, sub.bz<double,1>(), div.bz<double,1>());
 }
 
 void bind_trainer_svm() {
   class_<bob::trainer::SVMTrainer, boost::shared_ptr<bob::trainer::SVMTrainer> >("SVMTrainer", "This class emulates the behavior of the command line utility called svm-train, from libsvm. These bindings do not support:\n\n * Precomputed Kernels\n * Regression Problems\n * Different weights for every label (-wi option in svm-train)\n\nFell free to implement those and remove these remarks.", no_init)
     .def(init<optional<bob::machine::SupportVector::svm_t, bob::machine::SupportVector::kernel_t, int, double, double, double, double, double, double, double, bool, bool> >(
-          (arg("svm_type")=bob::machine::SupportVector::C_SVC,
+          (arg("self"),
+           arg("svm_type")=bob::machine::SupportVector::C_SVC,
            arg("kernel_type")=bob::machine::SupportVector::RBF,
            arg("degree")=3, //for poly
            arg("gamma")=0., //for poly/rbf/sigmoid

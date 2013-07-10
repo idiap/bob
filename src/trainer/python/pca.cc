@@ -134,7 +134,7 @@ void bind_trainer_pca() {
           "   This flag determines if this trainer will use the SVD method (set it to ``True``) to calculate the principal components or the Covariance method (set it to ``False``)\n"
           ))
 
-    .def(init<const bob::trainer::PCATrainer&>((args("self"), args("other")), "Copy constructor - use this to deepcopy another trainer"))
+    .def(init<const bob::trainer::PCATrainer&>((arg("self"), arg("other")), "Copy constructor - use this to deepcopy another trainer"))
 
     .def(self == self)
     .def(self != self)
