@@ -3,3 +3,5 @@
 .* : .*forbids casting between pointer-to-function and pointer-to-object.*
 .* : ^\s*1.*This is a warning message.*
 .* : .*html_static_path entry.*_static.*does not exist.*
+.* : .*LaTeX Warning:\s+.*
+.* : .*Package\s+\S+\s+Warning:.*
