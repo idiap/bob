@@ -36,19 +36,19 @@ void bind_trainer_empca()
     .add_property("max_iterations", &EMTrainerLinearBase::getMaxIterations, &EMTrainerLinearBase::setMaxIterations, "Max iterations")
     .add_property("compute_likelihood_variable", &EMTrainerLinearBase::getComputeLikelihood, &EMTrainerLinearBase::setComputeLikelihood, "Indicates whether the log likelihood should be computed during EM or not")
     .add_property("rng", &EMTrainerLinearBase::getRng, &EMTrainerLinearBase::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
-    .def("train", &EMTrainerLinearBase::train, (arg("machine"), arg("data")), "Trains a machine using data")
-    .def("initialize", &EMTrainerLinearBase::initialize, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("finalize", &EMTrainerLinearBase::finalize, (arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
-    .def("e_step", &EMTrainerLinearBase::eStep, (arg("machine"), arg("data")),
+    .def("train", &EMTrainerLinearBase::train, (arg("self"), arg("machine"), arg("data")), "Trains a machine using data")
+    .def("initialize", &EMTrainerLinearBase::initialize, (arg("self"), arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("finalize", &EMTrainerLinearBase::finalize, (arg("self"), arg("machine"), arg("data")), "This method is called at the end of the EM algorithm")
+    .def("e_step", &EMTrainerLinearBase::eStep, (arg("self"), arg("machine"), arg("data")),
        "Updates the hidden variable distribution (or the sufficient statistics) given the Machine parameters. ")
-    .def("m_step", &EMTrainerLinearBase::mStep, (arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("compute_likelihood", &EMTrainerLinearBase::computeLikelihood, (arg("machine")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
+    .def("m_step", &EMTrainerLinearBase::mStep, (arg("self"), arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("compute_likelihood", &EMTrainerLinearBase::computeLikelihood, (arg("self"), arg("machine")), "Computes the current log likelihood given the hidden variable distribution (or the sufficient statistics)")
   ;
 
   class_<bob::trainer::EMPCATrainer, boost::noncopyable, bases<EMTrainerLinearBase> >("EMPCATrainer",
       "This class implements the EM algorithm for a Linear Machine (Probabilistic PCA).\n"
-      "See Section 12.2 of Bishop, \"Pattern recognition and machine learning\", 2006", init<optional<double,size_t,bool> >((arg("convergence_threshold"), arg("max_iterations"), arg("compute_likelihood"))))
-    .def(init<const bob::trainer::EMPCATrainer&>((arg("trainer")), "Copy constructs an EMPCATrainer"))
+      "See Section 12.2 of Bishop, \"Pattern recognition and machine learning\", 2006", init<optional<double,size_t,bool> >((arg("self"), arg("convergence_threshold"), arg("max_iterations"), arg("compute_likelihood"))))
+    .def(init<const bob::trainer::EMPCATrainer&>((arg("self"), arg("trainer")), "Copy constructs an EMPCATrainer"))
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::trainer::EMPCATrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this EMPCATrainer with the 'other' one to be approximately the same.")

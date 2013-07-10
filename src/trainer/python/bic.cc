@@ -29,6 +29,7 @@ void bind_trainer_bic(){
           "or an IEC model (containing mean and variance only). See :py:class:`bob.machine.BICMachine` for more details.",
       boost::python::init<int,int>(
           (
+              boost::python::arg("self"),
               boost::python::arg("intra_dim"),
               boost::python::arg("extra_dim")
           ),
@@ -38,6 +39,7 @@ void bind_trainer_bic(){
 
     .def(
       boost::python::init<>(
+        (boost::python::arg("self")),
         "Initializes the BICTrainer to train a IEC model."
       )
     )
@@ -46,6 +48,7 @@ void bind_trainer_bic(){
       "train",
       &bob::trainer::BICTrainer::train,
       (
+          boost::python::arg("self"),
           boost::python::arg("machine"),
           boost::python::arg("intra_differences"),
           boost::python::arg("extra_differences")

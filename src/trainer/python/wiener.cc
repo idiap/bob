@@ -31,8 +31,7 @@ using namespace boost::python;
 void py_train1(bob::trainer::WienerTrainer& t, 
   bob::machine::WienerMachine& m, bob::python::const_ndarray data)
 {
-  const blitz::Array<double,3> data_ = data.bz<double,3>();
-  t.train(m, data_);
+  t.train(m, data.bz<double,3>());
 }
 
 object py_train2(bob::trainer::WienerTrainer& t, 
@@ -48,8 +47,8 @@ object py_train2(bob::trainer::WienerTrainer& t,
 
 void bind_trainer_wiener() {
 
-  class_<bob::trainer::WienerTrainer, boost::shared_ptr<bob::trainer::WienerTrainer> >("WienerTrainer", "Trains a WienerMachine on a given dataset.\nReference:\n'Computer Vision: Algorithms and Applications', Richard Szeliski\n(Part 3.4.3)", init<>("Initializes a new WienerTrainer."))
-    .def(init<const bob::trainer::WienerTrainer&>(args("other"), "Copy constructs a WienerTrainer"))
+  class_<bob::trainer::WienerTrainer, boost::shared_ptr<bob::trainer::WienerTrainer> >("WienerTrainer", "Trains a WienerMachine on a given dataset.\nReference:\n'Computer Vision: Algorithms and Applications', Richard Szeliski\n(Part 3.4.3)", init<>((arg("self")), "Initializes a new WienerTrainer."))
+    .def(init<const bob::trainer::WienerTrainer&>((arg("self"), arg("other")), "Copy constructs a WienerTrainer"))
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::trainer::WienerTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this WienerTrainer with the 'other' one to be approximately the same.")

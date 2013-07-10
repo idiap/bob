@@ -45,8 +45,8 @@ object py_train2(bob::trainer::WhiteningTrainer& t,
 
 void bind_trainer_whitening() 
 {
-  class_<bob::trainer::WhiteningTrainer, boost::shared_ptr<bob::trainer::WhiteningTrainer> >("WhiteningTrainer", "Trains a linear machine to perform whitening.\nReference:\n'Independent component analysis: algorithms and applications', Aapo Hyvarinen, Erkki Oja, Neural Networks, 2000, vol. 13, p. 411--430\nGiven a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.", init<>("Initializes a new Whitening trainer."))
-    .def(init<const bob::trainer::WhiteningTrainer&>(args("other"), "Copy constructs a WhiteningTrainer"))
+  class_<bob::trainer::WhiteningTrainer, boost::shared_ptr<bob::trainer::WhiteningTrainer> >("WhiteningTrainer", "Trains a linear machine to perform whitening.\nReference:\n'Independent component analysis: algorithms and applications', Aapo Hyvarinen, Erkki Oja, Neural Networks, 2000, vol. 13, p. 411--430\nGiven a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.", init<>((arg("self")), "Initializes a new Whitening trainer."))
+    .def(init<const bob::trainer::WhiteningTrainer&>((arg("self"), arg("other")), "Copy constructs a WhiteningTrainer"))
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::trainer::WhiteningTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this WhiteningTrainer with the 'other' one to be approximately the same.")

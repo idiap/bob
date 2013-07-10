@@ -27,35 +27,14 @@
 
 using namespace boost::python;
 
-
-static object vector_as_list(const std::vector<blitz::Array<double,1> >& vec) 
+template <int N>
+static object vector_as_list(const std::vector<blitz::Array<double,N> >& vec) 
 {
   list retval;
-  for(size_t k=0; k<vec.size(); ++k) 
-  {
-    const blitz::Array<double,1>& array = vec[k];
-    bob::python::ndarray a(bob::core::array::t_float64, array.extent(0));
-    blitz::Array<double,1> a_ = a.bz<double,1>();
-    a_ = array;
-    retval.append(a); //copy
-  }
-  return retval;
+  for(size_t k=0; k<vec.size(); ++k)
+    retval.append(vec[k]);
+  return tuple(retval);
 }
-
-static object vector_as_list(const std::vector<blitz::Array<double,2> >& vec) 
-{
-  list retval;
-  for(size_t k=0; k<vec.size(); ++k) 
-  {
-    const blitz::Array<double,2>& array = vec[k];
-    bob::python::ndarray a(bob::core::array::t_float64, array.extent(0), array.extent(1));
-    blitz::Array<double,2> a_ = a.bz<double,2>();
-    a_ = array;
-    retval.append(a); //copy
-  }
-  return retval;
-}
-
 
 static void extract_GMMStats(object data, 
   std::vector<std::vector<boost::shared_ptr<bob::machine::GMMStats> > >& training_data)
@@ -146,36 +125,16 @@ static void isv_set_z(bob::trainer::ISVTrainer& t, object data)
 }
 
 
-static object isv_get_accUA1(const bob::trainer::ISVTrainer& trainer)
-{
-  const blitz::Array<double,3>& acc_ref = trainer.getAccUA1();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1), acc_ref.extent(2));
-  blitz::Array<double,3> acc_ = acc.bz<double,3>();
-  acc_ = acc_ref;
-  return acc.self();
-}
-
 static void isv_set_accUA1(bob::trainer::ISVTrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,3> acc_ = acc.bz<double,3>();
-  trainer.setAccUA1(acc_);
-}
-
-static object isv_get_accUA2(const bob::trainer::ISVTrainer& trainer)
-{
-  const blitz::Array<double,2>& acc_ref = trainer.getAccUA2();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1));
-  blitz::Array<double,2> acc_ = acc.bz<double,2>();
-  acc_ = acc_ref;
-  return acc.self();
+  trainer.setAccUA1(acc.bz<double,3>());
 }
 
 static void isv_set_accUA2(bob::trainer::ISVTrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,2> acc_ = acc.bz<double,2>();
-  trainer.setAccUA2(acc_);
+  trainer.setAccUA2(acc.bz<double,2>());
 }
 
 
@@ -327,108 +286,47 @@ static void jfa_set_z(bob::trainer::JFATrainer& t, object data)
 }
 
 
-static object jfa_get_accUA1(const bob::trainer::JFATrainer& trainer)
-{
-  const blitz::Array<double,3>& acc_ref = trainer.getAccUA1();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1), acc_ref.extent(2));
-  blitz::Array<double,3> acc_ = acc.bz<double,3>();
-  acc_ = acc_ref;
-  return acc.self();
-}
-
 static void jfa_set_accUA1(bob::trainer::JFATrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,3> acc_ = acc.bz<double,3>();
-  trainer.setAccUA1(acc_);
-}
-
-static object jfa_get_accUA2(const bob::trainer::JFATrainer& trainer)
-{
-  const blitz::Array<double,2>& acc_ref = trainer.getAccUA2();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1));
-  blitz::Array<double,2> acc_ = acc.bz<double,2>();
-  acc_ = acc_ref;
-  return acc.self();
+  trainer.setAccUA1(acc.bz<double,3>());
 }
 
 static void jfa_set_accUA2(bob::trainer::JFATrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,2> acc_ = acc.bz<double,2>();
-  trainer.setAccUA2(acc_);
-}
-
-static object jfa_get_accVA1(const bob::trainer::JFATrainer& trainer)
-{
-  const blitz::Array<double,3>& acc_ref = trainer.getAccVA1();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1), acc_ref.extent(2));
-  blitz::Array<double,3> acc_ = acc.bz<double,3>();
-  acc_ = acc_ref;
-  return acc.self();
+  trainer.setAccUA2(acc.bz<double,2>());
 }
 
 static void jfa_set_accVA1(bob::trainer::JFATrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,3> acc_ = acc.bz<double,3>();
-  trainer.setAccVA1(acc_);
-}
-
-static object jfa_get_accVA2(const bob::trainer::JFATrainer& trainer)
-{
-  const blitz::Array<double,2>& acc_ref = trainer.getAccVA2();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0), acc_ref.extent(1));
-  blitz::Array<double,2> acc_ = acc.bz<double,2>();
-  acc_ = acc_ref;
-  return acc.self();
+  trainer.setAccVA1(acc.bz<double,3>());
 }
 
 static void jfa_set_accVA2(bob::trainer::JFATrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,2> acc_ = acc.bz<double,2>();
-  trainer.setAccVA2(acc_);
-}
-
-static object jfa_get_accDA1(const bob::trainer::JFATrainer& trainer)
-{
-  const blitz::Array<double,1>& acc_ref = trainer.getAccDA1();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0));
-  blitz::Array<double,1> acc_ = acc.bz<double,1>();
-  acc_ = acc_ref;
-  return acc.self();
+  trainer.setAccVA2(acc.bz<double,2>());
 }
 
 static void jfa_set_accDA1(bob::trainer::JFATrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,1> acc_ = acc.bz<double,1>();
-  trainer.setAccDA1(acc_);
-}
-
-static object jfa_get_accDA2(const bob::trainer::JFATrainer& trainer)
-{
-  const blitz::Array<double,1>& acc_ref = trainer.getAccDA2();
-  bob::python::ndarray acc(bob::core::array::t_float64, acc_ref.extent(0));
-  blitz::Array<double,1> acc_ = acc.bz<double,1>();
-  acc_ = acc_ref;
-  return acc.self();
+  trainer.setAccDA1(acc.bz<double,1>());
 }
 
 static void jfa_set_accDA2(bob::trainer::JFATrainer& trainer, 
   bob::python::const_ndarray acc)
 {
-  const blitz::Array<double,1> acc_ = acc.bz<double,1>();
-  trainer.setAccDA2(acc_);
+  trainer.setAccDA2(acc.bz<double,1>());
 }
-
 
 
 void bind_trainer_jfa() 
 {
-  class_<bob::trainer::ISVTrainer, boost::noncopyable >("ISVTrainer", "Create a trainer for the ISV.", init<optional<const size_t, const double> >((arg("max_iterations")=10, arg("relevance_factor")=4.),"Initializes a new ISVTrainer."))
-    .def(init<const bob::trainer::ISVTrainer&>((arg("other")), "Copy constructs an ISVTrainer"))
+  class_<bob::trainer::ISVTrainer, boost::noncopyable >("ISVTrainer", "Create a trainer for the ISV.", init<optional<const size_t, const double> >((arg("self"), arg("max_iterations")=10, arg("relevance_factor")=4.),"Initializes a new ISVTrainer."))
+    .def(init<const bob::trainer::ISVTrainer&>((arg("self"), arg("other")), "Copy constructs an ISVTrainer"))
     .add_property("max_iterations", &bob::trainer::ISVTrainer::getMaxIterations, &bob::trainer::ISVTrainer::setMaxIterations, "Max iterations")
     .add_property("rng", &bob::trainer::ISVTrainer::getRng, &bob::trainer::ISVTrainer::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
     .add_property("__X__", &isv_get_x, &isv_set_x)
@@ -442,12 +340,12 @@ void bind_trainer_jfa()
     .def("m_step", &isv_mstep, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the m-step procedure.")
     .def("finalize", &isv_finalize, (arg("self"), arg("isv_base"), arg("gmm_stats")), "Call the finalization procedure.")
     .def("enrol", &isv_enrol, (arg("self"), arg("isv_machine"), arg("gmm_stats"), arg("n_iter")), "Call the enrolment procedure.")
-    .add_property("acc_u_a1", &isv_get_accUA1, &isv_set_accUA1, "Accumulator updated during the E-step")
-    .add_property("acc_u_a2", &isv_get_accUA2, &isv_set_accUA2, "Accumulator updated during the E-step")
+    .add_property("acc_u_a1", make_function(&bob::trainer::ISVTrainer::getAccUA1, return_value_policy<copy_const_reference>()), &isv_set_accUA1, "Accumulator updated during the E-step")
+    .add_property("acc_u_a2", make_function(&bob::trainer::ISVTrainer::getAccUA2, return_value_policy<copy_const_reference>()), &isv_set_accUA2, "Accumulator updated during the E-step")
   ;
 
-  class_<bob::trainer::JFATrainer, boost::noncopyable >("JFATrainer", "Create a trainer for the ISV.", init<optional<const size_t> >((arg("max_iterations")=10),"Initializes a new JFATrainer."))
-    .def(init<const bob::trainer::JFATrainer&>((arg("other")), "Copy constructs an JFATrainer"))
+  class_<bob::trainer::JFATrainer, boost::noncopyable >("JFATrainer", "Create a trainer for the ISV.", init<optional<const size_t> >((arg("self"), arg("max_iterations")=10),"Initializes a new JFATrainer."))
+    .def(init<const bob::trainer::JFATrainer&>((arg("self"), arg("other")), "Copy constructs an JFATrainer"))
     .add_property("max_iterations", &bob::trainer::JFATrainer::getMaxIterations, &bob::trainer::JFATrainer::setMaxIterations, "Max iterations")
     .add_property("rng", &bob::trainer::JFATrainer::getRng, &bob::trainer::JFATrainer::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
     .add_property("__X__", &jfa_get_x, &jfa_set_x)
@@ -469,11 +367,11 @@ void bind_trainer_jfa()
     .def("m_step3", &jfa_mstep3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd m-step procedure (for the d subspace).")
     .def("finalize3", &jfa_finalize3, (arg("self"), arg("jfa_base"), arg("gmm_stats")), "Call the 3rd finalization procedure (for the d subspace).")
     .def("enrol", &jfa_enrol, (arg("self"), arg("jfa_machine"), arg("gmm_stats"), arg("n_iter")), "Call the enrolment procedure.")
-    .add_property("acc_v_a1", &jfa_get_accVA1, &jfa_set_accVA1, "Accumulator updated during the E-step")
-    .add_property("acc_v_a2", &jfa_get_accVA2, &jfa_set_accVA2, "Accumulator updated during the E-step")
-    .add_property("acc_u_a1", &jfa_get_accUA1, &jfa_set_accUA1, "Accumulator updated during the E-step")
-    .add_property("acc_u_a2", &jfa_get_accUA2, &jfa_set_accUA2, "Accumulator updated during the E-step")
-    .add_property("acc_d_a1", &jfa_get_accDA1, &jfa_set_accDA1, "Accumulator updated during the E-step")
-    .add_property("acc_d_a2", &jfa_get_accDA2, &jfa_set_accDA2, "Accumulator updated during the E-step")
+    .add_property("acc_v_a1", make_function(&bob::trainer::JFATrainer::getAccVA1, return_value_policy<copy_const_reference>()), &jfa_set_accVA1, "Accumulator updated during the E-step")
+    .add_property("acc_v_a2", make_function(&bob::trainer::JFATrainer::getAccVA2, return_value_policy<copy_const_reference>()), &jfa_set_accVA2, "Accumulator updated during the E-step")
+    .add_property("acc_u_a1", make_function(&bob::trainer::JFATrainer::getAccUA1, return_value_policy<copy_const_reference>()), &jfa_set_accUA1, "Accumulator updated during the E-step")
+    .add_property("acc_u_a2", make_function(&bob::trainer::JFATrainer::getAccUA2, return_value_policy<copy_const_reference>()), &jfa_set_accUA2, "Accumulator updated during the E-step")
+    .add_property("acc_d_a1", make_function(&bob::trainer::JFATrainer::getAccDA1, return_value_policy<copy_const_reference>()), &jfa_set_accDA1, "Accumulator updated during the E-step")
+    .add_property("acc_d_a2", make_function(&bob::trainer::JFATrainer::getAccDA2, return_value_policy<copy_const_reference>()), &jfa_set_accDA2, "Accumulator updated during the E-step")
   ;
 }

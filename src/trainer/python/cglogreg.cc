@@ -28,11 +28,6 @@ using namespace boost::python;
 object train1(const bob::trainer::CGLogRegTrainer& t,
   bob::python::const_ndarray data1, bob::python::const_ndarray data2)
 {
-  const bob::core::array::typeinfo& info1 = data1.type();
-  const bob::core::array::typeinfo& info2 = data2.type();
-  if(info1.dtype != bob::core::array::t_float64 || info1.nd != 2 ||
-     info2.dtype != bob::core::array::t_float64 || info2.nd != 2)
-    PYTHON_ERROR(TypeError, "Can only train with double precision array of 2 dimensions.");
   bob::machine::LinearMachine m;
   t.train(m, data1.bz<double,2>(), data2.bz<double,2>());
   return object(m);
@@ -41,18 +36,13 @@ object train1(const bob::trainer::CGLogRegTrainer& t,
 void train2(const bob::trainer::CGLogRegTrainer& t, bob::machine::LinearMachine& m, 
   bob::python::const_ndarray data1, bob::python::const_ndarray data2)
 {
-  const bob::core::array::typeinfo& info1 = data1.type();
-  const bob::core::array::typeinfo& info2 = data2.type();
-  if(info1.dtype != bob::core::array::t_float64 || info1.nd != 2 ||
-     info2.dtype != bob::core::array::t_float64 || info2.nd != 2)
-    PYTHON_ERROR(TypeError, "Can only train with double precision array of 2 dimensions.");
   t.train(m, data1.bz<double,2>(), data2.bz<double,2>());
 }
 
 void bind_trainer_cglogreg() 
 {
-  class_<bob::trainer::CGLogRegTrainer, boost::shared_ptr<bob::trainer::CGLogRegTrainer> >("CGLogRegTrainer", "Trains a linear machine to perform Linear Logistic Regression. References:\n1. A comparison of numerical optimizers for logistic regression, T. Minka, http://research.microsoft.com/en-us/um/people/minka/papers/logreg/\n2. FoCal, http://www.dsp.sun.ac.za/~nbrummer/focal/.", init<optional<const double, const double, const size_t, const double> >((arg("prior")=0.5, arg("convergence_threshold")=1e-5, arg("max_iterations")=10000, arg("lambda")=0.), "Initializes a new Linear Logistic Regression trainer. The training stage will place the resulting weights (and bias) in a linear machine with a single output dimension."))
-    .def(init<bob::trainer::CGLogRegTrainer&>(args("other")))
+  class_<bob::trainer::CGLogRegTrainer, boost::shared_ptr<bob::trainer::CGLogRegTrainer> >("CGLogRegTrainer", "Trains a linear machine to perform Linear Logistic Regression. References:\n1. A comparison of numerical optimizers for logistic regression, T. Minka, http://research.microsoft.com/en-us/um/people/minka/papers/logreg/\n2. FoCal, http://www.dsp.sun.ac.za/~nbrummer/focal/.", init<optional<const double, const double, const size_t, const double> >((arg("self"), arg("prior")=0.5, arg("convergence_threshold")=1e-5, arg("max_iterations")=10000, arg("lambda")=0.), "Initializes a new Linear Logistic Regression trainer. The training stage will place the resulting weights (and bias) in a linear machine with a single output dimension."))
+    .def(init<bob::trainer::CGLogRegTrainer&>((arg("self"), arg("other"))))
     .def(self == self)
     .def(self != self)
     .add_property("prior", &bob::trainer::CGLogRegTrainer::getPrior, &bob::trainer::CGLogRegTrainer::setPrior, "The synthetic prior (should be in range ]0.,1.[.")

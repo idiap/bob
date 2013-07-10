@@ -33,40 +33,60 @@ typedef bob::trainer::EMTrainer<bob::machine::PLDABase, std::vector<blitz::Array
 
 static void plda_train(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   // Calls the train function
   t.train(m, vdata_ref);
 }
 
 static void plda_initialize(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   // Calls the initialization function
   t.initialize(m, vdata_ref);
 }
 
 static void plda_eStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   // Calls the eStep function
   t.eStep(m, vdata_ref);
 }
 
 static void plda_mStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   // Calls the mStep function
   t.mStep(m, vdata_ref);
 }
 
 static void plda_finalize(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 { 
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   // Calls the finalization function
   t.finalize(m, vdata_ref);
 }
