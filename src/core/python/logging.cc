@@ -23,6 +23,7 @@
 #include <pthread.h>
 #include <boost/python.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <bob/python/ndarray.h>
 #include <bob/python/gil.h>
@@ -43,6 +44,10 @@
 
 using namespace boost::python;
 
+#define PYTHON_LOGGING_DEBUG 0
+
+static bob::core::OutputStream static_log("stdout");
+
 /**
  * Objects of this class are able to redirect the data injected into a
  * bob::core::OutputStream to be re-injected in a given python callable object,
@@ -59,7 +64,24 @@ struct PythonLoggingOutputDevice: public bob::core::OutputDevice {
      * that implements the __call__() slot.
      */
     PythonLoggingOutputDevice(object callable):
-      m_callable(callable) { }
+      m_callable(callable), m_mutex(new boost::mutex) {
+#if   PYTHON_LOGGING_DEBUG != 0
+        pthread_t thread_id = pthread_self();
+        static_log << "(0x" << std::hex << thread_id << std::dec
+          << ") Constructing new PythonLoggingOutputDevice from callable"
+          << std::endl;
+#endif
+      }
+
+    PythonLoggingOutputDevice(const PythonLoggingOutputDevice& other):
+      m_callable(other.m_callable), m_mutex(other.m_mutex) {
+#if   PYTHON_LOGGING_DEBUG != 0
+        pthread_t thread_id = pthread_self();
+        static_log << "(0x" << std::hex << thread_id << std::dec
+          << ") Copy-constructing PythonLoggingOutputDevice"
+          << std::endl;
+#endif
+      }
 
     /**
      * D'tor
@@ -79,90 +101,103 @@ struct PythonLoggingOutputDevice: public bob::core::OutputDevice {
      * Writes a message to the callable.
      */
     virtual inline std::streamsize write(const char* s, std::streamsize n) {
-      static boost::mutex mutex;
 #if   ((BOOST_VERSION / 100) % 1000) > 35
-      boost::lock_guard<boost::mutex> lock(mutex);
+      boost::lock_guard<boost::mutex> lock(*m_mutex);
 #endif
       if (TPY_ISNONE(m_callable)) return 0;
-      std::string value(s);
+      std::string value(s, n);
       if (std::isspace(value[n-1])) { //remove accidental newlines in the end
         value = value.substr(0, n-1);
       }
       bob::python::gil gil;
+#if   PYTHON_LOGGING_DEBUG != 0
+      pthread_t thread_id = pthread_self();
+      static_log << "(0x" << std::hex << thread_id << std::dec
+        << ") Processing message `" << value << "' (size = " << n << ")" << std::endl;
+#endif
       m_callable(value);
+#if   PYTHON_LOGGING_DEBUG != 0
+      m_callable.attr("flush")();
+#endif
       return n;
     }
 
   private:
     object m_callable; ///< the callable we use to stream the data out.
+    boost::shared_ptr<boost::mutex> m_mutex; ///< multi-threading guardian
 };
 
 struct message_info_t {
-  bob::core::OutputStream& s;
+  bob::core::OutputStream* s;
   std::string message;
   bool exit;
+  unsigned int ntimes;
+  unsigned int thread_id;
 };
 
 static void* log_message_inner(void* cookie) {
-  //unsigned int thread_id = (unsigned int)pthread_self();
-  /**
+  message_info_t* mi = (message_info_t*)cookie;
   if (PyEval_ThreadsInitialized()) {
-    printf("(0x%x) python threads initialized\n", thread_id);
+    static_log << "(thread " << mi->thread_id << ") Python threads initialized correctly for this thread" << std::endl;
   }
   else {
-    printf("(0x%x) python threads NOT initialized\n", thread_id);
+    static_log << "(thread " << mi->thread_id << ") Python threads NOT INITIALIZED correctly for this thread" << std::endl;
   }
-  **/
-  message_info_t* mi = (message_info_t*)cookie;
-  mi->s << "\"" << mi->message << "\"" << std::endl;
+  for (unsigned int i=0; i<(mi->ntimes); ++i) {
+    static_log << "(thread " << mi->thread_id << ") Injecting message `" << mi->message << " (thread " << mi->thread_id << "; iteration " << i << ")'" << std::endl;
+    *(mi->s) << mi->message << " (thread " << mi->thread_id << "; iteration " << i << ")" << std::endl;
+    mi->s->flush();
+  }
   if (mi->exit) {
-    //printf("(0x%x) exiting thread\n", thread_id);
+    static_log << "(thread " << mi->thread_id << ") Exiting this thread" << std::endl;
     pthread_exit(0);
   }
-  //printf("(0x%x) returning 0\n", thread_id);
+  if (mi->exit) {
+    static_log << "(thread " << mi->thread_id << ") Returning 0" << std::endl;
+  }
   return 0;
 }
 
 /**
  * A test function for your python bindings
  */
-static void log_message(bob::core::OutputStream& s, const char* message) {
+static void log_message(unsigned int ntimes, bob::core::OutputStream& s, const char* message) {
   bob::python::no_gil unlock;
-  //unsigned int thread_id = (unsigned int)pthread_self();
-  message_info_t mi = {s, message, false};
+  message_info_t mi = {&s, message, false, ntimes, 0};
   log_message_inner((void*)&mi);
-  //printf("(0x%x) returning to caller\n", thread_id);
+  static_log << "(thread 0) Returning to caller" << std::endl;
 }
 
 /**
  * Logs a number of messages from a separate thread
  */
-static void log_message_mt(unsigned int nthreads, bob::core::OutputStream& s, const char* message) {
+static void log_message_mt(unsigned int nthreads, unsigned int ntimes, bob::core::OutputStream& s, const char* message) {
   bob::python::no_gil unlock;
-  //unsigned int thread_id = (unsigned int)pthread_self();
-
-  //printf("(0x%x) writing message sample\n", thread_id);
-  message_info_t mi_sample = {s, message, false};
-  log_message_inner((void*)&mi_sample);
-  //printf("(0x%x) sampled - now launching %u thread(s)\n", thread_id, nthreads);
 
   boost::shared_array<pthread_t> threads(new pthread_t[nthreads]);
-  message_info_t mi = {s, message, true};
-  //printf("(0x%x) launching %u thread(s)\n", thread_id, nthreads);
+  boost::shared_array<message_info_t> infos(new message_info_t[nthreads]);
+  for (unsigned int i=0; i<nthreads; ++i) {
+    message_info_t mi = {&s, message, true, ntimes, i+1};
+    infos[i] = mi;
+  }
+
+  static_log << "(thread 0) Launching " << nthreads << " thread(s)" << std::endl;
 
   for (unsigned int i=0; i<nthreads; ++i) {
-    //printf("(0x%x) launch thread %d: `%s'\n", thread_id, i, mi.message.c_str());
-    pthread_create(&threads[i], NULL, &log_message_inner, (void*)&mi);
-    //printf("(0x%x) thread %d = 0x%x launched\n", thread_id, i, (unsigned int)threads[i]);
+    static_log << "(thread 0) Launch thread " << (i+1) << ": `" << message << "'" << std::endl;
+    pthread_create(&threads[i], NULL, &log_message_inner, (void*)&infos[i]);
+    static_log << "(thread 0) thread " << (i+1)
+      << " == 0x" << std::hex << threads[i] << std::dec
+      << " launched" << std::endl;
   }
 
   void* status;
-  //printf("(0x%x) waiting %u thread(s)\n", thread_id, nthreads);
+  static_log << "(thread 0) Waiting " << nthreads << " thread(s)" << std::endl;
   for (unsigned int i=0; i<nthreads; ++i) {
     pthread_join(threads[i], &status);
-    //printf("(0x%x) waiting on thread 0x%x\n", thread_id, (unsigned int)threads[i]);
+    static_log << "(thread 0) Waiting on thread " << (i+1) << std::endl;
   }
-  //printf("(0x%x) returning to caller\n", thread_id);
+  static_log << "(thread 0) Returning to caller" << std::endl;
 }
 
 /**
@@ -195,12 +230,15 @@ void bind_core_logging() {
   scope().attr("error") = object(ptr(&bob::core::error));
 
   //a test function
-  def("__log_message__", &log_message, (arg("stream"), arg("message")),
+  def("__log_message__", &log_message, (arg("ntimes"), arg("stream"), arg("message")),
       "Logs a message into Bob's logging system from C++.\n" \
       "\n" \
       "This method is included for testing purposes only and should not be considered part of the Python API for Bob.\n" \
       "\n" \
       "Keyword parameters:\n" \
+      "\n" \
+      "ntimes\n" \
+      "  The number of times to print the given message\n" \
       "\n" \
       "stream\n" \
       "  The stream to use for logging the message. Choose from the streams available at this module.\n" \
@@ -211,7 +249,7 @@ void bind_core_logging() {
      );
 
   //a test function
-  def("__log_message_mt__", &log_message_mt, (arg("nthreads"), arg("stream"), arg("message")),
+  def("__log_message_mt__", &log_message_mt, (arg("nthreads"), arg("ntimes"), arg("stream"), arg("message")),
       "Logs a message into Bob's logging system from C++ in a separate thread.\n" \
       "\n" \
       "This method is included for testing purposes only and should not be considered part of the Python API for Bob.\n" \
@@ -220,6 +258,9 @@ void bind_core_logging() {
       "\n" \
       "nthreads\n" \
       "  The total number of threads from which to write messages to the logging system using the C++->Python API.\n" \
+      "\n" \
+      "ntimes\n" \
+      "  The number of times to print the given message, in the same thread\n" \
       "\n" \
       "stream\n" \
       "  The stream to use for logging the message. Choose from the streams available at this module.\n" \
