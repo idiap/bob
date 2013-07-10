@@ -25,11 +25,10 @@
 
 using namespace boost::python;
 
-static object forward(const bob::machine::LinearMachine& m, bob::python::const_ndarray input) {
+static object forward(const bob::machine::LinearMachine& m,
+  bob::python::const_ndarray input)
+{
   const bob::core::array::typeinfo& info = input.type();
-
-  if (info.dtype != bob::core::array::t_float64)
-    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
 
   switch(info.nd) {
     case 1:
@@ -53,16 +52,14 @@ static object forward(const bob::machine::LinearMachine& m, bob::python::const_n
         return output.self();
       }
     default:
-      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "cannot forward arrays with "  SIZE_T_FMT " dimensions (only with 1 or 2 dimensions).", info.nd);
   }
 }
 
-static void forward2(const bob::machine::LinearMachine& m, bob::python::const_ndarray input,
-    bob::python::ndarray output) {
+static void forward2(const bob::machine::LinearMachine& m, 
+    bob::python::const_ndarray input, bob::python::ndarray output)
+{
   const bob::core::array::typeinfo& info = input.type();
-
-  if (info.dtype != bob::core::array::t_float64)
-    PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
 
   switch(info.nd) {
     case 1:
@@ -84,7 +81,7 @@ static void forward2(const bob::machine::LinearMachine& m, bob::python::const_nd
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "cannot forward arrays of type '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "cannot forward arrays with "  SIZE_T_FMT " dimensions (only with 1 or 2 dimensions).", info.nd);
   }
 }
 
@@ -108,8 +105,11 @@ static void set_input_sub(bob::machine::LinearMachine& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
-    m.setInputSubtraction(val);
+    extract<bob::python::const_ndarray> array_check(o);
+    if (!array_check.check())
+      PYTHON_ERROR(TypeError, "Cannot extract an array from this Python object");
+    bob::python::const_ndarray ar = array_check();
+    m.setInputSubtraction(ar.bz<double,1>());
   }
 }
 
@@ -124,8 +124,11 @@ static void set_input_div(bob::machine::LinearMachine& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
-    m.setInputDivision(val);
+    extract<bob::python::const_ndarray> array_check(o);
+    if (!array_check.check())
+      PYTHON_ERROR(TypeError, "Cannot extract an array from this Python object");
+    bob::python::const_ndarray ar = array_check();
+    m.setInputDivision(ar.bz<double,1>());
   }
 }
 
@@ -140,8 +143,11 @@ static void set_weight(bob::machine::LinearMachine& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    blitz::Array<double,2> val = extract<blitz::Array<double,2> >(o);
-    m.setWeights(val);
+    extract<bob::python::const_ndarray> array_check(o);
+    if (!array_check.check())
+      PYTHON_ERROR(TypeError, "Cannot extract an array from this Python object");
+    bob::python::const_ndarray ar = array_check();
+    m.setWeights(ar.bz<double,2>());
   }
 }
 
@@ -156,8 +162,11 @@ static void set_bias(bob::machine::LinearMachine& m, object o) {
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(o);
-    m.setBiases(val);
+    extract<bob::python::const_ndarray> array_check(o);
+    if (!array_check.check())
+      PYTHON_ERROR(TypeError, "Cannot extract an array from this Python object");
+    bob::python::const_ndarray ar = array_check();
+    m.setBiases(ar.bz<double,1>());
   }
 }
 
@@ -166,7 +175,7 @@ void bind_machine_linear() {
     >("LinearMachine", "A linear classifier. See C. M. Bishop, 'Pattern Recognition and Machine  Learning', chapter 4 for more details.\n\nThe basic matrix operation performed for projecting the input to the output is: output = weights * input. The 'weights' matrix is therefore organized column-wise. In this scheme, each column of the weights matrix can be interpreted as vector to which the input is projected.\n\nThe number of columns of the weights matrix determines the number of outputs this linear machine will have. The number of rows, the number of allowed inputs it can process.", init<size_t,size_t>((arg("self"), arg("input_size"), arg("output_size")), "Constructs a new linear machine with a certain input and output sizes. The weights and biases are initialized to zero."))
     .def(init<const blitz::Array<double,2>&>((arg("self"), arg("weights")), "Constructs a new LinearMachine from a set of weight values. Each column of the weight matrix should represent a direction to which the input is projected."))
     .def(init<bob::io::HDF5File&>((arg("self"), arg("config")), "Constructs a new LinearMachine from a configuration file. Both weights and biases have their dimensionalities checked between each other for consistency."))
-    .def(init<>("Default constructor, builds a machine as with 'LinearMachine(0,0)' which, of course, does not accept inputs or produce outputs."))
+    .def(init<>((arg("self")), "Default constructor, builds a machine as with 'LinearMachine(0,0)' which, of course, does not accept inputs or produce outputs."))
     .def(init<bob::machine::LinearMachine&>((arg("self"), args("other")), "Constructs a **new** LinearMachine from an existing one, using the copy constructor."))
     .def(self == self)
     .def(self != self)

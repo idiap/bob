@@ -214,7 +214,7 @@ void bind_machine_gmm()
       "Eq (8) is n(i)\n"
       "Eq (9) is sumPx(i) / n(i)\n"
       "Eq (10) is sumPxx(i) / n(i)\n",
-      init<>())
+      init<>(arg("self")))
     .def(init<const size_t, const size_t>((arg("self"), arg("n_gaussians"), arg("n_inputs"))))
     .def(init<bob::io::HDF5File&>((arg("self"), arg("config"))))
     .def(init<bob::machine::GMMStats&>((arg("self"), arg("other")), "Creates a GMMStats from another GMMStats, using the copy constructor."))
@@ -238,7 +238,7 @@ void bind_machine_gmm()
   class_<bob::machine::GMMMachine, boost::shared_ptr<bob::machine::GMMMachine>, bases<bob::machine::Machine<blitz::Array<double,1>, double> > >("GMMMachine",
       "This class implements a multivariate diagonal Gaussian distribution.\n"
       "See Section 2.3.9 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<>())
+      init<>(arg("self")))
     .def(init<const size_t, const size_t>((arg("self"), arg("n_gaussians"), arg("n_inputs"))))
     .def(init<bob::machine::GMMMachine&>((arg("self"), arg("other")), "Creates a GMMMachine from another GMMMachine, using the copy constructor."))
     .def(init<bob::io::HDF5File&>((arg("self"), arg("config"))))

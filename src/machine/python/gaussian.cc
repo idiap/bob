@@ -73,7 +73,7 @@ static double py_logLikelihood_(const bob::machine::Gaussian& machine,
 void bind_machine_gaussian()
 {
   class_<bob::machine::Gaussian, boost::shared_ptr<bob::machine::Gaussian>, bases<bob::machine::Machine<blitz::Array<double,1>, double> > >("Gaussian",
-    "This class implements a multivariate diagonal Gaussian distribution.", init<>())
+    "This class implements a multivariate diagonal Gaussian distribution.", init<>(arg("self")))
     .def(init<const size_t>((arg("self"), arg("n_inputs"))))
     .def(init<bob::machine::Gaussian&>((arg("self"), arg("other"))))
     .def(init<bob::io::HDF5File&>((arg("self"), arg("config"))))
