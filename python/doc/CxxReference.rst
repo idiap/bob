@@ -20,7 +20,7 @@
  C++ reference
 ===============
 
-For a reference of `C++`_ classes, methods, etc., implemented in |project|, please see the `Doxygen`_ reference `here <../../../doxygen/html/index.html>`_.
+For a reference of `C++`_ classes, methods, etc., implemented in |project|, please see the `Doxygen`_ reference `here <../../doxygen/html/index.html>`_.
 
 .. include:: links.rst
 
