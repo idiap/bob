@@ -71,8 +71,12 @@ static object mlpbase_get_deriv_bias(const bob::trainer::MLPBaseTrainer& t) {
 static void mlpbase_set_error(bob::trainer::MLPBaseTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   t.setError(vdata_ref);
 }
 
@@ -85,8 +89,12 @@ static void mlpbase_set_error2(bob::trainer::MLPBaseTrainer& t,
 static void mlpbase_set_output(bob::trainer::MLPBaseTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   t.setOutput(vdata_ref);
 }
 
@@ -99,8 +107,12 @@ static void mlpbase_set_output2(bob::trainer::MLPBaseTrainer& t,
 static void mlpbase_set_deriv(bob::trainer::MLPBaseTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,2>());
   t.setDerivatives(vdata_ref);
 }
 
@@ -113,8 +125,12 @@ static void mlpbase_set_deriv2(bob::trainer::MLPBaseTrainer& t,
 static void mlpbase_set_deriv_bias(bob::trainer::MLPBaseTrainer& t, 
   object data)
 {
-  stl_input_iterator<blitz::Array<double,1> > dbegin(data), dend;
-  std::vector<blitz::Array<double,1> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
+  std::vector<blitz::Array<double,1> > vdata_ref;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+      it!=vdata.end(); ++it)
+    vdata_ref.push_back(it->bz<double,1>());
   t.setBiasDerivatives(vdata_ref);
 }
 

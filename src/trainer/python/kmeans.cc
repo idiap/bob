@@ -23,31 +23,13 @@
 
 using namespace boost::python;
 
-static object py_getZeroethOrderStats(const bob::trainer::KMeansTrainer& op) 
-{
-  const blitz::Array<double,1>& stats = op.getZeroethOrderStats();
-  bob::python::ndarray stats_new(bob::core::array::t_float64, 
-    stats.extent(0));
-  blitz::Array<double,1> stats_new_ = stats_new.bz<double,1>();
-  stats_new_ = stats;
-  return stats_new.self();
-}
+typedef bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
 
 static void py_setZeroethOrderStats(bob::trainer::KMeansTrainer& op, bob::python::const_ndarray stats) {
   const bob::core::array::typeinfo& info = stats.type();
   if(info.dtype != bob::core::array::t_float64 || info.nd != 1)
     PYTHON_ERROR(TypeError, "cannot set array of type '%s'", info.str().c_str());
   op.setZeroethOrderStats(stats.bz<double,1>());
-}
-
-static object py_getFirstOrderStats(const bob::trainer::KMeansTrainer& op) 
-{
-  const blitz::Array<double,2>& stats = op.getFirstOrderStats();
-  bob::python::ndarray stats_new(bob::core::array::t_float64, 
-    stats.extent(0), stats.extent(1));
-  blitz::Array<double,2> stats_new_ = stats_new.bz<double,2>();
-  stats_new_ = stats;
-  return stats_new.self();
 }
 
 static void py_setFirstOrderStats(bob::trainer::KMeansTrainer& op, bob::python::const_ndarray stats) {
@@ -57,15 +39,38 @@ static void py_setFirstOrderStats(bob::trainer::KMeansTrainer& op, bob::python::
   op.setFirstOrderStats(stats.bz<double,2>());
 }
 
-static void py_train(bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> >& trainer, bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
+static void py_train(EMTrainerKMeansBase& trainer, 
+  bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
 {
   trainer.train(machine, sample.bz<double,2>());
 }
 
+static void py_initialize(EMTrainerKMeansBase& trainer, 
+  bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
+{
+  trainer.initialize(machine, sample.bz<double,2>());
+}
+
+static void py_finalize(EMTrainerKMeansBase& trainer, 
+  bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
+{
+  trainer.finalize(machine, sample.bz<double,2>());
+}
+
+static void py_eStep(EMTrainerKMeansBase& trainer, 
+  bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
+{
+  trainer.eStep(machine, sample.bz<double,2>());
+}
+
+static void py_mStep(EMTrainerKMeansBase& trainer, 
+  bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
+{
+  trainer.mStep(machine, sample.bz<double,2>());
+}
+
 void bind_trainer_kmeans() 
 {
-  typedef bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
-
   class_<EMTrainerKMeansBase, boost::noncopyable>("EMTrainerKMeans", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")
     .add_property("max_iterations", &EMTrainerKMeansBase::getMaxIterations, &EMTrainerKMeansBase::setMaxIterations, "Max iterations")
@@ -73,17 +78,17 @@ void bind_trainer_kmeans()
     .add_property("rng", &EMTrainerKMeansBase::getRng, &EMTrainerKMeansBase::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
     .def(self == self)
     .def(self != self)
-    .def("train", &py_train, (arg("machine"), arg("data")), "Train a machine using data")
-    .def("initialize", &EMTrainerKMeansBase::initialize, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
-    .def("e_step", &EMTrainerKMeansBase::eStep, (arg("machine"), arg("data")),
+    .def("train", &py_train, (arg("self"), arg("machine"), arg("data")), "Train a machine using data")
+    .def("initialize", &py_initialize, (arg("machine"), arg("data")), "This method is called before the EM algorithm")
+    .def("e_step", &py_eStep, (arg("self"), arg("machine"), arg("data")),
        "Update the hidden variable distribution (or the sufficient statistics) given the Machine parameters. "
        "Also, calculate the average output of the Machine given these parameters.\n"
        "Return the average output of the Machine across the dataset. "
        "The EM algorithm will terminate once the change in average_output "
        "is less than the convergence_threshold.")
-    .def("m_step", &EMTrainerKMeansBase::mStep, (arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
-    .def("compute_likelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("machine")), "Returns the average min (square Euclidean) distance")
-    .def("finalize", &EMTrainerKMeansBase::finalize, (arg("machine"), arg("data")), "This method is called after the EM algorithm")
+    .def("m_step", &py_mStep, (arg("self"), arg("machine"), arg("data")), "Update the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
+    .def("compute_likelihood", &EMTrainerKMeansBase::computeLikelihood, (arg("self"), arg("machine")), "Returns the average min (square Euclidean) distance")
+    .def("finalize", &py_finalize, (arg("self"), arg("machine"), arg("data")), "This method is called after the EM algorithm")
   ;
 
   // Starts binding the KMeansTrainer
@@ -100,8 +105,8 @@ void bind_trainer_kmeans()
      .add_property("initialization_method", &bob::trainer::KMeansTrainer::getInitializationMethod, &bob::trainer::KMeansTrainer::setInitializationMethod, "The initialization method to generate the initial means.")
      .add_property("rng", &bob::trainer::KMeansTrainer::getRng, &bob::trainer::KMeansTrainer::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of the means.")
      .add_property("average_min_distance", &bob::trainer::KMeansTrainer::getAverageMinDistance, &bob::trainer::KMeansTrainer::setAverageMinDistance, "Average min (square Euclidean) distance. Useful to parallelize the E-step.")
-     .add_property("zeroeth_order_statistics", &py_getZeroethOrderStats, &py_setZeroethOrderStats, "The zeroeth order statistics. Useful to parallelize the E-step.")
-     .add_property("first_order_statistics", &py_getFirstOrderStats, &py_setFirstOrderStats, "The first order statistics. Useful to parallelize the E-step.")
+     .add_property("zeroeth_order_statistics", make_function(&bob::trainer::KMeansTrainer::getZeroethOrderStats, return_value_policy<copy_const_reference>()), &py_setZeroethOrderStats, "The zeroeth order statistics. Useful to parallelize the E-step.")
+     .add_property("first_order_statistics", make_function(&bob::trainer::KMeansTrainer::getFirstOrderStats, return_value_policy<copy_const_reference>()), &py_setFirstOrderStats, "The first order statistics. Useful to parallelize the E-step.")
     ;
 
   // Sets the scope to the one of the KMeansTrainer
@@ -118,5 +123,5 @@ void bind_trainer_kmeans()
     ;   
 
   // Binds methods that has nested enum values as default parameters
-  KMT.def(init<optional<double,int,bool,bob::trainer::KMeansTrainer::InitializationMethod> >((arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true, arg("initialization_method")=bob::trainer::KMeansTrainer::RANDOM)));
+  KMT.def(init<optional<double,int,bool,bob::trainer::KMeansTrainer::InitializationMethod> >((arg("self"), arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true, arg("initialization_method")=bob::trainer::KMeansTrainer::RANDOM)));
 }

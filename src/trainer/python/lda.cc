@@ -31,8 +31,12 @@ using namespace boost::python;
 
 static tuple lda_train1(bob::trainer::FisherLDATrainer& t, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata_ref(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata_ref.begin(); 
+      it!=vdata_ref.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
   int osize = t.output_size(vdata);
   blitz::Array<double,1> eig_val(osize);
   bob::machine::LinearMachine m(vdata[0].extent(1), osize);
@@ -43,16 +47,24 @@ static tuple lda_train1(bob::trainer::FisherLDATrainer& t, object data)
 static object lda_train2(bob::trainer::FisherLDATrainer& t,
   bob::machine::LinearMachine& m, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata_ref(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata_ref.begin(); 
+      it!=vdata_ref.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
   blitz::Array<double,1> eig_val(t.output_size(vdata));
   t.train(m, eig_val, vdata);
   return object(eig_val);
 }
 
 static size_t output_size(bob::trainer::FisherLDATrainer& t, object data) {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata_ref(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata_ref.begin(); 
+      it!=vdata_ref.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
   return t.output_size(vdata);
 }
 
@@ -106,7 +118,7 @@ void bind_trainer_lda()
 {
   class_<bob::trainer::FisherLDATrainer, boost::shared_ptr<bob::trainer::FisherLDATrainer> >("FisherLDATrainer", CLASS_DOC, no_init)
     
-    .def(init<optional<bool,bool> >((arg("use_pinv")=false, arg("strip_to_rank")=true),
+    .def(init<optional<bool,bool> >((arg("self"), arg("use_pinv")=false, arg("strip_to_rank")=true),
           "Creates a new trainer to perform LDA\n" \
           "\n" \
           "Keyword parameters:\n" \

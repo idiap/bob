@@ -19,7 +19,18 @@
  */
 
 #include <boost/python.hpp>
+#include <bob/python/ndarray.h>
 #include <bob/trainer/BICTrainer.h>
+
+void py_train(const bob::trainer::BICTrainer& t, 
+  bob::machine::BICMachine& m, bob::python::const_ndarray intra_differences,
+  bob::python::const_ndarray extra_differences)
+{
+  t.train(m, intra_differences.bz<double,2>(), 
+    extra_differences.bz<double,2>());
+}
+
+
 
 void bind_trainer_bic(){
 
@@ -46,7 +57,7 @@ void bind_trainer_bic(){
 
     .def(
       "train",
-      &bob::trainer::BICTrainer::train,
+      &py_train,
       (
           boost::python::arg("self"),
           boost::python::arg("machine"),
