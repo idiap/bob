@@ -43,7 +43,16 @@ static tuple call_shuffler2(bob::trainer::DataShuffler& s, boost::mt19937& rng,
   return make_tuple(data, target);
 }
 
-static void call_shuffler3(bob::trainer::DataShuffler& s, bob::python::ndarray d, bob::python::ndarray t)
+static void call_shuffler3(bob::trainer::DataShuffler& s, boost::mt19937& rng, 
+  bob::python::ndarray d, bob::python::ndarray t)
+{
+  blitz::Array<double,2> data_ = d.bz<double,2>();
+  blitz::Array<double,2> target_ = t.bz<double,2>();
+  s(rng, data_, target_);
+}
+
+static void call_shuffler4(bob::trainer::DataShuffler& s, 
+  bob::python::ndarray d, bob::python::ndarray t)
 {
   blitz::Array<double,2> data_ = d.bz<double,2>();
   blitz::Array<double,2> target_ = t.bz<double,2>();
@@ -78,8 +87,10 @@ static boost::shared_ptr<bob::trainer::DataShuffler> shuffler_from_arrays
 static boost::shared_ptr<bob::trainer::DataShuffler> shuffler_from_arraysets
 (object data, object target) {
   //data
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata_ref(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> vdata(data), dend;
+  std::vector<blitz::Array<double,2> > vdata_ref;
+  vdata_ref.reserve(len(data));
+  for (; vdata != dend; ++vdata) vdata_ref.push_back((*vdata).bz<double,2>());
 
   //target
   stl_input_iterator<bob::python::const_ndarray> vtarget(target), tend;
@@ -130,7 +141,7 @@ void bind_trainer_shuffler() {
     .add_property("target_width", &bob::trainer::DataShuffler::getTargetWidth)
     .def("__call__", &call_shuffler1, (arg("self"), arg("n")), "Populates the output matrices (data, target) by randomly selecting 'n' arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain 'n' rows and the number of columns that are dependent on input arraysets and target array widths.")
     .def("__call__", &call_shuffler2, (arg("self"), arg("rng"), arg("n")), "Populates the output matrices (data, target) by randomly selecting 'n' arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain 'n' rows and the number of columns that are dependent on input arraysets and target array widths. In this version you should provide your own random number generator, already initialized.")
-    .def("__call__", (void (bob::trainer::DataShuffler::*)(boost::mt19937&, blitz::Array<double,2>&, blitz::Array<double,2>&))&bob::trainer::DataShuffler::operator(), (arg("self"), arg("data"), arg("target")), "Populates the output matrices by randomly selecting 'n' arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain 'n' rows and the number of columns that are dependent on input arraysets and target arrays.\n\nWe check don't 'data' and 'target' for size compatibility and is your responsibility to do so.")
-    .def("__call__", call_shuffler3, (arg("self"), arg("data"), arg("target")), "This version is a shortcut to the previous declaration of operator() that actually instantiates its own random number generator and seed it a time-based variable. We guarantee two calls will lead to different results if they are at least 1 microsecond appart (procedure uses the machine clock).")
+    .def("__call__", &call_shuffler3, (arg("self"), arg("rng"), arg("data"), arg("target")), "Populates the output matrices by randomly selecting 'n' arrays from the input arraysets and matching targets in the most possible fair way. The 'data' and 'target' matrices will contain 'n' rows and the number of columns that are dependent on input arraysets and target arrays.\n\nWe check don't 'data' and 'target' for size compatibility and is your responsibility to do so.")
+    .def("__call__", call_shuffler4, (arg("self"), arg("data"), arg("target")), "This version is a shortcut to the previous declaration of operator() that actually instantiates its own random number generator and seed it a time-based variable. We guarantee two calls will lead to different results if they are at least 1 microsecond appart (procedure uses the machine clock).")
     ;
 }

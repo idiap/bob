@@ -30,16 +30,24 @@ using namespace boost::python;
 
 void py_train1(bob::trainer::WCCNTrainer& t, bob::machine::LinearMachine& m, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata_ref(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata_ref.begin(); 
+      it!=vdata_ref.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
   blitz::Array<double,1> eig_val(vdata[0].extent(1)-1);
   t.train(m, vdata);
 }
 
 object py_train2(bob::trainer::WCCNTrainer& t, object data)
 {
-  stl_input_iterator<blitz::Array<double,2> > dbegin(data), dend;
-  std::vector<blitz::Array<double,2> > vdata(dbegin, dend);
+  stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
+  std::vector<bob::python::const_ndarray> vdata_ref(dbegin, dend);
+  std::vector<blitz::Array<double,2> > vdata;
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata_ref.begin(); 
+      it!=vdata_ref.end(); ++it)
+    vdata.push_back(it->bz<double,2>());
   bob::machine::LinearMachine m(vdata[0].extent(1),vdata[0].extent(1));
   t.train(m, vdata);
   return object(m);

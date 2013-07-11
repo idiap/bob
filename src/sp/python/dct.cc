@@ -108,9 +108,6 @@ static object py_idct2d_p(bob::sp::IDCT2D& op, bob::python::const_ndarray src)
 static object script_dct(bob::python::const_ndarray ar) 
 {
   const bob::core::array::typeinfo& info = ar.type();
-  if (info.dtype != bob::core::array::t_float64) {
-    PYTHON_ERROR(TypeError, "DCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
-  }
   bob::python::ndarray res(info);
   switch (info.nd) {
     case 1:
@@ -128,16 +125,13 @@ static object script_dct(bob::python::const_ndarray ar)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "DCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "DCT operation only supports 1 or 2D double input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
   return res.self();
 }
 
 static object script_idct(bob::python::const_ndarray ar) {
   const bob::core::array::typeinfo& info = ar.type();
-  if (info.dtype != bob::core::array::t_float64) {
-    PYTHON_ERROR(TypeError, "iDCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
-  }
   bob::python::ndarray res(info);
   switch (info.nd) {
     case 1:
@@ -155,7 +149,7 @@ static object script_idct(bob::python::const_ndarray ar) {
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "iDCT operation only supports 1 or 2D double input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "iDCT operation only supports 1 or 2D double input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
   return res.self();
 }
@@ -169,16 +163,16 @@ void bind_sp_dct()
       .add_property("length", &bob::sp::DCT1D::getLength, &bob::sp::DCT1D::setLength, "Length of the array to process.")
     ;
 
-  class_<bob::sp::DCT1D, boost::shared_ptr<bob::sp::DCT1D>, bases<bob::sp::DCT1DAbstract> >("DCT1D", DCT1D_DOC, init<const size_t>((arg("length"))))
-      .def(init<bob::sp::DCT1D&>(args("other")))
+  class_<bob::sp::DCT1D, boost::shared_ptr<bob::sp::DCT1D>, bases<bob::sp::DCT1DAbstract> >("DCT1D", DCT1D_DOC, init<const size_t>((arg("self"), arg("length"))))
+      .def(init<bob::sp::DCT1D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_dct1d_c, (arg("self"), arg("input"), arg("output")), "Compute the DCT of the input 1D array/signal. The output should have the expected size and type (numpy.float64).")
       .def("__call__", &py_dct1d_p, (arg("self"), arg("input")), "Compute the DCT of the input 1D array/signal. The output is allocated and returned.")
     ;
 
-  class_<bob::sp::IDCT1D, boost::shared_ptr<bob::sp::IDCT1D>, bases<bob::sp::DCT1DAbstract> >("IDCT1D", IDCT1D_DOC, init<const size_t>((arg("length"))))
-      .def(init<bob::sp::IDCT1D&>(args("other")))
+  class_<bob::sp::IDCT1D, boost::shared_ptr<bob::sp::IDCT1D>, bases<bob::sp::DCT1DAbstract> >("IDCT1D", IDCT1D_DOC, init<const size_t>((arg("self"), arg("length"))))
+      .def(init<bob::sp::IDCT1D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_idct1d_c, (arg("self"), arg("input"), arg("output")), "Compute the inverse DCT of the input 1D array/signal. The output should have the expected size and type (numpy.float64).")
@@ -191,16 +185,16 @@ void bind_sp_dct()
       .add_property("width", &bob::sp::DCT2D::getWidth, &bob::sp::DCT2D::setWidth, "Width of the array to process.")
     ;
 
-  class_<bob::sp::DCT2D, boost::shared_ptr<bob::sp::DCT2D>, bases<bob::sp::DCT2DAbstract> >("DCT2D", DCT2D_DOC, init<const size_t, const size_t>((arg("height"), arg("width"))))
-      .def(init<bob::sp::DCT2D&>(args("other")))
+  class_<bob::sp::DCT2D, boost::shared_ptr<bob::sp::DCT2D>, bases<bob::sp::DCT2DAbstract> >("DCT2D", DCT2D_DOC, init<const size_t, const size_t>((arg("self"), arg("height"), arg("width"))))
+      .def(init<bob::sp::DCT2D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_dct2d_c, (arg("self"), arg("input"), arg("output")), "Compute the DCT of the input 2D array/signal. The output should have the expected size and type (numpy.float64).")
       .def("__call__", &py_dct2d_p, (arg("self"), arg("input")), "Compute the DCT of the input 2D array/signal. The output is allocated and returned.")
     ;
 
-  class_<bob::sp::IDCT2D, boost::shared_ptr<bob::sp::IDCT2D>, bases<bob::sp::DCT2DAbstract> >("IDCT2D", IDCT2D_DOC, init<const size_t, const size_t>((arg("height"), arg("width"))))
-      .def(init<bob::sp::IDCT2D&>(args("other")))
+  class_<bob::sp::IDCT2D, boost::shared_ptr<bob::sp::IDCT2D>, bases<bob::sp::DCT2DAbstract> >("IDCT2D", IDCT2D_DOC, init<const size_t, const size_t>((arg("self"), arg("height"), arg("width"))))
+      .def(init<bob::sp::IDCT2D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_idct2d_c, (arg("self"), arg("input"), arg("output")), "Compute the inverse DCT of the input 2D array/signal. The output should have the expected size and type (numpy.float64).")

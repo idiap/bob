@@ -46,8 +46,11 @@ static boost::python::tuple py_extractor_get_shape(bob::ap::FrameExtractor& ext,
   }
   else {
     //try hard-core extraction - throws TypeError, if not possible
-    blitz::Array<double,1> val = extract<blitz::Array<double,1> >(input_object);
-    blitz::TinyVector<int,2> size = ext.getShape(val);
+    extract<bob::python::const_ndarray> array_check(input_object);
+    if (!array_check.check())
+      PYTHON_ERROR(TypeError, "Cannot extract an array from this Python object");
+    bob::python::const_ndarray ar = array_check();
+    blitz::TinyVector<int,2> size = ext.getShape(ar.bz<double,1>());
     res = boost::python::make_tuple(size[0], size[1]);
   }
   return res;
@@ -94,8 +97,8 @@ static object py_ceps_call(bob::ap::Ceps& ceps, bob::python::const_ndarray input
 
 void bind_ap_ceps()
 {
-  class_<bob::ap::FrameExtractor, boost::shared_ptr<bob::ap::FrameExtractor> >("FrameExtractor", FRAME_EXTRACTOR_DOC, init<const double, optional<const double, const double> >((arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10.)))
-    .def(init<bob::ap::FrameExtractor&>(args("other"), "Constructs a new audio frame extractor from an existing one, using the copy constructor."))
+  class_<bob::ap::FrameExtractor, boost::shared_ptr<bob::ap::FrameExtractor> >("FrameExtractor", FRAME_EXTRACTOR_DOC, init<const double, optional<const double, const double> >((arg("self"), arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10.)))
+    .def(init<bob::ap::FrameExtractor&>((arg("self"), arg("other")), "Constructs a new audio frame extractor from an existing one, using the copy constructor."))
     .def(self == self)
     .def(self != self)
     .add_property("sampling_frequency", &bob::ap::FrameExtractor::getSamplingFrequency, &bob::ap::FrameExtractor::setSamplingFrequency, "The sampling frequency of the input data")
@@ -103,19 +106,19 @@ void bind_ap_ceps()
     .add_property("win_length", &bob::ap::FrameExtractor::getWinLength, "The normalized window length wrt. to the sample frequency")
     .add_property("win_shift_ms", &bob::ap::FrameExtractor::getWinShiftMs, &bob::ap::FrameExtractor::setWinShiftMs, "The window shift of the cepstral analysis in milliseconds")
     .add_property("win_shift", &bob::ap::FrameExtractor::getWinShift, "The normalized window shift wrt. to the sample frequency")
-    .def("get_shape", &py_extractor_get_shape, (arg("n_size"), arg("input_data")), "Computes the shape of the output features")
+    .def("get_shape", &py_extractor_get_shape, (arg("self"), arg("input")), "Computes the shape of the output features, given the size of an input array or an input array.")
   ;
 
-  class_<bob::ap::Energy, boost::shared_ptr<bob::ap::Energy>, bases<bob::ap::FrameExtractor> >("Energy", ENERGY_DOC, init<const double, optional<const double, const double> >((arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10.)))
-    .def(init<bob::ap::Energy&>(args("other"), "Constructs a new audio energy extractor from an existing one, using the copy constructor."))
+  class_<bob::ap::Energy, boost::shared_ptr<bob::ap::Energy>, bases<bob::ap::FrameExtractor> >("Energy", ENERGY_DOC, init<const double, optional<const double, const double> >((arg("self"), arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10.)))
+    .def(init<bob::ap::Energy&>((arg("self"), arg("other")), "Constructs a new audio energy extractor from an existing one, using the copy constructor."))
     .def(self == self)
     .def(self != self)
     .add_property("energy_floor", &bob::ap::Energy::getEnergyFloor, &bob::ap::Energy::setEnergyFloor, "The energy flooring threshold")
-    .def("__call__", &py_energy_call, (arg("input")), "Computes the energy features")
+    .def("__call__", &py_energy_call, (arg("self"), arg("input")), "Computes the energy features")
   ;
 
-  class_<bob::ap::Spectrogram, boost::shared_ptr<bob::ap::Spectrogram>, bases<bob::ap::Energy> >("Spectrogram", SPECTROGRAM_DOC, init<const double, optional<const double, const double, const size_t, const double, const double, const double, const bool> >((arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10., arg("n_filters")=24, arg("f_min")=0., arg("f_max")=4000., arg("pre_emphasis_coeff")=0.95, arg("mel_scale")=true)))
-    .def(init<bob::ap::Spectrogram&>(args("other"), "Constructs a new spectrogram extractor from an existing one, using the copy constructor."))
+  class_<bob::ap::Spectrogram, boost::shared_ptr<bob::ap::Spectrogram>, bases<bob::ap::Energy> >("Spectrogram", SPECTROGRAM_DOC, init<const double, optional<const double, const double, const size_t, const double, const double, const double, const bool> >((arg("self"), arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10., arg("n_filters")=24, arg("f_min")=0., arg("f_max")=4000., arg("pre_emphasis_coeff")=0.95, arg("mel_scale")=true)))
+    .def(init<bob::ap::Spectrogram&>((arg("self"), arg("other")), "Constructs a new spectrogram extractor from an existing one, using the copy constructor."))
     .def(self == self)
     .def(self != self)
     .add_property("sampling_frequency", &bob::ap::Spectrogram::getSamplingFrequency, &bob::ap::Spectrogram::setSamplingFrequency, "The sampling frequency of the input data")
@@ -129,11 +132,11 @@ void bind_ap_ceps()
     .add_property("energy_filter", &bob::ap::Spectrogram::getEnergyFilter, &bob::ap::Spectrogram::setEnergyFilter, "Tells whether we use the energy or the square root of the energy")
     .add_property("log_filter", &bob::ap::Spectrogram::getLogFilter, &bob::ap::Spectrogram::setLogFilter, "Tells whether we use the log triangular filter or the triangular filter")
     .add_property("energy_bands", &bob::ap::Spectrogram::getEnergyBands, &bob::ap::Spectrogram::setEnergyBands, "Tells whether we compute a spectrogram or energy bands")
-    .def("__call__", &py_spectrogram_call, (arg("input")), "Computes the spectrogram")
+    .def("__call__", &py_spectrogram_call, (arg("self"), arg("input")), "Computes the spectrogram")
   ;
 
-  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps>, bases<bob::ap::Spectrogram> >("Ceps", CEPS_DOC, init<const double, optional<const double, const double, const size_t, const size_t, const double, const double, const size_t, const double, const bool, const bool> >((arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10., arg("n_filters")=24, arg("n_ceps")=19, arg("f_min")=0., arg("f_max")=4000., arg("delta_win")=2, arg("pre_emphasis_coeff")=0.95, arg("mel_scale")=true, arg("dct_norm")=true)))
-    .def(init<bob::ap::Ceps&>(args("other"), "Constructs a new spectrogram extractor from an existing one, using the copy constructor."))
+  class_<bob::ap::Ceps, boost::shared_ptr<bob::ap::Ceps>, bases<bob::ap::Spectrogram> >("Ceps", CEPS_DOC, init<const double, optional<const double, const double, const size_t, const size_t, const double, const double, const size_t, const double, const bool, const bool> >((arg("self"), arg("sampling_frequency"), arg("win_length_ms")=20., arg("win_shift_ms")=10., arg("n_filters")=24, arg("n_ceps")=19, arg("f_min")=0., arg("f_max")=4000., arg("delta_win")=2, arg("pre_emphasis_coeff")=0.95, arg("mel_scale")=true, arg("dct_norm")=true)))
+    .def(init<bob::ap::Ceps&>((arg("self"), arg("other")), "Constructs a new spectrogram extractor from an existing one, using the copy constructor."))
     .def(self == self)
     .def(self != self)
     .add_property("n_filters", &bob::ap::Ceps::getNFilters, &bob::ap::Ceps::setNFilters, "The number of filter bands")
@@ -143,7 +146,7 @@ void bind_ap_ceps()
     .add_property("with_energy", &bob::ap::Ceps::getWithEnergy, &bob::ap::Ceps::setWithEnergy, "Tells if we add the energy to the output feature")
     .add_property("with_delta", &bob::ap::Ceps::getWithDelta, &bob::ap::Ceps::setWithDelta, "Tells if we add the first derivatives to the output feature")
     .add_property("with_delta_delta", &bob::ap::Ceps::getWithDeltaDelta, &bob::ap::Ceps::setWithDeltaDelta, "Tells if we add the second derivatives to the output feature")
-    .def("__call__", &py_ceps_call, (arg("input")), "Computes the cepstral coefficients")
+    .def("__call__", &py_ceps_call, (arg("self"), arg("input")), "Computes the cepstral coefficients")
   ;
 }
 

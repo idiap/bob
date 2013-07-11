@@ -114,9 +114,6 @@ static object script_fft(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
-  if (info.dtype != bob::core::array::t_complex128) {
-    PYTHON_ERROR(TypeError, "FFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
-  }
   bob::python::ndarray res(info);
   switch (info.nd) {
     case 1:
@@ -134,7 +131,7 @@ static object script_fft(bob::python::const_ndarray ar)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "FFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "FFT operation only supports 1 or 2D complex128 input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
   return res.self();
 }
@@ -143,9 +140,6 @@ static object script_ifft(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
-  if (info.dtype != bob::core::array::t_complex128) {
-    PYTHON_ERROR(TypeError, "iFFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
-  }
   bob::python::ndarray res(info);
   switch (info.nd) {
     case 1:
@@ -163,7 +157,7 @@ static object script_ifft(bob::python::const_ndarray ar)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "iFFT operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "iFFT operation only supports 1 or 2D complex128 input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
   return res.self();
 }
@@ -172,9 +166,6 @@ static object script_fftshift(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
-  if (info.dtype != bob::core::array::t_complex128) {
-    PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
-  }
   bob::python::ndarray res(info);
   switch (info.nd) {
     case 1:
@@ -190,7 +181,7 @@ static object script_fftshift(bob::python::const_ndarray ar)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
   return res.self();
 }
@@ -199,9 +190,6 @@ static object script_ifftshift(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
-  if (info.dtype != bob::core::array::t_complex128) {
-    PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
-  }
   bob::python::ndarray res(info);
   switch (info.nd) {
     case 1:
@@ -217,7 +205,7 @@ static object script_ifftshift(bob::python::const_ndarray ar)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
   return res.self();
 }
@@ -241,7 +229,7 @@ static void py_fftshift(bob::python::const_ndarray ar, bob::python::ndarray t)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "FFTshift operation only supports 1 or 2D complex128 input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
 }
 
@@ -264,7 +252,7 @@ static void py_ifftshift(bob::python::const_ndarray ar, bob::python::ndarray t)
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided '%s'", info.str().c_str());
+      PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
 }
 
@@ -276,16 +264,16 @@ void bind_sp_fft()
     .add_property("length", &bob::sp::FFT1D::getLength)
     ;
 
-  class_<bob::sp::FFT1D, boost::shared_ptr<bob::sp::FFT1D>, bases<bob::sp::FFT1DAbstract> >("FFT1D", FFT1D_DOC, init<const size_t>((arg("length"))))
-      .def(init<bob::sp::FFT1D&>(args("other")))
+  class_<bob::sp::FFT1D, boost::shared_ptr<bob::sp::FFT1D>, bases<bob::sp::FFT1DAbstract> >("FFT1D", FFT1D_DOC, init<const size_t>((arg("self"), arg("length"))))
+      .def(init<bob::sp::FFT1D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_fft1d_c, (arg("self"), arg("input"), arg("output")), "Compute the FFT of the input 1D array/signal. The output should have the expected size and type (numpy.float64).")
       .def("__call__", &py_fft1d_p, (arg("self"), arg("input")), "Compute the FFT of the input 1D array/signal. The output is allocated and returned.")
     ;
 
-  class_<bob::sp::IFFT1D, boost::shared_ptr<bob::sp::IFFT1D>, bases<bob::sp::FFT1DAbstract> >("IFFT1D", IFFT1D_DOC, init<const size_t>((arg("length"))))
-      .def(init<bob::sp::IFFT1D&>(args("other")))
+  class_<bob::sp::IFFT1D, boost::shared_ptr<bob::sp::IFFT1D>, bases<bob::sp::FFT1DAbstract> >("IFFT1D", IFFT1D_DOC, init<const size_t>((arg("self"), arg("length"))))
+      .def(init<bob::sp::IFFT1D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_ifft1d_c, (arg("self"), arg("input"), arg("output")), "Compute the inverse FFT of the input 1D array/signal. The output should have the expected size and type (numpy.float64).")
@@ -298,16 +286,16 @@ void bind_sp_fft()
     .add_property("width", &bob::sp::FFT2D::getWidth)
     ;
 
-  class_<bob::sp::FFT2D, boost::shared_ptr<bob::sp::FFT2D>, bases<bob::sp::FFT2DAbstract> >("FFT2D", FFT2D_DOC, init<const size_t,const size_t>((arg("height"), arg("width"))))
-      .def(init<bob::sp::FFT2D&>(args("other")))
+  class_<bob::sp::FFT2D, boost::shared_ptr<bob::sp::FFT2D>, bases<bob::sp::FFT2DAbstract> >("FFT2D", FFT2D_DOC, init<const size_t,const size_t>((arg("self"), arg("height"), arg("width"))))
+      .def(init<bob::sp::FFT2D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_fft2d_c, (arg("self"), arg("input"), arg("output")), "Compute the FFT of the input 2D array/signal. The output should have the expected size and type (numpy.float64).")
       .def("__call__", &py_fft2d_p, (arg("self"), arg("input")), "Compute the FFT of the input 2D array/signal. The output is allocated and returned.")
     ;
 
-  class_<bob::sp::IFFT2D, boost::shared_ptr<bob::sp::IFFT2D>, bases<bob::sp::FFT2DAbstract> >("IFFT2D", IFFT2D_DOC, init<const size_t,const size_t>((arg("height"), arg("width"))))
-      .def(init<bob::sp::IFFT2D&>(args("other")))
+  class_<bob::sp::IFFT2D, boost::shared_ptr<bob::sp::IFFT2D>, bases<bob::sp::FFT2DAbstract> >("IFFT2D", IFFT2D_DOC, init<const size_t,const size_t>((arg("self"), arg("height"), arg("width"))))
+      .def(init<bob::sp::IFFT2D&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .def("__call__", &py_ifft2d_c, (arg("self"), arg("input"), arg("output")), "Compute the inverse FFT of the input 2D array/signal. The output should have the expected size and type (numpy.float64).")
