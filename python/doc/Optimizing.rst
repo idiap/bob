@@ -1,18 +1,18 @@
 .. vim: set fileencoding=utf-8 :
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Wed Jan 11 14:43:35 2012 +0100
-.. 
+..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -48,30 +48,31 @@ Profiling your code is a 3-step procedure.
 
 1. Bracket the target code with ``ProfilerStart()`` and ``ProfilerStop()``.
 2. Link against ``libprofiler.so``.
-3. Analyse the output. 
+3. Analyse the output.
 
 In |project|, we provide a few constructions that allow you to easily adapt any
 code to support profiling. In this guide we only cover specific topics to be
 addressed for |project| builds. We consider that item 1, which is your
 responsibility, has already been done and will focus this guide on getting the
-code to compile/link properly (item 2). Analysis (item 3) should be conducted in the
-same way as explained on `PerfTool introduction to profiling`_.
+code to compile/link properly (item 2). Analysis (item 3) should be conducted
+in the same way as explained on `PerfTool introduction to profiling`_.
 
 Guidelines on building against Google perftools
 -----------------------------------------------
 
-1. At your ``CMakeLists.txt``, always test to check for the availability of
-   google-perftools:
+1. While compiling |project|, make sure you have added support for Google
+   Perftools, during its configuration, by using the flag ``WITH_PERFTOOLS``.
+   For example:
 
-.. code-block:: cmake
+   .. code-block:: cmake
 
-  if(googlePerfTools_FOUND)
-    set(shared "${googlePerfTools_LIBRARIES}") #or make sure you link against "libprofile.so"
-    add_definitions(-DHAVE_GOOGLE_PERFTOOLS)
-  endif(googlePerfTools_FOUND)
+     $ cmake -DWITH_PERFTOOLS=ON -DCMAKE_BUILD_TYPE=Debug ..
 
-2. Within your code, include **optional** usage of perftools in the following
-   (suggested) way:
+   Before doing so, make sure you have followed your operating system
+   instructions to install Google Perftools and that cmake can find it.
+
+2. Within your C++ code, include **optional** usage of perftools in the
+   following (suggested) way:
 
 .. code-block:: c++
 
@@ -114,8 +115,8 @@ visualize the output.
 Profiling |project| Python C++ extensions
 -----------------------------------------
 
-If |project| was compiled with Google perftools support, profiling python C++
-extensions should be easy. Here is a recipe:
+If |project| was compiled with Google perftools support like indicated above,
+profiling python C++ extensions should be easy. Here is a recipe:
 
 .. code-block:: sh
 
