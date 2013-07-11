@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ip/DCTFeatures.h"
-#include "bob/python/ndarray.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/DCTFeatures.h>
 
 using namespace boost::python;
 
@@ -53,21 +53,15 @@ static object py_dct_apply(bob::ip::DCTFeatures& dct_features,
   bob::python::const_ndarray src, const bool output3d=false)
 {
   const bob::core::array::typeinfo& info = src.type();
-  switch(info.nd)
-  {
-    case 2:
-      switch (info.dtype) {
-        case bob::core::array::t_uint8: 
-          return py_inner_2d_dct_apply<uint8_t>(dct_features, src, output3d);
-        case bob::core::array::t_uint16:
-          return py_inner_2d_dct_apply<uint16_t>(dct_features, src, output3d);
-        case bob::core::array::t_float64: 
-          return py_inner_2d_dct_apply<double>(dct_features, src, output3d);
-        default: 
-          PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array of type '%s'.", info.str().c_str());
-      }
-    default:
-      PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array with " SIZE_T_FMT " dimensions", info.nd);
+  switch (info.dtype) {
+    case bob::core::array::t_uint8: 
+      return py_inner_2d_dct_apply<uint8_t>(dct_features, src, output3d);
+    case bob::core::array::t_uint16:
+      return py_inner_2d_dct_apply<uint16_t>(dct_features, src, output3d);
+    case bob::core::array::t_float64: 
+      return py_inner_2d_dct_apply<double>(dct_features, src, output3d);
+    default: 
+      PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array of type '%s'.", info.str().c_str());
   }
 }
 
@@ -85,38 +79,32 @@ static object c_dct_apply(bob::ip::DCTFeatures& dct_features,
 {
   const bob::core::array::typeinfo& info = src.type();
   const bob::core::array::typeinfo& infod = dst.type();
-  switch(info.nd)
+  switch(infod.nd)
   {
     case 2:
-      switch(infod.nd)
-      {
-        case 2:
-          switch (info.dtype) {
-            case bob::core::array::t_uint8: 
-              return c_inner_dct_apply<uint8_t,2>(dct_features, src, dst);
-            case bob::core::array::t_uint16:
-              return c_inner_dct_apply<uint16_t,2>(dct_features, src, dst);
-            case bob::core::array::t_float64: 
-              return c_inner_dct_apply<double,2>(dct_features, src, dst);
-            default: 
-              PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array of type '%s'.", info.str().c_str());
-          }
-        case 3:
-          switch (info.dtype) {
-            case bob::core::array::t_uint8: 
-              return c_inner_dct_apply<uint8_t,3>(dct_features, src, dst);
-            case bob::core::array::t_uint16:
-              return c_inner_dct_apply<uint16_t,3>(dct_features, src, dst);
-            case bob::core::array::t_float64: 
-              return c_inner_dct_apply<double,3>(dct_features, src, dst);
-            default: 
-              PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array of type '%s'.", info.str().c_str());
-          }
+      switch (info.dtype) {
+        case bob::core::array::t_uint8: 
+          return c_inner_dct_apply<uint8_t,2>(dct_features, src, dst);
+        case bob::core::array::t_uint16:
+          return c_inner_dct_apply<uint16_t,2>(dct_features, src, dst);
+        case bob::core::array::t_float64: 
+          return c_inner_dct_apply<double,2>(dct_features, src, dst);
         default: 
-          PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support output array with " SIZE_T_FMT " dimensions", infod.nd);
+          PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array of type '%s'.", info.str().c_str());
       }
-    default:
-      PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array with " SIZE_T_FMT " dimensions", info.nd);
+    case 3:
+      switch (info.dtype) {
+        case bob::core::array::t_uint8: 
+          return c_inner_dct_apply<uint8_t,3>(dct_features, src, dst);
+        case bob::core::array::t_uint16:
+          return c_inner_dct_apply<uint16_t,3>(dct_features, src, dst);
+        case bob::core::array::t_float64: 
+          return c_inner_dct_apply<double,3>(dct_features, src, dst);
+        default: 
+          PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support input array of type '%s'.", info.str().c_str());
+      }
+    default: 
+      PYTHON_ERROR(TypeError, "bob.ip.DCTFeatures does not support output array with " SIZE_T_FMT " dimensions", infod.nd);
   }
 }
 
@@ -171,8 +159,8 @@ static boost::python::tuple get_3d_output_shape(
 
 void bind_ip_dctfeatures() 
 {
-  class_<bob::ip::DCTFeatures, boost::shared_ptr<bob::ip::DCTFeatures> >("DCTFeatures", dctdoc, init<const size_t, const size_t, const size_t, const size_t, const size_t, optional<const bool, const bool, const bool> >((arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("n_dct_coefs"), arg("norm_block")=false, arg("norm_dct")=false, arg("square_pattern")=false), "Constructs a new DCT features extractor.")) 
-    .def(init<bob::ip::DCTFeatures&>(args("other")))
+  class_<bob::ip::DCTFeatures, boost::shared_ptr<bob::ip::DCTFeatures> >("DCTFeatures", dctdoc, init<const size_t, const size_t, const size_t, const size_t, const size_t, optional<const bool, const bool, const bool> >((arg("self"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("n_dct_coefs"), arg("norm_block")=false, arg("norm_dct")=false, arg("square_pattern")=false), "Constructs a new DCT features extractor.")) 
+    .def(init<bob::ip::DCTFeatures&>((arg("self"), arg("other"))))
     .def(self == self)
     .def(self != self)
     .add_property("block_h", &bob::ip::DCTFeatures::getBlockH, &bob::ip::DCTFeatures::setBlockH, "The height of each block for the block decomposition")

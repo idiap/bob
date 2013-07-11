@@ -20,21 +20,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/WeightedGaussian.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/WeightedGaussian.h>
 
 using namespace boost::python;
-
-static object py_getUnweightedKernel(const bob::ip::WeightedGaussian& op) 
-{
-  const blitz::Array<double,2>& kernel = op.getUnweightedKernel();
-  bob::python::ndarray kernel_new(bob::core::array::t_float64, 
-    kernel.extent(0), kernel.extent(1));
-  blitz::Array<double,2> kernel_new_ = kernel_new.bz<double,2>();
-  kernel_new_ = kernel;
-  return kernel_new.self();
-}
-
 
 template <typename T, int N>
 static void inner_call_wgs_C(bob::ip::WeightedGaussian& op, 
@@ -61,8 +50,7 @@ static void call_wgs_C(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_float64: 
             return inner_call_wgs_C<double,2>(op, src, dst);
           default:
-            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does \
-              not support array of type '%s'.", info.str().c_str());
+            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not support array of type '%s'.", info.str().c_str());
         }
       }
       break;
@@ -76,14 +64,12 @@ static void call_wgs_C(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_float64: 
             return inner_call_wgs_C<double,3>(op, src, dst);
           default:
-            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does \
-              not support array of type '%s'.", info.str().c_str());
+            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not support array of type '%s'.", info.str().c_str());
         }
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not \
-        support array with " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }    
 }
 
@@ -128,8 +114,7 @@ static object call_wgs_P(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_float64: 
             return inner_call_wgs_P_2d<double>(op, src);
           default:
-            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does \
-              not support array of type '%s'.", info.str().c_str());
+            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not support array of type '%s'.", info.str().c_str());
         }
       }
       break;
@@ -143,14 +128,12 @@ static object call_wgs_P(bob::ip::WeightedGaussian& op,
           case bob::core::array::t_float64: 
             return inner_call_wgs_P_3d<double>(op, src);
           default:
-            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does \
-              not support array of type '%s'.", info.str().c_str());
+            PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not support array of type '%s'.", info.str().c_str());
         }
       }
       break;
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not \
-        support array with " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.WeightedGaussian __call__ does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -164,11 +147,12 @@ void bind_ip_wgaussian()
       wgaussiandoc, 
       init<optional<const size_t, const size_t, const double, const double,
         const bob::sp::Extrapolation::BorderType> >((
+          arg("self"),
           arg("radius_y")=1, arg("radius_x")=1, 
           arg("sigma2_y")=2., arg("sigma2_x")=2., 
           arg("conv_border")=bob::sp::Extrapolation::Mirror), 
           "Creates a weighted gaussian smoother."))
-      .def(init<bob::ip::WeightedGaussian&>(args("other")))
+      .def(init<bob::ip::WeightedGaussian&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .add_property("radius_y", 
@@ -192,7 +176,7 @@ void bind_ip_wgaussian()
         &bob::ip::WeightedGaussian::setConvBorder, 
         "The extrapolation method used by the convolution at the border")
       .add_property("unweighted_kernel", 
-        &py_getUnweightedKernel, 
+        make_function(&bob::ip::WeightedGaussian::getUnweightedKernel, return_value_policy<copy_const_reference>()),
         "The values of the unweighted kernel (read only access)")
       .def("reset", 
         &bob::ip::WeightedGaussian::reset, 

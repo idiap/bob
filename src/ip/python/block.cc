@@ -20,26 +20,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/block.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/block.h>
 
 using namespace boost::python;
 
 static const char* BLOCK2D_DOC = 
-  "Performs a block decomposition of a 2D array/image. The output 3D or 4D \
-  destination array should be allocated and of the correct size.";
+  "Performs a block decomposition of a 2D array/image. The output 3D or 4D destination array should be allocated and of the correct size.";
 static const char* BLOCK2D_P_DOC = 
-  "Performs a block decomposition of a 2D array/image. This will allocate \
-  and return a 4D array of blocks indexed along the y- and x-axes \
+  "Performs a block decomposition of a 2D array/image. This will allocate and return a 4D array of blocks indexed along the y- and x-axes \
   (block_index_y, block_index_x, y, x).";
-static const char* GETBLOCK3DOUTPUTSHAPE_DOC = "Returns the shape of the \
-  output 2D blitz array/image, when calling bob.ip.block() which performs a \
-  block decomposition of a 2D array/image, and saving the results in a 3D \
-  array (block_index, y, x).";
-static const char* GETBLOCK4DOUTPUTSHAPE_DOC = "Returns the shape of the \
-  output 2D blitz array/image, when calling bob.ip.block() which performs a \
-  block decomposition of a 2D array/image, and saving the results in a 4D \
-  array (block_index_y, block_index_x, y, x).";
+static const char* GETBLOCK3DOUTPUTSHAPE_DOC = "Returns the shape of the output 2D blitz array/image, when calling bob.ip.block() which performs a \
+  block decomposition of a 2D array/image, and saving the results in a 3D array (block_index, y, x).";
+static const char* GETBLOCK4DOUTPUTSHAPE_DOC = "Returns the shape of the output 2D blitz array/image, when calling bob.ip.block() which performs a \
+  block decomposition of a 2D array/image, and saving the results in a 4D array (block_index_y, block_index_x, y, x).";
 
 template <typename T> 
 static void inner_block_3d(bob::python::const_ndarray input,
@@ -94,8 +88,7 @@ static void block(bob::python::const_ndarray input,
       }     
     default: 
       PYTHON_ERROR(TypeError, 
-        "bob.ip.block() operator does not support output array with number \
-         of dimensions " SIZE_T_FMT ".", info.nd);
+        "bob.ip.block() operator does not support output array with number of dimensions " SIZE_T_FMT ".", info.nd);
   }
 }
 
@@ -171,8 +164,7 @@ static object get_block_3d_output_shape(bob::python::const_ndarray input,
       return inner_get_block_3d_output_shape<double>(input, a,b,c,d);
     default: 
       PYTHON_ERROR(TypeError, 
-        "bob.ip.get_block_3d_output_shape() does not support array with \
-         type '%s'.", info.str().c_str());
+        "bob.ip.get_block_3d_output_shape() does not support array with type '%s'.", info.str().c_str());
   }
 }
 
@@ -189,8 +181,7 @@ static object get_block_4d_output_shape(bob::python::const_ndarray input,
       return inner_get_block_4d_output_shape<double>(input, a,b,c,d);
     default: 
       PYTHON_ERROR(TypeError, 
-        "bob.ip.get_block_4d_output_shape() does not support array with \
-         type '%s'", info.str().c_str());
+        "bob.ip.get_block_4d_output_shape() does not support array with type '%s'", info.str().c_str());
   }
 }
 

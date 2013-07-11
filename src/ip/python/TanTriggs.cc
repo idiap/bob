@@ -20,22 +20,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ip/TanTriggs.h"
-#include "bob/python/ndarray.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/TanTriggs.h>
 
 using namespace boost::python;
 
 static const char* ttdoc = "Objects of this class, after configuration, can preprocess images. It does this using the method described by Tan and Triggs in the paper titled \" Enhanced_Local_Texture_Feature_Sets for_Face_Recognition_Under_Difficult_Lighting_Conditions\", published in 2007";
-
-static object py_getKernel(const bob::ip::TanTriggs& op) 
-{
-  const blitz::Array<double,2>& kernel = op.getKernel();
-  bob::python::ndarray kernel_new(bob::core::array::t_float64, 
-    kernel.extent(0), kernel.extent(1));
-  blitz::Array<double,2> kernel_new_ = kernel_new.bz<double,2>();
-  kernel_new_ = kernel;
-  return kernel_new.self();
-}
 
 template <typename T> 
 static void inner_call1(bob::ip::TanTriggs& obj, 
@@ -56,7 +46,7 @@ static void call1(bob::ip::TanTriggs& obj, bob::python::const_ndarray src,
       return inner_call1<uint16_t>(obj, src, dst);
     case bob::core::array::t_float64: 
       return inner_call1<double>(obj, src, dst);
-    default: PYTHON_ERROR(TypeError, "TanTriggers __call__ does not support array with type '%s'", info.str().c_str());
+    default: PYTHON_ERROR(TypeError, "TanTriggs __call__ does not support array with type '%s'", info.str().c_str());
   }
 }
 
@@ -85,7 +75,7 @@ static object call2(bob::ip::TanTriggs& op, bob::python::const_ndarray src)
 }
 
 void bind_ip_tantriggs() {
-  class_<bob::ip::TanTriggs, boost::shared_ptr<bob::ip::TanTriggs> >("TanTriggs", ttdoc, init<optional<const double, const double, const double, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("gamma")=0.2, arg("sigma0")=1., arg("sigma1")=2., arg("radius")=2, arg("threshold")=10., arg("alpha")=0.1, arg("conv_border")=bob::sp::Extrapolation::Mirror), "Constructs a new Tan and Triggs filter."))
+  class_<bob::ip::TanTriggs, boost::shared_ptr<bob::ip::TanTriggs> >("TanTriggs", ttdoc, init<optional<const double, const double, const double, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("self"), arg("gamma")=0.2, arg("sigma0")=1., arg("sigma1")=2., arg("radius")=2, arg("threshold")=10., arg("alpha")=0.1, arg("conv_border")=bob::sp::Extrapolation::Mirror), "Constructs a new Tan and Triggs filter."))
       .def(init<bob::ip::TanTriggs&>(args("other")))
       .def(self == self)
       .def(self != self)
@@ -96,7 +86,7 @@ void bind_ip_tantriggs() {
       .add_property("threshold", &bob::ip::TanTriggs::getThreshold, &bob::ip::TanTriggs::setThreshold, "The threshold used for the contrast equalization")
       .add_property("alpha", &bob::ip::TanTriggs::getAlpha, &bob::ip::TanTriggs::setAlpha, "The alpha value used for the contrast equalization")
       .add_property("conv_border", &bob::ip::TanTriggs::getConvBorder, &bob::ip::TanTriggs::setConvBorder, "The extrapolation method used by the convolution at the border")
-      .add_property("kernel", &py_getKernel, "The values of the DoG filter (read only access)")
+      .add_property("kernel", make_function(&bob::ip::TanTriggs::getKernel, return_value_policy<copy_const_reference>()), "The values of the DoG filter (read only access)")
       .def("reset", &bob::ip::TanTriggs::reset, (arg("self"), arg("gamma")=0.2, arg("sigma0")=0.1, arg("sigma1")=0.2, arg("radius")=2, arg("threshold")=10., arg("alpha")=0.1, arg("conv_border")=bob::sp::Extrapolation::Mirror), "Resets the parametrization of the Tan and Triggs preprocessor")
       .def("__call__", &call1, (arg("self"), arg("src"), arg("dst")), "Preprocesses a 2D/grayscale image using the algorithm from Tan and Triggs. The dst array should have the expected type (numpy.float64) and the same size as the src array.")
       .def("__call__", &call2, (arg("self"), arg("src")), "Preprocesses a 2D/grayscale image using the algorithm from Tan and Triggs. The preprocessed image is returned as a 2D numpy array of type numpy.float64.")

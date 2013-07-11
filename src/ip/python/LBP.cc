@@ -132,8 +132,8 @@ void bind_ip_lbp() {
     .value("DIRECTION_CODED", bob::ip::ELBP_DIRECTION_CODED);
 
   class_<bob::ip::LBP, boost::shared_ptr<bob::ip::LBP> >("LBP", "A class for the LBP operators", no_init)
-    .def(init<int, double, double, bool, bool, bool, bool, bool, bob::ip::ELBPType >((arg("neighbors"), arg("radius_y"), arg("radius_x"), arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR), "Constructs a new LBP operator with different radii"))
-    .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType >((arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR), "Constructs a new LBP operator"))
+    .def(init<int, double, double, bool, bool, bool, bool, bool, bob::ip::ELBPType >((arg("self"), arg("neighbors"), arg("radius_y"), arg("radius_x"), arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR), "Constructs a new LBP operator with different radii"))
+    .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType >((arg("self"), arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR), "Constructs a new LBP operator"))
 
     .add_property("radius", &bob::ip::LBP::getRadius, &bob::ip::LBP::setRadius)
     .add_property("radii", &bob::ip::LBP::getRadii, &bob::ip::LBP::setRadii)
@@ -156,7 +156,7 @@ void bind_ip_lbp() {
     ;
 
   class_<bob::ip::LBPTop, boost::shared_ptr<bob::ip::LBPTop> >("LBPTop", "Constructs a new LBPTop object starting from the algorithm configuration.",
-     init< const bob::ip::LBP &,  const bob::ip::LBP &,  const bob::ip::LBP & >((arg("xy"), arg("xt"), arg("yt")), "Constructs a new LBPTop object"))
+     init< const bob::ip::LBP &,  const bob::ip::LBP &,  const bob::ip::LBP & >((arg("self"), arg("xy"), arg("xt"), arg("yt")), "Constructs a new LBPTop object"))
     .add_property("xy", &bob::ip::LBPTop::getXY)
     .add_property("xt", &bob::ip::LBPTop::getXT)
     .add_property("yt", &bob::ip::LBPTop::getYT)
@@ -165,8 +165,8 @@ void bind_ip_lbp() {
 
 
   class_<bob::ip::LBPHSFeatures, boost::shared_ptr<bob::ip::LBPHSFeatures> >("LBPHSFeatures", "Constructs a new LBPHSFeatures object to extract histogram of LBP over 2D blitz arrays/images.", no_init)
-    .def(init<const int, const int, const int, const int, optional<const double, const int, const bool, const bool, const bool, const bool, const bool> >((arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("lbp_radius")=1., arg("lbp_neighbours")=8, arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Constructs a new LBPHS features extractor creating a new LBP extractor with the given parameters."))
-    .def(init<const int, const int, const int, const int, const bob::ip::LBP& >((arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("lbp")), "Constructs a new LBPHS features extractor using the given LBP extractor."))
+    .def(init<const int, const int, const int, const int, optional<const double, const int, const bool, const bool, const bool, const bool, const bool> >((arg("self"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("lbp_radius")=1., arg("lbp_neighbours")=8, arg("circular")=false,arg("to_average")=false,arg("add_average_bit")=false,arg("uniform")=false, arg("rotation_invariant")=false), "Constructs a new LBPHS features extractor creating a new LBP extractor with the given parameters."))
+    .def(init<const int, const int, const int, const int, const bob::ip::LBP& >((arg("self"), arg("block_h"), arg("block_w"), arg("overlap_h"), arg("overlap_w"), arg("lbp")), "Constructs a new LBPHS features extractor using the given LBP extractor."))
     .add_property("n_bins", &bob::ip::LBPHSFeatures::getNBins)
     .def("get_n_blocks", (const int (bob::ip::LBPHSFeatures::*)(const blitz::Array<uint8_t,2>& src))&bob::ip::LBPHSFeatures::getNBlocks<uint8_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting LBPHS Features on the given input")
     .def("get_n_blocks", (const int (bob::ip::LBPHSFeatures::*)(const blitz::Array<uint16_t,2>& src))&bob::ip::LBPHSFeatures::getNBlocks<uint16_t>, (arg("self"),arg("input")), "Return the number of blocks generated when extracting LBPHS Features on the given input")

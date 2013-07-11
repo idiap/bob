@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/ip/FaceEyesNorm.h"
-#include "bob/python/ndarray.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/FaceEyesNorm.h>
 
 using namespace boost::python;
 
@@ -105,9 +105,9 @@ static void call2(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
 }
 
 void bind_ip_faceeyesnorm() {
-  class_<bob::ip::FaceEyesNorm, boost::shared_ptr<bob::ip::FaceEyesNorm> >("FaceEyesNorm", faceeyesnorm_doc, init<const double, const size_t, const size_t, const double, const double>((arg("eyes_distance"), arg("crop_height"), arg("crop_width"), arg("crop_eyecenter_offset_h"), arg("crop_eyecenter_offset_w")), "Constructs a FaceEyeNorm object."))
-      .def(init<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>(args("crop_height", "crop_width", "re_y", "re_x", "le_y", "le_x"), "Creates a FaceEyesNorm class that will put the eyes to the given locations and crop the image to the desired size."))
-      .def(init<bob::ip::FaceEyesNorm&>(args("other")))
+  class_<bob::ip::FaceEyesNorm, boost::shared_ptr<bob::ip::FaceEyesNorm> >("FaceEyesNorm", faceeyesnorm_doc, init<const double, const size_t, const size_t, const double, const double>((arg("self"), arg("eyes_distance"), arg("crop_height"), arg("crop_width"), arg("crop_eyecenter_offset_h"), arg("crop_eyecenter_offset_w")), "Constructs a FaceEyeNorm object."))
+      .def(init<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>(args("self", "crop_height", "crop_width", "re_y", "re_x", "le_y", "le_x"), "Creates a FaceEyesNorm class that will put the eyes to the given locations and crop the image to the desired size."))
+      .def(init<bob::ip::FaceEyesNorm&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .add_property("eyes_distance", &bob::ip::FaceEyesNorm::getEyesDistance, &bob::ip::FaceEyesNorm::setEyesDistance, "Expected distance between the eyes after the geometric normalization.")
@@ -117,8 +117,8 @@ void bind_ip_faceeyesnorm() {
       .add_property("crop_offset_w", &bob::ip::FaceEyesNorm::getCropOffsetW, &bob::ip::FaceEyesNorm::setCropOffsetW, "x-coordinate of the point in the cropping area which is the middle of the segment defined by the eyes after the geometric normalization.")
       .add_property("last_angle", &bob::ip::FaceEyesNorm::getLastAngle, "The angle value (in degrees) used by the rotation involved in the last call of the operator ()")
       .add_property("last_scale", &bob::ip::FaceEyesNorm::getLastScale, "The scaling factor used by the scaling involved in the last call of the operator ()")
-      .def("__call__", &call1, (arg("input"), arg("output"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye.")
-      .def("__call__", &call1b, (arg("input"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye. The output is allocated and returned.")
-      .def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers, taking mask into account.")
+      .def("__call__", &call1, (arg("self"), arg("input"), arg("output"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye.")
+      .def("__call__", &call1b, (arg("self"), arg("input"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers. Please note that the horizontal position le_x of the left eye is usually larger than the position re_x of the right eye. The output is allocated and returned.")
+      .def("__call__", &call2, (arg("self"), arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("re_y"), arg("re_x"), arg("le_y"), arg("le_x")), "Extracts a face given the coordinates of the left (le_y, le_x) and right (re_y, re_x) eye centers, taking mask into account.")
     ;
 }

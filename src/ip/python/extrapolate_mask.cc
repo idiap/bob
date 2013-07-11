@@ -37,8 +37,6 @@ static void extrapolate_mask(bob::python::const_ndarray src,
   bob::python::const_ndarray img) 
 {  
   const bob::core::array::typeinfo& info = img.type(); 
-  if (info.nd != 2) PYTHON_ERROR(TypeError, "mask extrapolation does not support input of type '%s'", info.str().c_str());
-
   switch (info.dtype) {
     case bob::core::array::t_uint8: return inner_extrapolateMask<uint8_t>(src, img);
     case bob::core::array::t_uint16: return inner_extrapolateMask<uint16_t>(src, img);

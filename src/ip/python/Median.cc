@@ -30,10 +30,10 @@ using namespace boost::python;
 static const char* medianfilter_doc = "Objects of this class, after configuration, can perform a median filtering operation.";
 
 #define MEDIAN_CLASS(T,N) \
-  class_<bob::ip::Median<T> , boost::shared_ptr<bob::ip::Median<T> > >(N, medianfilter_doc, init<const int, const int>((arg("radius_y"), arg("radius_x")), "Constructs a median filter object.")) \
-    .def("reset", (void (bob::ip::Median<T>::*)(const int, const int))&bob::ip::Median<T>::reset, (arg("radius_y"), arg("radius_x")), "Updates the kernel dimensions.") \
-    .def("__call__", (void (bob::ip::Median<T>::*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&bob::ip::Median<T>::operator(), (arg("input"), arg("output")), "Call an object of this type to filter an image with a median filter.") \
-    .def("__call__", (void (bob::ip::Median<T>::*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&bob::ip::Median<T>::operator(), (arg("input"), arg("output")), "Call an object of this type to filter an image with a median filter.") \
+  class_<bob::ip::Median<T> , boost::shared_ptr<bob::ip::Median<T> > >(N, medianfilter_doc, init<const int, const int>((arg("self"), arg("radius_y"), arg("radius_x")), "Constructs a median filter object.")) \
+    .def("reset", (void (bob::ip::Median<T>::*)(const int, const int))&bob::ip::Median<T>::reset, (arg("self"), arg("radius_y"), arg("radius_x")), "Updates the kernel dimensions.") \
+    .def("__call__", (void (bob::ip::Median<T>::*)(const blitz::Array<T,2>&, blitz::Array<T,2>&))&bob::ip::Median<T>::operator(), (arg("self"), arg("input"), arg("output")), "Call an object of this type to filter an image with a median filter.") \
+    .def("__call__", (void (bob::ip::Median<T>::*)(const blitz::Array<T,3>&, blitz::Array<T,3>&))&bob::ip::Median<T>::operator(), (arg("self"), arg("input"), arg("output")), "Call an object of this type to filter an image with a median filter.") \
   ;
 
 void bind_ip_median() {

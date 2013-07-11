@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/shear.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/shear.h>
 
 using namespace boost::python;
 
@@ -34,9 +34,6 @@ static object inner_shear_x_shape(bob::python::const_ndarray src, double s)
 static object shear_x_shape(bob::python::const_ndarray src, double s) 
 {
   const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2)
-    PYTHON_ERROR(TypeError, "bob.ip.get_shear_x_shape() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype) {
     case bob::core::array::t_uint8: return inner_shear_x_shape<uint8_t,2>(src, s);
@@ -56,9 +53,6 @@ static object inner_shear_y_shape (bob::python::const_ndarray src, double s)
 static object shear_y_shape (bob::python::const_ndarray src, double s) 
 {
   const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2)
-    PYTHON_ERROR(TypeError, "bob.ip.get_shear_y_shape() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype) {
     case bob::core::array::t_uint8: return inner_shear_y_shape<uint8_t,2>(src, s);
@@ -81,9 +75,6 @@ static void shear_x(bob::python::const_ndarray src,
   bob::python::ndarray dst, double a, bool aa=true) 
 {
   const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "bob.ip.shear_x() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype) {
     case bob::core::array::t_uint8: return inner_shear_x<uint8_t,2>(src, dst, a, aa);
@@ -112,9 +103,6 @@ static object shear_x_p(bob::python::const_ndarray src, double a,
 {
   const bob::core::array::typeinfo& info = src.type();
 
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "bob.ip.shear_x() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
-
   switch(info.dtype) {
     case bob::core::array::t_uint8: return inner_shear_x_p<uint8_t,2>(src, a, aa);
     case bob::core::array::t_uint16: return inner_shear_x_p<uint16_t,2>(src, a, aa);
@@ -139,9 +127,6 @@ static void shear_y(bob::python::const_ndarray src,
   bob::python::ndarray dst, double a, bool aa=true) 
 {
   const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2)
-    PYTHON_ERROR(TypeError, "bob.ip.shear_y() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype) {
     case bob::core::array::t_uint8: return inner_shear_y<uint8_t,2>(src, dst, a, aa);
@@ -170,9 +155,6 @@ static object shear_y_p(bob::python::const_ndarray src, double a,
 {
   const bob::core::array::typeinfo& info = src.type();
 
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "bob.ip.shear_y() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
-
   switch(info.dtype) {
     case bob::core::array::t_uint8: return inner_shear_y_p<uint8_t,2>(src, a, aa);
     case bob::core::array::t_uint16: return inner_shear_y_p<uint16_t,2>(src, a, aa);
@@ -199,9 +181,6 @@ static void shear_x2(bob::python::const_ndarray src,
   bob::python::ndarray dmask, double a, bool aa=true) 
 {
   const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2)
-    PYTHON_ERROR(TypeError, "bob.ip.shear_x() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype) {
     case bob::core::array::t_uint8:
@@ -232,9 +211,6 @@ static void shear_y2(bob::python::const_ndarray src,
   bob::python::ndarray dmask, double a, bool aa=true) 
 {
   const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "bob.ip.shear_y() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch(info.dtype) {
     case bob::core::array::t_uint8:

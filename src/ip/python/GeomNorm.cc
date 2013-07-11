@@ -97,8 +97,8 @@ static blitz::TinyVector<double,2> call3(bob::ip::GeomNorm& obj,
 
 void bind_ip_geomnorm() 
 {
-  class_<bob::ip::GeomNorm, boost::shared_ptr<bob::ip::GeomNorm> >("GeomNorm", GEOMNORM_DOC, init<const double, const double, const size_t, const size_t, const double, const double>((arg("rotation_angle"), arg("scaling_factor"), arg("crop_height"), arg("crop_width"), arg("crop_offset_h"), arg("crop_offset_w")), "Constructs a GeomNorm object."))
-    .def(init<bob::ip::GeomNorm&>(args("other")))
+  class_<bob::ip::GeomNorm, boost::shared_ptr<bob::ip::GeomNorm> >("GeomNorm", GEOMNORM_DOC, init<const double, const double, const size_t, const size_t, const double, const double>((arg("self"), arg("rotation_angle"), arg("scaling_factor"), arg("crop_height"), arg("crop_width"), arg("crop_offset_h"), arg("crop_offset_w")), "Constructs a GeomNorm object."))
+    .def(init<bob::ip::GeomNorm&>((arg("self"), arg("other"))))
     .def(self == self)
     .def(self != self)
     .add_property("rotation_angle", &bob::ip::GeomNorm::getRotationAngle, &bob::ip::GeomNorm::setRotationAngle, "Rotation angle for the geometric normalization (in radians)")
@@ -107,9 +107,9 @@ void bind_ip_geomnorm()
     .add_property("crop_width", &bob::ip::GeomNorm::getCropWidth, &bob::ip::GeomNorm::setCropWidth, "Width of the cropping area/output after the geometric normalization")
     .add_property("crop_offset_h", &bob::ip::GeomNorm::getCropOffsetH, &bob::ip::GeomNorm::setCropOffsetH, "y-coordinate of the rotation center in the new cropped area")
     .add_property("crop_offset_w", &bob::ip::GeomNorm::getCropOffsetW, &bob::ip::GeomNorm::setCropOffsetW, "x-coordinate of the rotation center in the new cropped area")
-    .def("__call__", &call1, (arg("input"), arg("output"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center")
-    .def("__call__", &call2, (arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center, taking mask into account.")
-    .def("__call__", &call3, (arg("input"), arg("rotation_center_y"), arg("rotation_center_x")), "This function performs the geometric normalization for the given input position")
+    .def("__call__", &call1, (arg("self"), arg("input"), arg("output"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center")
+    .def("__call__", &call2, (arg("self"), arg("input"), arg("input_mask"), arg("output"), arg("output_mask"), arg("rotation_center_y"), arg("rotation_center_x")), "Call an object of this type to perform a geometric normalization of an image wrt. the given rotation center, taking mask into account.")
+    .def("__call__", &call3, (arg("self"), arg("input"), arg("rotation_center_y"), arg("rotation_center_x")), "This function performs the geometric normalization for the given input position")
   ;
 
   def("max_rect_in_mask", (const blitz::TinyVector<int,4> (*)(const blitz::Array<bool,2>&))&bob::ip::maxRectInMask, (("src")), MAXRECTINMASK2D_DOC); 

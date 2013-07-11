@@ -21,8 +21,8 @@
  */
 
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/gammaCorrection.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/gammaCorrection.h>
 
 using namespace boost::python;
 
@@ -39,12 +39,6 @@ static void py_gamma_correction_c(bob::python::const_ndarray src,
 {
   const bob::core::array::typeinfo& info = src.type();
 
-  if (info.nd != 2) 
-    PYTHON_ERROR(TypeError, 
-      "bob.ip.gamma_correction() does not support input array with \
-       " SIZE_T_FMT " dimensions.",
-      info.nd);
-
   switch (info.dtype) {
     case bob::core::array::t_uint8: 
       return inner_gammaCorrection_c<uint8_t,2>(src, dst, g);
@@ -54,8 +48,7 @@ static void py_gamma_correction_c(bob::python::const_ndarray src,
       return inner_gammaCorrection_c<double,2>(src, dst, g);
     default:
       PYTHON_ERROR(TypeError, 
-        "bob.ip.gamma_correction() does not support input array of \
-         type '%s'.",
+        "bob.ip.gamma_correction() does not support input array of type '%s'.",
         info.str().c_str());
   }
 }
@@ -77,12 +70,6 @@ static object py_gamma_correction_p(bob::python::const_ndarray src,
 {
   const bob::core::array::typeinfo& info = src.type();
 
-  if (info.nd != 2) 
-    PYTHON_ERROR(TypeError, 
-      "bob.ip.gamma_correction() does not support input array with \
-       " SIZE_T_FMT " dimensions.",
-      info.nd);
-
   switch (info.dtype) {
     case bob::core::array::t_uint8: 
       return inner_gammaCorrection_p<uint8_t,2>(src, g);
@@ -92,8 +79,7 @@ static object py_gamma_correction_p(bob::python::const_ndarray src,
       return inner_gammaCorrection_p<double,2>(src, g);
     default:
       PYTHON_ERROR(TypeError, 
-        "bob.ip.gamma_correction() does not support input array of \
-         type '%s'.",
+        "bob.ip.gamma_correction() does not support input array of type '%s'.",
         info.str().c_str());
   }
 }

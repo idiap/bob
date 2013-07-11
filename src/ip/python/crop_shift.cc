@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/crop.h"
-#include "bob/ip/shift.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/crop.h>
+#include <bob/ip/shift.h>
 
 using namespace boost::python;
 
@@ -69,8 +69,7 @@ static void py_crop1_c(bob::python::const_ndarray src,
     case 3: 
       return inner_crop1_type<3>(src, dst, y, x, h, w, allow_out, zero_out);
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with \
-        " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -93,8 +92,7 @@ static object py_crop1_p(bob::python::const_ndarray src, const int y,
         return dst.self();
       }
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with \
-        " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -152,8 +150,7 @@ static void py_crop2_c(bob::python::const_ndarray src,
       return inner_crop2_type<3>(src, smask, dst, dmask, y, x, h, w, 
                                  allow_out, zero_out);
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with \
-        " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.crop() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -200,8 +197,7 @@ static void py_shift1_c(bob::python::const_ndarray src,
     case 3: 
       return inner_shift1_type<3>(src, dst, y, x, allow_out, zero_out);
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with \
-        " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -224,8 +220,7 @@ static object py_shift1_p(bob::python::const_ndarray src, const int y,
         return dst.self();
       }
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with \
-        " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -283,8 +278,7 @@ static void py_shift2_c(bob::python::const_ndarray src,
       return inner_shift2_type<3>(src, smask, dst, dmask, y, x,
                                  allow_out, zero_out);
     default:
-      PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with \
-        " SIZE_T_FMT " dimensions.", info.nd);
+      PYTHON_ERROR(TypeError, "bob.ip.shift() does not support array with " SIZE_T_FMT " dimensions.", info.nd);
   }
 }
 
@@ -297,14 +291,12 @@ void bind_ip_crop_shift()
     py_crop1_c_overloads((arg("src"), arg("dst"), arg("crop_y"), 
       arg("crop_x"), arg("crop_h"), arg("crop_w"), arg("allow_out")=false,
       arg("zero_out")=false), 
-    "Crop a 2D or 3D array/image. The destination array should have the \
-     expected size."));
+    "Crop a 2D or 3D array/image. The destination array should have the expected size."));
   def("crop", &py_crop1_p, 
     py_crop1_p_overloads((arg("src"), arg("crop_y"), arg("crop_x"), 
       arg("crop_h"), arg("crop_w"), arg("allow_out")=false, 
       arg("zero_out")=false), 
-    "Crop a 2D or 3D array/image. The cropped image will be allocated and \
-     returned."));
+    "Crop a 2D or 3D array/image. The cropped image will be allocated and returned."));
   def("crop", &py_crop2_c, 
     py_crop2_c_overloads((arg("src"), arg("src_mask"), arg("dst"), 
       arg("dst_mask"), arg("crop_y"), arg("crop_x"), arg("crop_h"), 
@@ -314,13 +306,11 @@ void bind_ip_crop_shift()
   def("shift", &py_shift1_c, 
     py_shift1_c_overloads((arg("src"), arg("dst"), arg("shift_y"), 
       arg("shift_x"), arg("allow_out")=false, arg("zero_out")=false), 
-    "Shift a 2D or 3D array/image. The destination array should have the \
-     same size as the source array."));
+    "Shift a 2D or 3D array/image. The destination array should have the same size as the source array."));
   def("shift", &py_shift1_p, 
     py_shift1_p_overloads((arg("src"), arg("shift_y"), arg("shift_x"), 
       arg("allow_out")=false, arg("zero_out")=false), 
-    "Shift a 2D or 3D array/image. The shifted image will be allocated and \
-     returned."));
+    "Shift a 2D or 3D array/image. The shifted image will be allocated and returned."));
   def("shift", &py_shift2_c, 
     py_shift2_c_overloads((arg("src"), arg("src_mask"), arg("dst"), 
       arg("dst_mask"), arg("shift_y"), arg("shift_x"), 

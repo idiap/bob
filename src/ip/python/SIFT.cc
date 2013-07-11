@@ -50,25 +50,20 @@ static object compute_descr_p(bob::ip::SIFT& op,
 {
   const bob::core::array::typeinfo& info = src.type();
   
-  if(info.nd == 2)
+  switch(info.dtype) 
   {
-    switch(info.dtype) 
-    {
-      case bob::core::array::t_uint8: return inner_compute_descr_p<uint8_t>(op, src, kp);
-      case bob::core::array::t_uint16: return inner_compute_descr_p<uint16_t>(op, src, kp);
-      case bob::core::array::t_float64: return inner_compute_descr_p<double>(op, src, kp);
-      default:
-        PYTHON_ERROR(TypeError, "bob.ip.SIFT.compute_descriptor() does not support array with type '%s'", info.str().c_str());
-    }
+    case bob::core::array::t_uint8: return inner_compute_descr_p<uint8_t>(op, src, kp);
+    case bob::core::array::t_uint16: return inner_compute_descr_p<uint16_t>(op, src, kp);
+    case bob::core::array::t_float64: return inner_compute_descr_p<double>(op, src, kp);
+    default:
+      PYTHON_ERROR(TypeError, "bob.ip.SIFT.compute_descriptor() does not support array with type '%s'", info.str().c_str());
   }
-  else
-    PYTHON_ERROR(TypeError, "bob.ip.SIFT.compute_descriptor() does not support array with " SIZE_T_FMT " dimensions", info.nd);
 }
 
 void bind_ip_sift() 
 {
-  class_<bob::ip::SIFT, boost::shared_ptr<bob::ip::SIFT> >("SIFT", "This class allows after configuration the extraction of SIFT descriptors.\n\nReference:\n'Distinctive Image Features from Scale-Invariant Keypoints', D. Lowe, International Journal of Computer Vision, 2004", init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double, const double, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("height"), arg("width"), arg("n_octaves"), arg("n_scales"), arg("octave_min"), arg("sigma_n")=0.5, arg("sigma0")=1.6, arg("contrast_thres")=0.03, arg("edge_thres")=10., arg("norm_thres")=0.2, arg("kernel_radius_factor")=4., arg("border_type")=bob::sp::Extrapolation::Mirror), "Creates an object that allows the extraction of SIFT descriptors."))
-      .def(init<bob::ip::SIFT&>(args("other")))
+  class_<bob::ip::SIFT, boost::shared_ptr<bob::ip::SIFT> >("SIFT", "This class allows after configuration the extraction of SIFT descriptors.\n\nReference:\n'Distinctive Image Features from Scale-Invariant Keypoints', D. Lowe, International Journal of Computer Vision, 2004", init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double, const double, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("self"), arg("height"), arg("width"), arg("n_octaves"), arg("n_scales"), arg("octave_min"), arg("sigma_n")=0.5, arg("sigma0")=1.6, arg("contrast_thres")=0.03, arg("edge_thres")=10., arg("norm_thres")=0.2, arg("kernel_radius_factor")=4., arg("border_type")=bob::sp::Extrapolation::Mirror), "Creates an object that allows the extraction of SIFT descriptors."))
+      .def(init<bob::ip::SIFT&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .add_property("height", &bob::ip::SIFT::getHeight, &bob::ip::SIFT::setHeight, "The height of the images to process")

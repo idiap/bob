@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/integral.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/integral.h>
 
 using namespace boost::python;
 
@@ -34,9 +34,6 @@ static void inner_integral (bob::python::const_ndarray src, bob::python::ndarray
 template <typename T, int N>
 static void integral2 (bob::python::const_ndarray src, bob::python::ndarray dst, bool b) {
   const bob::core::array::typeinfo& info = dst.type();
-
-  if(info.nd != 2)
-    PYTHON_ERROR(TypeError, "integral image operator does not support output with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch (info.dtype) {
     case bob::core::array::t_int8: return inner_integral<T,int8_t,N>(src, dst, b);
@@ -57,9 +54,6 @@ static void integral2 (bob::python::const_ndarray src, bob::python::ndarray dst,
 
 static void integral (bob::python::const_ndarray src, bob::python::ndarray dst, bool b=false) {
   const bob::core::array::typeinfo& info = src.type();
-
-  if(info.nd != 2)
-    PYTHON_ERROR(TypeError, "integral image operator does not support input with " SIZE_T_FMT " dimensions.", info.nd);
 
   switch (info.dtype) {
     case bob::core::array::t_uint8: return integral2<uint8_t,2>(src, dst, b);

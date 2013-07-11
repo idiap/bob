@@ -418,7 +418,7 @@ void bind_ip_glcmprop()
 {
   class_<bob::ip::GLCMProp, boost::shared_ptr<bob::ip::GLCMProp>, boost::noncopyable>("GLCMProp", glcmprop_doc, no_init)
     .def("__init__", make_constructor(&py_constructor_glcmprop, default_call_policies()),"Constuctor")
-    .def(init<const bob::ip::GLCMProp&>((arg("glcmprop_operator")), "Copy constructs a GLCMProp operator"))
+    .def(init<const bob::ip::GLCMProp&>((arg("self"), arg("glcmprop_operator")), "Copy constructs a GLCMProp operator"))
 
     .def("get_glcmprop_shape", &call_getprop_shape, (arg("self"), arg("input")), "Get the shape of the GLCM properties vector given the input GLCM. For each offset of the GLCM, one field of the output vector is filled.")
     .def("angular_second_moment", &call_angular_second_moment_c, (arg("self"),arg("input"), arg("output")), "Extract Angular Second Moment property of the input GLCM (see ref [1])")    

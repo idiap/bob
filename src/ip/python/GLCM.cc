@@ -38,8 +38,7 @@ static boost::shared_ptr<bob::ip::GLCM> py_constructor_glcm()
 template <typename T>  
 static void call_set_offset(bob::ip::GLCM<T>& op, bob::python::const_ndarray input)
 {
-  blitz::Array<int32_t, 2> input_ = input.bz<int32_t,2>(); 
-  op.setOffset(input_);
+  op.setOffset(input.bz<int32_t,2>());
 } 
 
 template <typename T>

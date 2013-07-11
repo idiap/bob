@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/SelfQuotientImage.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/SelfQuotientImage.h>
 
 using namespace boost::python;
 
@@ -125,8 +125,8 @@ static object py_call2(bob::ip::SelfQuotientImage& op,
 
 
 void bind_ip_sqi() {
-  class_<bob::ip::SelfQuotientImage, boost::shared_ptr<bob::ip::SelfQuotientImage> >("SelfQuotientImage", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const size_t, const size_t, const double, const bob::sp::Extrapolation::BorderType> >((arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma2")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a SelfQuotientImage object."))
-      .def(init<bob::ip::SelfQuotientImage&>(args("other")))
+  class_<bob::ip::SelfQuotientImage, boost::shared_ptr<bob::ip::SelfQuotientImage> >("SelfQuotientImage", "This class allows after configuration to apply the Self Quotient Image algorithm to images.", init<optional<const size_t, const size_t, const size_t, const double, const bob::sp::Extrapolation::BorderType> >((arg("self"), arg("n_scales")=1,arg("size_min")=1, arg("size_step")=1, arg("sigma2")=2., arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a SelfQuotientImage object."))
+      .def(init<bob::ip::SelfQuotientImage&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .add_property("n_scales", &bob::ip::SelfQuotientImage::getNScales, &bob::ip::SelfQuotientImage::setNScales, "The number of scales (Weighted Gaussian).")

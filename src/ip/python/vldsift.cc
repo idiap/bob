@@ -20,35 +20,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/VLDSIFT.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/VLDSIFT.h>
 
 using namespace boost::python;
 
 static void call_vldsift_(bob::ip::VLDSIFT& op, bob::python::const_ndarray src, bob::python::ndarray dst) {
-  const bob::core::array::typeinfo& info_s = src.type();  
-  if(info_s.nd != 2) 
-    PYTHON_ERROR(TypeError, "sift features extractor does not support input array with " SIZE_T_FMT "dimensions.", info_s.nd);
-  if(info_s.dtype != bob::core::array::t_float32)
-    PYTHON_ERROR(TypeError, "sift features does not support input array of type '%s'.", info_s.str().c_str());
-
-  const bob::core::array::typeinfo& info_d = dst.type();  
-  if(info_d.nd != 2)
-    PYTHON_ERROR(TypeError, "sift features extractor does not support output array with " SIZE_T_FMT "dimensions.", info_s.nd);
-  if(info_d.dtype != bob::core::array::t_float32)
-    PYTHON_ERROR(TypeError, "sift features does not support output array of type '%s'.", info_d.str().c_str());
-
   blitz::Array<float,2> dst_ = dst.bz<float,2>();
   op(src.bz<float,2>(), dst_);
 }
 
 static object call_vldsift(bob::ip::VLDSIFT& op, bob::python::const_ndarray src) {
-  const bob::core::array::typeinfo& info = src.type();  
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "sift features extractor does not support input array with " SIZE_T_FMT "dimensions.", info.nd);
-  if(info.dtype != bob::core::array::t_float32)
-    PYTHON_ERROR(TypeError, "sift features does not support input array of type '%s'.", info.str().c_str());
-
   bob::python::ndarray dst(bob::core::array::t_float32, op.getNKeypoints(), op.getDescriptorSize());
   blitz::Array<float,2> dst_ = dst.bz<float,2>();
   op(src.bz<float,2>(), dst_);
@@ -60,8 +42,8 @@ void bind_ip_vldsift()
 {
   static const char* VLDSIFT_doc = "Computes dense SIFT features using the VLFeat library";
 
-  class_<bob::ip::VLDSIFT, boost::shared_ptr<bob::ip::VLDSIFT> >("VLDSIFT", VLDSIFT_doc, init<const size_t, const size_t, optional<const size_t, const size_t> >((arg("height"), arg("width"), arg("step")=5, arg("block_size")=5), "Creates an object to compute dense SIFT features"))
-    .def(init<bob::ip::VLDSIFT&>(args("other")))
+  class_<bob::ip::VLDSIFT, boost::shared_ptr<bob::ip::VLDSIFT> >("VLDSIFT", VLDSIFT_doc, init<const size_t, const size_t, optional<const size_t, const size_t> >((arg("self"), arg("height"), arg("width"), arg("step")=5, arg("block_size")=5), "Creates an object to compute dense SIFT features"))
+    .def(init<bob::ip::VLDSIFT&>((arg("self"), arg("other"))))
     .def(self == self)
     .def(self != self)
     .add_property("height", &bob::ip::VLDSIFT::getHeight, &bob::ip::VLDSIFT::setHeight, "The height of the image to process")

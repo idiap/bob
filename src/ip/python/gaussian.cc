@@ -20,8 +20,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bob/python/ndarray.h"
-#include "bob/ip/Gaussian.h"
+#include <bob/python/ndarray.h>
+#include <bob/ip/Gaussian.h>
 
 using namespace boost::python;
 
@@ -150,8 +150,8 @@ void bind_ip_gaussian()
 {
   static const char* gaussiandoc = "This class allows after configuration to perform gaussian smoothing.";
 
-  class_<bob::ip::Gaussian, boost::shared_ptr<bob::ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const size_t, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=sqrt(2.5), arg("sigma_x")=sqrt(2.5), arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a gaussian smoother."))
-      .def(init<bob::ip::Gaussian&>(args("other")))
+  class_<bob::ip::Gaussian, boost::shared_ptr<bob::ip::Gaussian> >("Gaussian", gaussiandoc, init<optional<const size_t, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("self"), arg("radius_y")=1, arg("radius_x")=1, arg("sigma_y")=sqrt(2.5), arg("sigma_x")=sqrt(2.5), arg("conv_border")=bob::sp::Extrapolation::Mirror), "Creates a gaussian smoother."))
+      .def(init<bob::ip::Gaussian&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .add_property("radius_y", &bob::ip::Gaussian::getRadiusY, &bob::ip::Gaussian::setRadiusY, "The radius of the Gaussian along the y-axis (size of the kernel=2*radius+1)")

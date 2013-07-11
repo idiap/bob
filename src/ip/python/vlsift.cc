@@ -27,12 +27,6 @@ using namespace boost::python;
 
 static object call_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src) 
 {
-  const bob::core::array::typeinfo& info = src.type();  
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "sift features extractor does not support input of type " SIZE_T_FMT ".", info.nd);
-  if(info.dtype != bob::core::array::t_uint8)
-    PYTHON_ERROR(TypeError, "sift features does not support type '%s'", info.str().c_str());
-
   std::vector<blitz::Array<double,1> > dst;
   op(src.bz<uint8_t,2>(), dst);
   list t;
@@ -42,12 +36,6 @@ static object call_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src)
 
 static object call_kp_vlsift(bob::ip::VLSIFT& op, bob::python::const_ndarray src, bob::python::const_ndarray kp) 
 {
-  const bob::core::array::typeinfo& info = src.type();  
-  if(info.nd != 2) 
-    PYTHON_ERROR(TypeError, "sift features extractor does not support input of type " SIZE_T_FMT ".", info.nd);
-  if(info.dtype != bob::core::array::t_uint8)
-    PYTHON_ERROR(TypeError, "sift features does not support type '%s'", info.str().c_str());
-
   std::vector<blitz::Array<double,1> > dst;
   op(src.bz<uint8_t,2>(), kp.bz<double,2>(), dst);
   list t;
@@ -59,8 +47,8 @@ void bind_ip_vlsift()
 {
   static const char* VLSIFT_doc = "Computes SIFT features using the VLFeat library";
 
-  class_<bob::ip::VLSIFT, boost::shared_ptr<bob::ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double> >((arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=0.03, arg("edge_thres")=10., arg("magnif")=3.), "Creates an object to compute SIFT features using the VLFeat library"))
-    .def(init<bob::ip::VLSIFT&>(args("other")))
+  class_<bob::ip::VLSIFT, boost::shared_ptr<bob::ip::VLSIFT> >("VLSIFT", VLSIFT_doc, init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double> >((arg("self"), arg("height"), arg("width"), arg("n_intervals"), arg("n_octaves"), arg("octave_min"), arg("peak_thres")=0.03, arg("edge_thres")=10., arg("magnif")=3.), "Creates an object to compute SIFT features using the VLFeat library"))
+    .def(init<bob::ip::VLSIFT&>((arg("self"), arg("other"))))
     .def(self == self)
     .def(self != self)
     .add_property("height", &bob::ip::VLSIFT::getHeight, &bob::ip::VLSIFT::setHeight, "The height of the image to process")
