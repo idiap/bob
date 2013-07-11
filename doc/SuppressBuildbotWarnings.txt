@@ -5,3 +5,4 @@
 .* : .*html_static_path entry.*_static.*does not exist.*
 .* : .*LaTeX Warning:\s+.*
 .* : .*Package\s+\S+\s+Warning:.*
+.* : .*unusable reference target found: ../../doxygen/html/index.html.*
