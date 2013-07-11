@@ -71,46 +71,24 @@ Guidelines on building against Google perftools
    Before doing so, make sure you have followed your operating system
    instructions to install Google Perftools and that cmake can find it.
 
-2. Within your C++ code, include **optional** usage of perftools in the
-   following (suggested) way:
+2. Within your C++ code, include usage of perftools in the following
+   (suggested) way:
 
 .. code-block:: c++
 
-  #include <cstdlib> // for std::getenv()
-  #ifdef HAVE_GOOGLE_PERFTOOLS
   #include <google/profiler.h>
-  #endif
 
   int main(void) {
-    const char* profile_output = std::getenv("BOB_PROFILE");
-    if (profile_output && std::strlen(profile_output)) {
-  #ifdef HAVE_GOOGLE_PERFTOOLS
-      std::cout << "Google perftools profile output set to " << profile_output << std::endl;
-      ProfilerStart(profile_output);
-  #else
-      std::cout << "Google perftools were not found. Make sure they are available on your system and recompile." << std::endl;
-  #endif HAVE_GOOGLE_PERFTOOLS
-    }
+    ProfilerStart("/tmp/profile_info.out");
 
     run_code_to_be_profiled();
 
-  #ifdef HAVE_GOOGLE_PERFTOOLS
-    if (profile_output && std::strlen(profile_output)) ProfilerStop();
-  #endif
+    ProfilerStop();
   }
 
-With this, you tie the execution of the profiling to the setting of an
-environment variable called ``BOB_PROFILE``. If you don't set the variable,
-the code will execute in full speed. After compilation, to run your code in profile
-mode, just call your program in the following way:
-
-.. code-block:: sh
-
-  $ BOB_PROFILE="profile_info.out" my_program
-
-The file ``profile_info.out`` will contain the output of the profiling session.
-Use ``pprof`` as explained at Google's `PerfTool introduction to profiling`_ to
-visualize the output.
+The file ``/tmp/profile_info.out`` will contain the output of the profiling
+session.  Use ``pprof`` as explained at Google's `PerfTool introduction to
+profiling`_ to visualize the output.
 
 Profiling |project| Python C++ extensions
 -----------------------------------------
@@ -118,22 +96,15 @@ Profiling |project| Python C++ extensions
 If |project| was compiled with Google perftools support like indicated above,
 profiling python C++ extensions should be easy. Here is a recipe:
 
-.. code-block:: sh
+.. code-block:: python
 
-  #!python
   import bob
 
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStart'):
-    bob.core.ProfilerStart(os.environ['BOB_PROFILE'])
+  bob.core.ProfilerStart("/tmp/profile_info.out")
 
-  run_code_to_be_profiled();
+  run_code_to_be_profiled()
 
-  if os.environ.has_key('BOB_PROFILE') and \
-      os.environ['BOB_PROFILE'] and \
-      hasattr(bob.core, 'ProfilerStop'):
-    bob.core.ProfilerStop()
+  bob.core.ProfilerStop()
 
 .. Place here your links
 
