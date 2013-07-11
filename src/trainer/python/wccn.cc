@@ -28,6 +28,29 @@
 
 using namespace boost::python;
 
+
+static char CLASS_DOC[] = \
+  "Trains a :py:class:`bob.machine.LinearMachine` to perform Within-Class Covariance Normalisation.\n" \
+  "\n" \
+  //Given a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.
+  "WCCN finds the projection matrix W that allows us to linearly project the data matrix X to another (sub) space such that:\n"\
+  "\n"\
+  ".. math::\n" \
+  "   \n" \
+  "   W = cholesky(\[(1/N) S_{w}\]^{-1})\n" \
+  "\n"\
+  "where:\n"\
+  "\n" \
+  ":math:`S_w`\n" \
+  "\n" \
+  "   the within-class scatter; it also has dimensions (X.shape[0], X.shape[0]) and is defined as :math:`S_w = \\sum_{k=1}^K \\sum_{n \\in C_k} (x_n-m_k)(x_n-m_k)^T`, with K equal to the number of classes and :math:`C_k` a set representing all samples for class k.\n" \
+  "\n" \
+  ":math:`m_k`\n" \
+  "  \n" \
+  "   the class *k* empirical mean, defined as :math:`m_k = \\frac{1}{N_k}\\sum_{n \\in C_k} x_n`\n" \
+  "\n" \
+;
+
 void py_train1(bob::trainer::WCCNTrainer& t, bob::machine::LinearMachine& m, object data)
 {
   stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
@@ -55,7 +78,7 @@ object py_train2(bob::trainer::WCCNTrainer& t, object data)
 
 void bind_trainer_wccn()
 {
-  class_<bob::trainer::WCCNTrainer, boost::shared_ptr<bob::trainer::WCCNTrainer> >("WCCNTrainer", "Trains a linear machine to perform WCCN.\nReference:\n'Independent component analysis: algorithms and applications', Aapo Hyvarinen, Erkki Oja, Neural Networks, 2000, vol. 13, p. 411--430\nGiven a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.", init<>((arg("self")), "Initializes a new WCCN trainer."))
+  class_<bob::trainer::WCCNTrainer, boost::shared_ptr<bob::trainer::WCCNTrainer> >("WCCNTrainer", CLASS_DOC, init<>((arg("self")), "Initializes a new WCCN trainer."))
     .def(init<const bob::trainer::WCCNTrainer&>((arg("self"), arg("other")), "Copy constructs a WCCNTrainer"))
     .def(self == self)
     .def(self != self)
