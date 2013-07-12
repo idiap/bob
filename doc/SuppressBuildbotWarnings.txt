@@ -7,3 +7,4 @@
 .* : .*Package\s+\S+\s+Warning:.*
 .* : .*unusable reference target found: \.\./\.\./doxygen/html/index.html.*
 .* : .*no files found matching '\*\.sql3' under directory 'xbob'.*
+.* : .*command line option.*strict-prototypes.*for C/ObjC.*
