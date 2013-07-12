@@ -38,7 +38,7 @@ static char CLASS_DOC[] = \
   "   \n" \
   "   (1/N) S_{w} = W W^T\n" \
   "\n"\
-  "W is computed using Cholesky Decomposition:\n"\
+  "where W is an upper triangular matrix computed using Cholesky Decomposition:\n"\
   "\n"\
   ".. math::\n" \
   "   \n" \
