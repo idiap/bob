@@ -30,14 +30,14 @@ using namespace boost::python;
 
 
 static char CLASS_DOC[] = \
-  "Trains a :py:class:`bob.machine.LinearMachine` to perform Within-Class Covariance Normalisation.\n" \
+  "Trains a :py:class:`bob.machine.LinearMachine` to perform Within-Class Covariance Normalisation (WCCN).\n" \
   "\n" \
   //Given a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.
   "WCCN finds the projection matrix W that allows us to linearly project the data matrix X to another (sub) space such that:\n"\
   "\n"\
   ".. math::\n" \
   "   \n" \
-  "   W = cholesky(\[(1/N) S_{w}\]^{-1})\n" \
+  "   W = cholesky(\\[(1/N) S_{w}\\]^{-1})\n" \
   "\n"\
   "where:\n"\
   "\n" \
