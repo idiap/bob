@@ -32,12 +32,17 @@ using namespace boost::python;
 static char CLASS_DOC[] = \
   "Trains a :py:class:`bob.machine.LinearMachine` to perform Within-Class Covariance Normalisation (WCCN).\n" \
   "\n" \
-  //Given a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.
   "WCCN finds the projection matrix W that allows us to linearly project the data matrix X to another (sub) space such that:\n"\
   "\n"\
   ".. math::\n" \
   "   \n" \
-  "   W = cholesky(\\[(1/N) S_{w}\\]^{-1})\n" \
+  "   (1/N) S_{w} = W W^T\n" \
+  "\n"\
+  "W is computed using Cholesky Decomposition:\n"\
+  "\n"\
+  ".. math::\n" \
+  "   \n" \
+  "   W = cholesky([(1/N) S_{w} ]^{-1})\n" \
   "\n"\
   "where:\n"\
   "\n" \
@@ -49,6 +54,12 @@ static char CLASS_DOC[] = \
   "  \n" \
   "   the class *k* empirical mean, defined as :math:`m_k = \\frac{1}{N_k}\\sum_{n \\in C_k} x_n`\n" \
   "\n" \
+    "References:\n" \
+  "\n" \
+  "1. Andrew O. Hatch, Sachin Kajarekar, and Andreas Stolcke, Within-class covariance normalization for SVM-based speaker recognition, In INTERSPEECH, 2006.\n"\
+  "2. http://en.wikipedia.org/wiki/Cholesky_decomposition\n"\
+  "\n"\
+  "\n"\
 ;
 
 void py_train1(bob::trainer::WCCNTrainer& t, bob::machine::LinearMachine& m, object data)
