@@ -42,13 +42,17 @@ static char CLASS_DOC[] = \
   "\n"\
   ".. math::\n" \
   "   \n" \
-  "   W = cholesky([(1/N) S_{w} ]^{-1})\n" \
+  "   W = cholesky([(1/K) S_{w} ]^{-1})\n" \
   "\n"\
   "where:\n"\
   "\n" \
+  ":math:`K`\n" \
+  "  \n" \
+  "  the number of classes\n"\
+  "\n"\
   ":math:`S_w`\n" \
   "\n" \
-  "   the within-class scatter; it also has dimensions (X.shape[0], X.shape[0]) and is defined as :math:`S_w = \\sum_{k=1}^K \\sum_{n \\in C_k} (x_n-m_k)(x_n-m_k)^T`, with K equal to the number of classes and :math:`C_k` a set representing all samples for class k.\n" \
+  "   the within-class scatter; it also has dimensions (X.shape[0], X.shape[0]) and is defined as :math:`S_w = \\sum_{k=1}^K \\sum_{n \\in C_k} (x_n-m_k)(x_n-m_k)^T`, :math:`C_k` a set representing all samples for class k.\n" \
   "\n" \
   ":math:`m_k`\n" \
   "  \n" \
