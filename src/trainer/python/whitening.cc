@@ -26,6 +26,42 @@
 
 using namespace boost::python;
 
+static char CLASS_DOC[] = \
+  "Trains a :py:class:`bob.machine.LinearMachine` to perform Cholesky Whitening.\n" \
+  "\n" \
+  "The whitening transformation is a decorrelation method that converts the covariance matrix of a set of samples into the identity matrix :math:`I`. This effectively linearly transforms random variables such that the resulting variables are uncorrelated and have the same variances as the original random variables. this transformation is invertible. The method is called the whitening transform because it transforms the input matrix X closer towards white noise (let's call it :math:`\\tilde{X}`): \n"\
+  "\n"\
+  ".. math::\n" \
+  "   \n"\
+  "   Cov(\\tilde{X}) = I\n"\
+  "\n"\
+  "where:\n"\
+  "\n"\
+  ".. math::\n" \
+  "   \n"\
+  "   \\tilde{X} = X W\n"\
+  "\n"\
+  "W is the projection matrix that allows us to linearly project the data matrix X to another (sub) space such that:\n"\
+  "\n"\
+  ".. math::\n" \
+  "   \n" \
+  "   Cov(X) = W W^T\n" \
+  "\n"\
+  "W is computed using Cholesky Decomposition:\n"\
+  "\n"\
+  ".. math::\n" \
+  "   \n" \
+  "   W = cholesky([Cov(X)]^{-1})\n" \
+  "\n" \
+    "References:\n" \
+  "\n" \
+  "1. https://rtmath.net/help/html/e9c12dc0-e813-4ca9-aaa3-82340f1c5d24.htm\n"\
+  "2. http://en.wikipedia.org/wiki/Cholesky_decomposition\n"\
+  "\n"\
+  "\n"\
+;
+
+
 void py_train1(bob::trainer::WhiteningTrainer& t, 
   bob::machine::LinearMachine& m, bob::python::const_ndarray data)
 {
@@ -43,9 +79,10 @@ object py_train2(bob::trainer::WhiteningTrainer& t,
   return object(m);
 }
 
+
 void bind_trainer_whitening() 
 {
-  class_<bob::trainer::WhiteningTrainer, boost::shared_ptr<bob::trainer::WhiteningTrainer> >("WhiteningTrainer", "Trains a linear machine to perform whitening.\nGiven a training set X, this will compute the W matrix such that:\nW = cholesky(inv(cov(X_{n},X_{n}^{T}))), where X_{n} corresponds to the center data.\nReference:\n'Independent component analysis: algorithms and applications', Aapo Hyvarinen, Erkki Oja, Neural Networks, 2000, vol. 13, p. 411--430", init<>((arg("self")), "Initializes a new Whitening trainer."))
+  class_<bob::trainer::WhiteningTrainer, boost::shared_ptr<bob::trainer::WhiteningTrainer> >("WhiteningTrainer", CLASS_DOC, init<>((arg("self")), "Initializes a new Whitening trainer."))
     .def(init<const bob::trainer::WhiteningTrainer&>((arg("self"), arg("other")), "Copy constructs a WhiteningTrainer"))
     .def(self == self)
     .def(self != self)
