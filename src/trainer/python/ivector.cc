@@ -111,7 +111,7 @@ void bind_trainer_ivector()
   ;
 
 
-  class_<bob::trainer::IVectorTrainer, boost::shared_ptr<bob::trainer::IVectorTrainer>, boost::noncopyable, bases<EMTrainerIVectorBase> >("IVectorTrainer", "An IVectorTrainer to extract i-vector (TODO: references)", init<optional<bool, double, size_t, bool> >((arg("self"), arg("update_sigma")=false, arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=false), "Builds a new IVectorTrainer."))
+  class_<bob::trainer::IVectorTrainer, boost::shared_ptr<bob::trainer::IVectorTrainer>, boost::noncopyable, bases<EMTrainerIVectorBase> >("IVectorTrainer", "An trainer to extract i-vector (i.e. for training the Total Variability matrix)\n\nReferences:\n[1] 'Front End Factor Analysis for Speaker Verification', N. Dehak, P. Kenny, R. Dehak, P. Dumouchel, P. Ouellet, IEEE Transactions on Audio, Speech and Language Processing, 2010, vol. 19, issue 4, pp. 788-798", init<optional<bool, double, size_t, bool> >((arg("self"), arg("update_sigma")=false, arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=false), "Builds a new IVectorTrainer."))
     .def(init<const bob::trainer::IVectorTrainer&>((arg("self"), arg("trainer")), "Copy constructs an IVectorTrainer"))
     .def(self == self)
     .def(self != self)

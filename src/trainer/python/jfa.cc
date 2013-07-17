@@ -325,7 +325,7 @@ static void jfa_set_accDA2(bob::trainer::JFATrainer& trainer,
 
 void bind_trainer_jfa() 
 {
-  class_<bob::trainer::ISVTrainer, boost::noncopyable >("ISVTrainer", "Create a trainer for the ISV.", init<optional<const size_t, const double> >((arg("self"), arg("max_iterations")=10, arg("relevance_factor")=4.),"Initializes a new ISVTrainer."))
+  class_<bob::trainer::ISVTrainer, boost::noncopyable >("ISVTrainer", "A trainer for Inter-session Variability Modelling (ISV). \n\nReferences:\n[1] 'Explicit Modelling of Session Variability for Speaker Verification', R. Vogt, S. Sridharan, Computer Speech & Language, 2008, vol. 22, no. 1, pp. 17-38\n[2] 'Session Variability Modelling for Face Authentication', C. McCool, R. Wallace, M. McLaren, L. El Shafey, S. Marcel, IET Biometrics, 2013", init<optional<const size_t, const double> >((arg("self"), arg("max_iterations")=10, arg("relevance_factor")=4.),"Initializes a new ISVTrainer."))
     .def(init<const bob::trainer::ISVTrainer&>((arg("self"), arg("other")), "Copy constructs an ISVTrainer"))
     .add_property("max_iterations", &bob::trainer::ISVTrainer::getMaxIterations, &bob::trainer::ISVTrainer::setMaxIterations, "Max iterations")
     .add_property("rng", &bob::trainer::ISVTrainer::getRng, &bob::trainer::ISVTrainer::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
@@ -344,7 +344,7 @@ void bind_trainer_jfa()
     .add_property("acc_u_a2", make_function(&bob::trainer::ISVTrainer::getAccUA2, return_value_policy<copy_const_reference>()), &isv_set_accUA2, "Accumulator updated during the E-step")
   ;
 
-  class_<bob::trainer::JFATrainer, boost::noncopyable >("JFATrainer", "Create a trainer for the ISV.", init<optional<const size_t> >((arg("self"), arg("max_iterations")=10),"Initializes a new JFATrainer."))
+  class_<bob::trainer::JFATrainer, boost::noncopyable >("JFATrainer", "A trainer for Joint Factor Analysis (JFA).\n\nReferences:\n[1] 'Explicit Modelling of Session Variability for Speaker Verification', R. Vogt, S. Sridharan, Computer Speech & Language, 2008, vol. 22, no. 1, pp. 17-38\n[2] 'Session Variability Modelling for Face Authentication', C. McCool, R. Wallace, M. McLaren, L. El Shafey, S. Marcel, IET Biometrics, 2013", init<optional<const size_t> >((arg("self"), arg("max_iterations")=10),"Initializes a new JFATrainer."))
     .def(init<const bob::trainer::JFATrainer&>((arg("self"), arg("other")), "Copy constructs an JFATrainer"))
     .add_property("max_iterations", &bob::trainer::JFATrainer::getMaxIterations, &bob::trainer::JFATrainer::setMaxIterations, "Max iterations")
     .add_property("rng", &bob::trainer::JFATrainer::getRng, &bob::trainer::JFATrainer::setRng, "The Mersenne Twister mt19937 random generator used for the initialization of subspaces/arrays before the EM loop.")
