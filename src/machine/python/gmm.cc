@@ -196,13 +196,33 @@ static double py_gmmmachine_loglikelihoodB_(const bob::machine::GMMMachine& mach
 static void py_gmmmachine_accStatistics(const bob::machine::GMMMachine& machine,
   bob::python::const_ndarray x, bob::machine::GMMStats& gs)
 {
-  machine.accStatistics(x.bz<double,1>(), gs);
+  const bob::core::array::typeinfo& info = x.type();
+  switch(info.nd) {
+    case 1:
+      machine.accStatistics(x.bz<double,1>(), gs);
+      break;
+    case 2:
+      machine.accStatistics(x.bz<double,2>(), gs);
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "cannot accStatistics of arrays with "  SIZE_T_FMT " dimensions (only with 1 or 2 dimensions).", info.nd);
+  }
 }
 
 static void py_gmmmachine_accStatistics_(const bob::machine::GMMMachine& machine,
   bob::python::const_ndarray x, bob::machine::GMMStats& gs)
 {
-  machine.accStatistics_(x.bz<double,1>(), gs);
+  const bob::core::array::typeinfo& info = x.type();
+  switch(info.nd) {
+    case 1:
+      machine.accStatistics_(x.bz<double,1>(), gs);
+      break;
+    case 2:
+      machine.accStatistics_(x.bz<double,2>(), gs);
+      break;
+    default:
+      PYTHON_ERROR(TypeError, "cannot accStatistics of arrays with "  SIZE_T_FMT " dimensions (only with 1 or 2 dimensions).", info.nd);
+  }
 }
 
 void bind_machine_gmm()
@@ -276,15 +296,9 @@ void bind_machine_gmm()
     .def("log_likelihood_", &py_gmmmachine_loglikelihoodB_, args("self", "x"),
          " Output the log likelihood of the sample, x, i.e. log(p(x|GMM)). Inputs are checked.")
     .def("acc_statistics", &py_gmmmachine_accStatistics, args("self", "x", "stats"),
-         "Accumulate the GMM statistics for this sample. Inputs are checked.")
+         "Accumulate the GMM statistics for this sample(s). Inputs are checked.")
     .def("acc_statistics_", &py_gmmmachine_accStatistics_, args("self", "x", "stats"),
-         "Accumulate the GMM statistics for this sample. Inputs are NOT checked.")
-    .def("acc_statistics",
-         (void (bob::machine::GMMMachine::*)(const blitz::Array<double,2>&, bob::machine::GMMStats&) const)&bob::machine::GMMMachine::accStatistics,
-         args("self", "sampler", "stats"), "Accumulates the GMM statistics over a set of samples. Inputs are checked.")
-    .def("acc_statistics_",
-         (void (bob::machine::GMMMachine::*)(const blitz::Array<double,2>&, bob::machine::GMMStats&) const)&bob::machine::GMMMachine::accStatistics_,
-         args("self", "sampler", "stats"), "Accumulates the GMM statistics over a set of samples. Inputs are NOT checked.")
+         "Accumulate the GMM statistics for this sample(s). Inputs are NOT checked.")
     .def("load", &bob::machine::GMMMachine::load, (arg("self"), arg("config")), "Load from a Configuration")
     .def("save", &bob::machine::GMMMachine::save, (arg("self"), arg("config")), "Save to a Configuration")
     .def(self_ns::str(self_ns::self))
