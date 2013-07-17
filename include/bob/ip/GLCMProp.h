@@ -48,66 +48,61 @@ namespace bob { namespace ip {
     public: //api
 
       /**
-       * Complete constructor
+       * @brief Complete constructor
        */
 
       GLCMProp();
 
 
       /**
-       * Copy constructor
+       * @brief Copy constructor
        */
       GLCMProp(const GLCMProp& other) {}
 
       /**
-       * Destructor
+       * @brief Destructor
        */
       virtual ~GLCMProp();
 
       /**
-       * Assignment
+       * @brief Assignment
        */
       GLCMProp& operator= (const GLCMProp& other) { return *this; }
 
       /**
-       * Clone self into a boost::shared_ptr<GLCMProp>
-       */
-      boost::shared_ptr<GLCMProp> clone() const;
-
-      /**
-      * Get the shape of the output array for the property
+      * @brief Get the shape of the output array for the property
       */
       const blitz::TinyVector<int,1> get_prop_shape(const blitz::Array<double,3>& glcm) const;
 
       /**
-       * Compute each of the single GLCM properties from a 3D blitz::Array which is the GLCM matrix
+       * @brief Compute each of the single GLCM properties from a 3D blitz::Array which is the GLCM matrix
        *
        * The following method provides texture properties of the GLCM matrix. Here is a list of all the implemented features.
-        f1. angular second moment [1] / energy [6]
-        f2. energy [4]
-        f3. sum of squares (variance) [1]
-        f4. contrast [1] == contrast [6]
-        f5. correlation [1]
-        f6. inverse difference moment [1] = homogeneity [2], homop[5]
-        f7. sum average [1]
-        f8. sum variance [1]
-        f9. sum entropy [1]
-        f10. entropy [1]
-        f11. difference variance [4]
-        f12. difference entropy [1]
-        f13. dissimilarity [4]
-        f14. homogeneity [6]
-        f15. cluster prominence [2]
-        f16. cluster shade [2]
-        f17. maximum probability [2]
-        f18. information measure of correlation 1 [1]
-        f19. information measure of correlation 2 [1]
-        f20. inverse difference (INV) is homom [3]
-        f21. inverse difference normalized (INN) [3]
-        f22. inverse difference moment normalized [3]
-        f23. auto-correlation [2]
-        f24. correlation as in MATLAB Image Processing Toolbox method graycoprops() ([6])
-    */
+       * f1. angular second moment [1] / energy [6]
+       * f2. energy [4]
+       * f3. sum of squares (variance) [1]
+       * f4. contrast [1] == contrast [6]
+       * f5. correlation [1]
+       * f6. inverse difference moment [1] = homogeneity [2], homop[5]
+       * f7. sum average [1]
+       * f8. sum variance [1]
+       * f9. sum entropy [1]
+       * f10. entropy [1]
+       * f11. difference variance [4]
+       * f12. difference entropy [1]
+       * f13. dissimilarity [4]
+       * f14. homogeneity [6]
+       * f15. cluster prominence [2]
+       * f16. cluster shade [2]
+       * f17. maximum probability [2]
+       * f18. information measure of correlation 1 [1]
+       * f19. information measure of correlation 2 [1]
+       * f20. inverse difference (INV) is homom [3]
+       * f21. inverse difference normalized (INN) [3]
+       * f22. inverse difference moment normalized [3]
+       * f23. auto-correlation [2]
+       * f24. correlation as in MATLAB Image Processing Toolbox method graycoprops() ([6])
+       */
 
       void angular_second_moment(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
       void energy(const blitz::Array<double,3>& glcm, blitz::Array<double,1>& prop) const;
@@ -136,12 +131,12 @@ namespace bob { namespace ip {
 
     protected:
     /**
-    * Methods
-    */
+     * @brief Methods
+     */
 
     /**
-    * Normalizes the glcm matrix (by offset. The separate matrix for each offset is separately normalized))
-    */
+     * @brief Normalizes the glcm matrix (by offset. The separate matrix for each offset is separately normalized))
+     */
     const blitz::Array<double,3> normalize_glcm(const blitz::Array<double,3>& glcm) const;
 
 };
