@@ -172,6 +172,7 @@ void bind_ip_gabor_wavelet_transform() {
   .def(
     boost::python::init< const blitz::TinyVector<int,2>&, const blitz::TinyVector<double,2>&, boost::python::optional <const double, const double, const bool, const double> >(
       (
+        boost::python::arg("self"),
         boost::python::arg("resolution"),
         boost::python::arg("wavelet_frequency"),
         boost::python::arg("sigma") = 2. * M_PI,
@@ -183,7 +184,7 @@ void bind_ip_gabor_wavelet_transform() {
     )
   )
 
-  .def(boost::python::init<bob::ip::GaborKernel&>(boost::python::args("other")))
+  .def(boost::python::init<bob::ip::GaborKernel&>((boost::python::arg("self"), boost::python::arg("other"))))
   .def(boost::python::self == boost::python::self)
   .def(boost::python::self != boost::python::self)
 
@@ -212,6 +213,7 @@ void bind_ip_gabor_wavelet_transform() {
   .def(
     boost::python::init<boost::python::optional<int,int,double,double,double,double,bool> >(
       (
+        boost::python::arg("self"),
         boost::python::arg("number_of_scales") = 5,
         boost::python::arg("number_of_angles") = 8,
         boost::python::arg("sigma") = 2. * M_PI,
@@ -224,19 +226,21 @@ void bind_ip_gabor_wavelet_transform() {
     )
   )
 
-  .def(boost::python::init<bob::ip::GaborWaveletTransform&>(boost::python::args("other")))
+  .def(boost::python::init<bob::ip::GaborWaveletTransform&>((boost::python::arg("self"), boost::python::arg("other"))))
   .def(boost::python::self == boost::python::self)
   .def(boost::python::self != boost::python::self)
 
   .def(
     "save",
     &bob::ip::GaborWaveletTransform::save,
+    (boost::python::arg("self"), boost::python::arg("config")),
     "Saves the parameterization of this Gabor wavelet transform to HDF5 file."
   )
 
   .def(
     "load",
     &bob::ip::GaborWaveletTransform::load,
+    (boost::python::arg("self"), boost::python::arg("config")),
     "Loads the parameterization of this Gabor wavelet transform from HDF5 file."
   )
 

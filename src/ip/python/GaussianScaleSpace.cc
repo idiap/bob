@@ -22,56 +22,49 @@
 
 #include <bob/python/ndarray.h>
 #include <bob/ip/GaussianScaleSpace.h>
+#include <boost/python/stl_iterator.hpp>
 
 using namespace boost::python;
 
 static object allocate_output(const bob::ip::GaussianScaleSpace& op)
 {
-  std::vector<blitz::Array<double,3> > dst;
-  boost::python::list dst_p;
+  boost::python::list dst;
   for (int i=op.getOctaveMin(); i<=op.getOctaveMax(); ++i)
   {
     const blitz::TinyVector<int,3> shape = op.getOutputShape(i);
     bob::python::ndarray dst_i(bob::core::array::t_float64, shape(0), shape(1), shape(2));
-    dst_p.append(dst_i);
-    dst.push_back(dst_i.bz<double,3>());
+    dst.append(dst_i);
   }
-  return object(dst_p);
+  return dst;
 }
 
 
 template <typename T>
-static object inner_call_c(const bob::ip::GaussianScaleSpace& op, 
+static void inner_call_c(const bob::ip::GaussianScaleSpace& op, 
   bob::python::const_ndarray src, boost::python::object dst) 
 {
-  std::vector<blitz::Array<double,3> > dst_c;
-  for (int i=0; i<len(dst); ++i)
-  {
-    bob::python::ndarray dst_i = boost::python::extract<bob::python::ndarray>(dst[i]);
-    dst_c.push_back(dst_i.bz<double,3>());
-  }
-  op(src.bz<T,2>(), dst_c);
-  return dst;
+  stl_input_iterator<bob::python::const_ndarray> begin(dst), end;
+  std::vector<bob::python::const_ndarray> ndst(begin, end);
+  std::vector<blitz::Array<double,3> > vdst;
+  for(std::vector<bob::python::const_ndarray>::iterator it=ndst.begin(); 
+    it!=ndst.end(); ++it)
+  vdst.push_back(it->bz<double,3>());
+  op(src.bz<T,2>(), vdst);
 }
 
-static object call_c(bob::ip::GaussianScaleSpace& op, 
+static void call_c(bob::ip::GaussianScaleSpace& op, 
   bob::python::const_ndarray src, boost::python::object dst) 
 {
   const bob::core::array::typeinfo& info = src.type();
   
-  if (info.nd == 2)
+  switch (info.dtype) 
   {
-    switch (info.dtype) 
-    {
-      case bob::core::array::t_uint8: return inner_call_c<uint8_t>(op, src, dst);
-      case bob::core::array::t_uint16: return inner_call_c<uint16_t>(op, src, dst);
-      case bob::core::array::t_float64: return inner_call_c<double>(op, src, dst);
-      default:
-        PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
-    }
+    case bob::core::array::t_uint8: inner_call_c<uint8_t>(op, src, dst); break;
+    case bob::core::array::t_uint16: inner_call_c<uint16_t>(op, src, dst); break;
+    case bob::core::array::t_float64: inner_call_c<double>(op, src, dst); break;
+    default:
+      PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
   }
-  else
-    PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
 }
 
 
@@ -90,7 +83,7 @@ static object inner_call_p(const bob::ip::GaussianScaleSpace& op,
     dst.push_back(dst_i.bz<double,3>());
   }
   op(src.bz<T,2>(), dst);
-  return object(dst_p);
+  return dst_p;
 }
 
 static object call_p(const bob::ip::GaussianScaleSpace& op, 
@@ -98,19 +91,14 @@ static object call_p(const bob::ip::GaussianScaleSpace& op,
 {
   const bob::core::array::typeinfo& info = src.type();
   
-  if (info.nd == 2)
+  switch(info.dtype) 
   {
-    switch(info.dtype) 
-    {
-      case bob::core::array::t_uint8: return inner_call_p<uint8_t>(op, src);
-      case bob::core::array::t_uint16: return inner_call_p<uint16_t>(op, src);
-      case bob::core::array::t_float64: return inner_call_p<double>(op, src);
-      default:
-        PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
-    }
+    case bob::core::array::t_uint8: return inner_call_p<uint8_t>(op, src);
+    case bob::core::array::t_uint16: return inner_call_p<uint16_t>(op, src);
+    case bob::core::array::t_float64: return inner_call_p<double>(op, src);
+    default:
+      PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with type '%s'", info.str().c_str());
   }
-  else
-    PYTHON_ERROR(TypeError, "bob.ip.GaussianScaleSpace __call__ does not support array with " SIZE_T_FMT " dimensions", info.nd);
 }
 
 void bind_ip_gaussian_scale_space() 
@@ -132,7 +120,7 @@ void bind_ip_gaussian_scale_space()
     ;
 
   class_<bob::ip::GaussianScaleSpace, boost::shared_ptr<bob::ip::GaussianScaleSpace> >("GaussianScaleSpace", "This class allows after configuration the generation of Gaussian Pyramids that can be used to extract SIFT features.\n\nReference:\n'Distinctive Image Features from Scale-Invariant Keypoints', D. Lowe, International Journal of Computer Vision, 2004", init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("height"), arg("width"), arg("n_octaves"), arg("n_scales"), arg("octave_min"), arg("sigma_n")=0.5, arg("sigma0")=1.6, arg("kernel_radius_factor")=4., arg("border_type")=bob::sp::Extrapolation::Mirror), "Creates an object that allows the construction of Gaussian pyramids."))
-      .def(init<bob::ip::GaussianScaleSpace&>(args("other")))
+      .def(init<bob::ip::GaussianScaleSpace&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .add_property("height", &bob::ip::GaussianScaleSpace::getHeight, &bob::ip::GaussianScaleSpace::setHeight, "The height of the images to process")
