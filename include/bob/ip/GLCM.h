@@ -36,7 +36,7 @@
 namespace bob { namespace ip {
 
   /**
-   * This class allows to extract Grey-Level Co-occurence Matrix (GLCM). For more information, please refer to the
+   * @brief This class allows to extract Grey-Level Co-occurence Matrix (GLCM). For more information, please refer to the
    * following article: "Textural Features for Image calssification", from R. M. Haralick, K. Shanmugam, I. Dinstein
    * in the IEEE Transactions on Systems, Man and Cybernetics, vol.SMC-3, No. 6, p. 610-621.
    *
@@ -54,52 +54,44 @@ namespace bob { namespace ip {
     public: //api
 
       /**
-       * Complete constructor
+       * @brief Complete constructor
        */
-
       GLCM();
       GLCM(const int num_levels);
       GLCM(const int num_levels, const T min_level, const T max_level);
       GLCM(const blitz::Array<T,1>& quant_thres);
 
       /**
-       * Copy constructor
+       * @brief Copy constructor
        */
       GLCM(const GLCM& other);
 
       /**
-       * Destructor
+       * @brief Destructor
        */
       virtual ~GLCM();
 
       /**
-       * Assignment
+       * @brief Assignment
        */
       GLCM& operator= (const GLCM& other);
 
       /**
-       * Clone self into a boost::shared_ptr<GLCM>
-       */
-      //boost::shared_ptr<GLCM> clone() const;
-
-
-
-      /**
-       * Get the required shape of the GLCM output blitz array, before calling
+       * @brief Get the required shape of the GLCM output blitz array, before calling
        * the operator() method.
        */
       const blitz::TinyVector<int,3> getGLCMShape() const;
 
 
       /**
-       * Compute Gray-Level Co-occurences from a 2D blitz::Array, and save the resulting
+       * @brief Compute Gray-Level Co-occurences from a 2D blitz::Array, and save the resulting
        * GLCM matrix in the dst 3D blitz::Array.
        */
       void operator()(const blitz::Array<T,2>& src, blitz::Array<double,3>& glcm) const;
 
       /**
-      * Accessors
-      */
+       * @brief Accessors
+       */
 
       const blitz::Array<int32_t,2>&  getOffset() const
       { return m_offset; }
@@ -113,8 +105,8 @@ namespace bob { namespace ip {
 
 
       /**
-      * Mutators
-      */
+       * @brief Mutators
+       */
 
       void setOffset(const blitz::Array<int32_t, 2>& offset)
       { m_offset.reference(bob::core::array::ccopy(offset)); }
@@ -127,15 +119,13 @@ namespace bob { namespace ip {
 
     protected:
     /**
-    * Attributes
-    */
-
+     * @brief Attributes
+     */
 
     blitz::Array<int32_t,2> m_offset;
     bob::sp::Quantization<T> m_quantization;
     bool m_symmetric;
     bool m_normalized;
-
 
    };
 
@@ -204,14 +194,6 @@ bob::ip::GLCM<T>& bob::ip::GLCM<T>::operator=(const bob::ip::GLCM<T>& other) {
   return *this;
 }
 
-/*
-template <typename T>
-boost::shared_ptr<bob::ip::GLCM<T>> bob::ip::GLCM<T>::clone() const {
-  return boost::make_shared<bob::ip::GLCM>(*this);
-}
-*/
-
-
 template <typename T>
 const blitz::TinyVector<int,3> bob::ip::GLCM<T>::getGLCMShape() const
 {
@@ -223,9 +205,6 @@ const blitz::TinyVector<int,3> bob::ip::GLCM<T>::getGLCMShape() const
   res(2) = m_offset.extent(0); // the total number of offsets
   return res;
 }
-
-
-
 
 template <typename T>
 void bob::ip::GLCM<T>::operator()(const blitz::Array<T,2>& src, blitz::Array<double,3>& glcm) const
