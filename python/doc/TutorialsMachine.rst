@@ -24,7 +24,7 @@
 
 Machines are one of the core components of |project|. They represent
 statistical models or other functions defined by parameters that can be learnt
-or set by using :doc:`TutorialsTrainer`.  Two examples of machines are
+or set by using :doc:`TutorialsTrainer`. Two examples of machines are
 multi-layer perceptrons (MLPs) and Gaussian mixture models (GMMs). The
 operation you normally expect from a machine is to be able to feed a feature
 vector and extract the machine response or output for that input vector. It
@@ -48,11 +48,11 @@ start with the simplest of the machines: a
 Linear machine
 ==============
 
-This machine executes the simple operation :math:`y = \mathbf{W} x`, where `y`
-is the output vector, `x` is the input vector and `W` is a matrix (2D array) stored
-in the machine. The input vector `x` should be composed of double-precision
-floating-point elements. The output will also be in double-precision. Here is
-how to use a :py:class:`bob.machine.LinearMachine`:
+This machine executes the simple operation :math:`y = \mathbf{W} x`, where :math:`y`
+is the output vector, :math:`x` is the input vector and :math:`W` is a matrix 
+(2D array) stored in the machine. The input vector :math:`x` should be composed 
+of double-precision floating-point elements. The output will also be in 
+double-precision. Here is how to use a :py:class:`bob.machine.LinearMachine`:
 
 .. doctest::
 
@@ -105,10 +105,11 @@ produces, in a tuple format like ``(input_size, output_size)``:
   (2, 2)
 
 A :py:class:`bob.machine.LinearMachine`` also supports pre-setting
-normalization vectors that are applied to every input `x`. You can set a
-subtraction factor and a division factor, so that the actual input `x'` that is
-fed to the matrix `W` is :math:`x' = (x - s) ./ d`. The variables `s` and `d` are vectors
-that have to have the same size as the input vector `x`. The operator `./` indicates
+normalization vectors that are applied to every input :math:`x`. You can set 
+a subtraction factor and a division factor, so that the actual input :math:`x'` 
+that is fed to the matrix :math:`W` is :math:`x' = (x - s) ./ d`. The 
+variables :math:`s` and :math:`d` are vectors that have to have the same size 
+as the input vector :math:`x`. The operator :math:`./` indicates
 an element-wise division. By default, :math:`s := 0.0` and :math:`d := 1.0`.
 
 .. doctest::
@@ -118,7 +119,7 @@ an element-wise division. By default, :math:`s := 0.0` and :math:`d := 1.0`.
   >>> machine.input_divide
   array([ 1.,  1.])
 
-To set a new value for `s` or `d` just assign the desired machine property:
+To set a new value for :math:`s` or :math:`d` just assign the desired machine property:
 
 .. doctest::
 
@@ -497,17 +498,32 @@ As with other machines you can save and re-load machines of this type using
 Gaussian mixture models Statistics
 ==================================
 
-The :py:class:`bob.machine.GMMStats` is a container for GMM statistics. 
+The :py:class:`bob.machine.GMMStats` is a container for the sufficient 
+statistics of a GMM distribution. 
+
+Given a GMM, the sufficient statistics of a sample can be computed as 
+follows:
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
   
   >>> gs = bob.machine.GMMStats(2,3)
-  >>> log_likelihood = -3.
-  >>> T = 1
-  >>> n = numpy.array([0.4, 0.6], 'float64')
-  >>> sumpx = numpy.array([[1., 2., 3.], [4., 5., 6.]], 'float64')
-  >>> sumpxx = numpy.array([[10., 20., 30.], [40., 50., 60.]], 'float64')
+  >>> sample = numpy.array([0.5, 4.5, 1.5])
+  >>> gmm.acc_statistics(sample, gs)
+  >>> print gs # doctest: +SKIP
+
+Then, the sufficient statistics can be accessed (or set as below), by considering the
+following attributes.
+
+.. doctest::
+  :options: +NORMALIZE_WHITESPACE
+  
+  >>> gs = bob.machine.GMMStats(2,3)
+  >>> log_likelihood = -3. # log-likelihood of the accumulated samples
+  >>> T = 1 # Number of samples used to accumulate statistics
+  >>> n = numpy.array([0.4, 0.6], 'float64') # zeroth order stats
+  >>> sumpx = numpy.array([[1., 2., 3.], [4., 5., 6.]], 'float64') # first order stats
+  >>> sumpxx = numpy.array([[10., 20., 30.], [40., 50., 60.]], 'float64') # second order stats
   >>> gs.log_likelihood = log_likelihood
   >>> gs.t = T
   >>> gs.n = n
@@ -516,10 +532,20 @@ The :py:class:`bob.machine.GMMStats` is a container for GMM statistics.
 
 
 Joint Factor Analysis
-=======================
-The :py:class:`bob.machine.JFAMachine` carries information about the speaker factors y and z, whereas a :py:class:`bob.machine.JFABase` carries information about the matrices U, V and D.
+=====================
 
-First, to create and initialize a JFA Base:
+Joint Factor Analysis (JFA) [1]_ [2]_ is a session variability modelling technique built 
+on top of the Gaussian mixture modelling approach. It utilises a within-class subspace
+:math:`U`, a between-class subspace :math:`V`, and a subspace for the residuals :math:`D`
+to capture and suppress a significant portion of between-class variation.
+
+An instance of :py:class:`bob.machine.JFABase` carries information about the matrices 
+:math:`U`, :math:`V` and :math:`D`, which can be shared between several classes.
+In contrast, after the enrolment phase, an instance of :py:class:`bob.machine.JFAMachine` 
+carries class-specific information about the latent variables :math:`y` and :math:`z`.
+
+An instance of :py:class:`bob.machine.JFABase` can be initialized as follows, given
+an existing GMM:
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
@@ -532,7 +558,8 @@ First, to create and initialize a JFA Base:
   >>> jfa_base.v = V
   >>> jfa_base.d = d
 
-Then, to create and initialize a JFA Machine:
+Next, this :py:class:`bob.machine.JFABase` can be shared by several instances of 
+:py:class:`bob.machine.JFAMachine`, the initialization being as follows:
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
@@ -542,12 +569,17 @@ Then, to create and initialize a JFA Machine:
   >>> m.z = numpy.array([3,4,1,2,0,1], 'float64')
 
 
-Once the :py:class:`bob.machine.JFAMachine` has been set, you can use it to
-estimate the log-likelihood (score) of an input gmm stats:
+Once the :py:class:`bob.machine.JFAMachine` has been configured for a specific class,
+the log-likelihood (score) that an input sample belongs to the enrolled class, can 
+be estimated, by first computing the GMM sufficient statistics of this input sample,
+and then calling the :py:meth:`bob.machine.JFAMachine:forward` on the sufficient 
+statistics.
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
-  
+ 
+  >>> gs = bob.machine.GMMStats(2,3)
+  >>> gmm.acc_statistics(sample, gs)
   >>> score = m.forward(gs)
   
 As with other machines you can save and re-load machines of this type using
@@ -556,9 +588,21 @@ As with other machines you can save and re-load machines of this type using
 
 Inter-Session Variability
 =========================
-The :py:class:`bob.machine.ISVMachine` carries information about the speaker factor z, whereas a :py:class:`bob.machine.JFABase` carries information about the matrices U and D.
 
-First, to create and initialize a ISV Base:
+Similarly to Joint Factor Analysis, Inter-Session Variability (ISV) modelling [3]_ [2]_ 
+is another session variability modelling technique built on top of the Gaussian mixture 
+modelling approach. It utilises a within-class subspace :math:`U` and a subspace for 
+the residuals :math:`D` to capture and suppress a significant portion of between-class
+variation. The main difference compared to JFA is the absence of the between-class
+subspace :math:`V`.
+
+Similarly to JFA, an instance of :py:class:`bob.machine.JFABase` carries information 
+about the matrices :math:`U` and :math:`D`, which can be shared between several classes,
+whereas an instance of :py:class:`bob.machine.JFAMachine` carries class-specific 
+information about the latent variable :math:`z`.
+
+An instance of :py:class:`bob.machine.ISVBase` can be initialized as follows, given
+an existing GMM:
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
@@ -567,7 +611,8 @@ First, to create and initialize a ISV Base:
   >>> isv_base.u = U
   >>> isv_base.d = d
 
-Then, to create and initialize an ISV Machine:
+Next, this :py:class:`bob.machine.ISVBase` can be shared by several instances of 
+:py:class:`bob.machine.ISVMachine`, the initialization being as follows:
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
@@ -575,12 +620,17 @@ Then, to create and initialize an ISV Machine:
   >>> m = bob.machine.ISVMachine(isv_base)
   >>> m.z = numpy.array([3,4,1,2,0,1], 'float64')
 
-Once the :py:class:`bob.machine.JFAMachine` has been set, you can use it to
-estimate the log-likelihood (score) of an input gmm stats:
+Once the :py:class:`bob.machine.ISVMachine` has been configured for a specific class,
+the log-likelihood (score) that an input sample belongs to the enrolled class, can 
+be estimated, by first computing the GMM sufficient statistics of this input sample,
+and then calling the :py:meth:`bob.machine.ISVMachine:forward` on the sufficient 
+statistics.
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
   
+  >>> gs = bob.machine.GMMStats(2,3)
+  >>> gmm.acc_statistics(sample, gs)
   >>> score = m.forward(gs)
 
 As with other machines you can save and re-load machines of this type using
@@ -589,9 +639,15 @@ As with other machines you can save and re-load machines of this type using
 
 Total Variability (i-vectors)
 =============================
-The :py:class:`bob.machine.IVectorMachine` carries information about the matrix T used to extract i-vectors.
 
-First, to create and initialize an i-vector machine:
+Total Variability (TV) modelling [4]_ is a front-end initially introduced for
+speaker recognition, which aims at describing samples by vectors of low 
+dimensionality called ``i-vectors``. The model consists of a subspace :math:`T`
+and a residual diagonal covariance matrix :math:`\Sigma`, that are then used
+to extract i-vectors, and is built upon the GMM approach.
+
+An instance of the class :py:class:`bob.machine.IVectorMachine` carries 
+information about these two matrices. This can be initialized as follows:
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
@@ -601,12 +657,15 @@ First, to create and initialize an i-vector machine:
   >>> m.sigma = numpy.array([1.,2.,1.,3.,2.,4.])
 
 
-Once the :py:class:`bob.machine.IVectorMachine` has been set, you can use it to
-extract the i-vector (w_ij) of an input gmm stats:
+Once the :py:class:`bob.machine.IVectorMachine` has been set, the extraction
+of an i-vector :math:`w_ij` can be done in two steps, by first extracting
+the GMM sufficient statistics, and then estimating the i-vector:
 
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
   
+  >>> gs = bob.machine.GMMStats(2,3)
+  >>> gmm.acc_statistics(sample, gs)
   >>> w_ij = m.forward(gs)
 
 As with other machines you can save and re-load machines of this type using
@@ -616,7 +675,7 @@ As with other machines you can save and re-load machines of this type using
 Probabilistic Linear Discriminant Analysis (PLDA)
 =================================================
 
-Probabilistic Linear Discriminant Analysis [1]_ [2]_ is a probabilistic model that
+Probabilistic Linear Discriminant Analysis [5]_ [6]_ is a probabilistic model that
 incorporates components describing both between-class and within-class
 variations. Given a mean :math:`\mu`, between-class and within-class subspaces
 :math:`F` and :math:`G` and residual noise :math:`\epsilon` with zero mean and
@@ -657,5 +716,9 @@ can be performed.
 .. _numpy: http://numpy.scipy.org
 .. _libsvm: http://www.csie.ntu.edu.tw/~cjlin/libsvm/
 
-.. [1] http://dx.doi.org/10.1109/ICCV.2007.4409052
-.. [2] http://doi.ieeecomputersociety.org/10.1109/TPAMI.2013.38
+.. [1] http://dx.doi.org/10.1109/TASL.2006.881693
+.. [2] http://publications.idiap.ch/index.php/publications/show/2606
+.. [3] http://dx.doi.org/10.1016/j.csl.2007.05.003
+.. [4] http://dx.doi.org/10.1109/TASL.2010.2064307
+.. [5] http://dx.doi.org/10.1109/ICCV.2007.4409052
+.. [6] http://doi.ieeecomputersociety.org/10.1109/TPAMI.2013.38

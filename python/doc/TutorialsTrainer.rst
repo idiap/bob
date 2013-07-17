@@ -421,7 +421,10 @@ set.
 Joint Factor Analysis
 =====================
 
-The training of the U, V and D matrix is done using the training set of the GMM stats, for example:
+The training of the subspace :math:`U`, :math:`V` and :math:`D` of a 
+Joint Factor Analysis model, is performed in two steps. First, GMM
+sufficient statistics of the training samples should be computed 
+against the UBM GMM. Once done, we get a training set of GMM statistics:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -449,35 +452,34 @@ The training of the U, V and D matrix is done using the training set of the GMM 
    >>> gs22.sum_px = F2[:,1].reshape(2,3)
 
    >>> TRAINING_STATS = [[gs11, gs12], [gs21, gs22]]
-   
 
-Let's then initialize the JFABase machine:
+In the following, we will allocate a :py:class:`bob.machine.JFABase` machine, that
+will then be trained.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
     >>> jfa_base = bob.machine.JFABase(gmm, 2, 2) # the dimensions of U and V are both equal to 2
-    >>> jfa_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962, 0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
-    >>> jfa_base.v = numpy.array( [0.3367, 0.4116, 0.6624, 0.6026, 0.2442, 0.7505, 0.2955, 0.5835, 0.6802, 0.5518, 0.5278,0.5836]).reshape((6,2))
-    >>> jfa_base.d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
 
-
-Now, let's initialize the JFA Trainer:
+Next, we initialize a trainer, which is an instance of 
+:py:class:`bob.trainer.JFATrainer`, as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
    >>> jfa_trainer = bob.trainer.JFATrainer(10) # 10 is the number of iterations
-   >>> jfa_trainer.initialize(jfa_base, TRAINING_STATS)
-   
-The training is done as follows:
+
+The training process is started by calling the :py:meth:`bob.trainer.JFATrainer.train`.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> jfa_trainer.train_loop(jfa_base, TRAINING_STATS)
+   >>> jfa_trainer.train(jfa_base, TRAINING_STATS)
    
-Once the training is finished (i.e. the matrices U, V and D are estimated), one wants to enroll a special client (or subject). Let's suppose the following GMM stats of the subject:
+Once the training is finished (i.e. the subspaces :math:`U`, :math:`V` and :math:`D` are 
+estimated), the JFA model can be shared and used by several class-specific models.
+As for the training samples, we first need to extract GMM statistics from the samples.
+These GMM statistics are manually defined in the following.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -492,91 +494,97 @@ Once the training is finished (i.e. the matrices U, V and D are estimated), one 
    >>> gse2.sum_px = Fe[:,1].reshape(2,3)
    >>> gse = [gse1, gse2]
     
-The enrolment is then perfomed as follows:
+Class-specific enrollment can then be perfomed as follows. This will estimate
+the class-specific latent variables :math:`y` and :math:`z`:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
    >>> m = bob.machine.JFAMachine(jfa_base)
-   >>> jfa_trainer.enrol(m, gse, 5) # where 5 is the number of iterations
+   >>> jfa_trainer.enrol(m, gse, 5) # where 5 is the number of enrollment iterations
       
+More information about the training process can be found in [12]_ and [13]_.
+
 
 Inter-Session Variability
 =========================
 
-Let's first initialize the ISVBase machine:
+The training of the subspace :math:`U` and :math:`D` of an
+Inter-Session Variability model, is performed in two steps. As for JFA, 
+GMM sufficient statistics of the training samples should be computed 
+against the UBM GMM. Once done, we get a training set of GMM statistics.
+Next, we will allocate an :py:class:`bob.machine.ISVBase` machine, that
+will then be trained.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
    
     >>> isv_base = bob.machine.ISVBase(gmm, 2) # the dimensions of U is equal to 2
-    >>> isv_base.u = numpy.array( [0.5118, 0.3464, 0.0826, 0.8865, 0.7196, 0.4547, 0.9962, 0.4134, 0.3545, 0.2177, 0.9713, 0.1257]).reshape((6,2))
-    >>> isv_base.d = numpy.array([0.4106, 0.9843, 0.9456, 0.6766, 0.9883, 0.7668])
 
-
-Now, let's initialize the ISV Trainer:
+Next, we initialize a trainer, which is an instance of 
+:py:class:`bob.trainer.ISVTrainer`, as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
    >>> isv_trainer = bob.trainer.ISVTrainer(10, 4.) # 10 is the number of iterations, and 4 is the relevance factor
-   >>> isv_trainer.initialize(isv_base, TRAINING_STATS)
    
-The training is done as follows:
+The training process is started by calling the :py:meth:`bob.trainer.ISVTrainer.train`.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
    >>> isv_trainer.train(isv_base, TRAINING_STATS)
    
-Once the training is finished (i.e. the matrices U, V and D are estimated), the enrolment is perfomed as follows:
+Once the training is finished (i.e. the subspaces :math:`V` and :math:`D` are 
+estimated), the ISV model can be shared and used by several class-specific models.
+As for the training samples, we first need to extract GMM statistics from the samples.
+Class-specific enrollment can then be perfomed, which will estimate
+the class-specific latent variable :math:`z`:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
    >>> m = bob.machine.ISVMachine(isv_base)
-   >>> isv_trainer.enrol(m, gse, 5) # where 5 is the number of iterations
-   
+   >>> isv_trainer.enrol(m, gse, 5) # where 5 is the number of iterations 
+
+More information about the training process can be found in [14]_ and [13]_.
 
 
 Total Variability (i-vectors)
 =============================
 
-Let's first initialize the machine:
+The training of the subspace :math:`T` and :math:`\Sigma` of a
+Total Variability model, is performed in two steps. As for JFA and ISV, 
+GMM sufficient statistics of the training samples should be computed 
+against the UBM GMM. Once done, we get a training set of GMM statistics.
+Next, we will allocate an instance of :py:class:`bob.machine.IVectorMachine`,
+that will then be trained.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
     
     >>> m = bob.machine.IVectorMachine(gmm, 2)
     >>> m.variance_threshold = 1e-5
-    >>> m.t = numpy.array([[1.,2],[4,1],[0,3],[5,8],[7,10],[11,1]]) # Initialise the total variability matrix T
-    >>> m.sigma = numpy.array([1.,2.,1.,3.,2.,4.])  # Initialise the covariance sigma
 
 
-Now, let's initialize the trainer:
+Next, we initialize a trainer, which is an instance of 
+:py:class:`bob.trainer.IVectorTrainer`, as follows:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
     
    >>> ivec_trainer = bob.trainer.IVectorTrainer(update_sigma=True, max_iterations=10)
    >>> TRAINING_STATS_flatten = [gs11, gs12, gs21, gs22]
-   >>> ivec_trainer.initialize(m, TRAINING_STATS_flatten)
-    
-       
-The training is then done as follows:
+           
+The training process is started by calling the :py:meth:`bob.trainer.IVectorTrainer.train`.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
     
    >>> ivec_trainer.train(m, TRAINING_STATS_flatten) 
-   
-The extraction of an i-vector is done as follows:
 
-.. doctest::
-   :options: +NORMALIZE_WHITESPACE
-
-   >>> w_ij=m.forward(gse1)   
-   
+More information about the training process can be found in [15]_.   
 
 
 Whitening
@@ -633,14 +641,13 @@ Then, the training and projection are done as follows:
    :options: +NORMALIZE_WHITESPACE
    
    >>> m = t.train(data)
-   >>> wccn_sample = m.forward(sample)
-    
+   >>> wccn_sample = m.forward(sample) 
 
        
 Probabilistic Linear Discriminant Analysis (PLDA)
 =================================================
 
-Probabilistic Linear Discriminant Analysis [12]_ is a probabilistic model that
+Probabilistic Linear Discriminant Analysis [16]_ is a probabilistic model that
 incorporates components describing both between-class and within-class
 variations. Given a mean :math:`\mu`, between-class and within-class subspaces
 :math:`F` and :math:`G` and residual noise :math:`\epsilon` with zero mean and
@@ -653,7 +660,7 @@ An Expectaction-Maximization algorithm can be used to learn the parameters of
 this model :math:`\mu`, :math:`F` :math:`G` and :math:`\Sigma`. As these 
 parameters can be shared between classes, there is a specific container
 class for this purpose, which is :py:class:`bob.machine.PLDABase`. The process
-is described in detail in [13]_.
+is described in detail in [17]_.
 
 Let us consider a training set of two classes, each with 3 samples of 
 dimensionality 3.
@@ -744,5 +751,9 @@ ratio will be computed, which is defined in more formal way by:
 .. [9] http://en.wikipedia.org/wiki/Mixture_model
 .. [10] http://en.wikipedia.org/wiki/Maximum_likelihood
 .. [11] http://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation
-.. [12] http://dx.doi.org/10.1109/ICCV.2007.4409052
-.. [13] http://doi.ieeecomputersociety.org/10.1109/TPAMI.2013.38
+.. [12] http://dx.doi.org/10.1109/TASL.2006.881693
+.. [13] http://publications.idiap.ch/index.php/publications/show/2606
+.. [14] http://dx.doi.org/10.1016/j.csl.2007.05.003
+.. [15] http://dx.doi.org/10.1109/TASL.2010.2064307
+.. [16] http://dx.doi.org/10.1109/ICCV.2007.4409052
+.. [17] http://doi.ieeecomputersociety.org/10.1109/TPAMI.2013.38
