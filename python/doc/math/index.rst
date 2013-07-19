@@ -33,7 +33,6 @@ equivalent.
    :toctree: generated/
 
    chi_square
-   euclidean_distance
    histogram_intersection
    kullback_leibler
    linsolve
@@ -42,7 +41,6 @@ equivalent.
    linsolve_cg_sympos_
    linsolve_sympos
    linsolve_sympos_
-   normalized_scalar_product
    norminv
    normsinv
    pavx
