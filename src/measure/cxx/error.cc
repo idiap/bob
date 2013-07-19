@@ -43,6 +43,31 @@ std::pair<double, double> bob::measure::farfrr(const blitz::Array<double,1>& neg
       false_rejects/(double)total_positives);
 }
 
+std::pair<double, double> bob::measure::precision_recall(const blitz::Array<double,1>& negatives,
+    const blitz::Array<double,1>& positives, double threshold) {
+  blitz::sizeType total_positives = positives.extent(blitz::firstDim);
+  blitz::sizeType false_positives = blitz::count(negatives >= threshold);
+  blitz::sizeType true_positives = blitz::count(positives >= threshold);
+  blitz::sizeType total_classified_positives = true_positives + false_positives;
+  if (!total_classified_positives) total_classified_positives = 1; //avoids division by zero
+  if (!total_positives) total_positives = 1; //avoids division by zero
+  return std::make_pair(true_positives/(double)(total_classified_positives),
+      true_positives/(double)(total_positives));
+}
+
+
+double bob::measure::f_score(const blitz::Array<double,1>& negatives,
+    const blitz::Array<double,1>& positives, double threshold, double weight) {
+  std::pair<double, double> ratios =
+      bob::measure::precision_recall(negatives, positives, threshold);
+  double precision = ratios.first;
+  double recall = ratios.second;
+  if (weight <= 0) weight = 1;
+  if (precision == 0 && recall == 0)
+    return 0;
+  return (1 + weight*weight) * precision * recall / (weight * weight * precision + recall);
+}
+
 double eer_predicate(double far, double frr) {
   return std::abs(far - frr);
 }
@@ -176,6 +201,21 @@ blitz::Array<double,2> bob::measure::roc(const blitz::Array<double,1>& negatives
     //note: inversion to preserve X x Y ordering (FRR x FAR)
     retval(0,i) = ratios.second;
     retval(1,i) = ratios.first;
+  }
+  return retval;
+}
+
+blitz::Array<double,2> bob::measure::precision_recall_curve(const blitz::Array<double,1>& negatives,
+ const blitz::Array<double,1>& positives, size_t points) {
+  double min = std::min(blitz::min(negatives), blitz::min(positives));
+  double max = std::max(blitz::max(negatives), blitz::max(positives));
+  double step = (max-min)/((double)points-1.0);
+  blitz::Array<double,2> retval(2, points);
+  for (int i=0; i<(int)points; ++i) {
+    std::pair<double, double> ratios =
+      bob::measure::precision_recall(negatives, positives, min + i*step);
+    retval(0,i) = ratios.first;
+    retval(1,i) = ratios.second;
   }
   return retval;
 }

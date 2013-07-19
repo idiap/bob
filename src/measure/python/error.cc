@@ -34,6 +34,23 @@ static tuple farfrr(
   return make_tuple(retval.first, retval.second);
 }
 
+static tuple precision_recall(
+    bob::python::const_ndarray negatives,
+    bob::python::const_ndarray positives,
+    double threshold
+){
+  std::pair<double, double> retval = bob::measure::precision_recall(negatives.cast<double,1>(), positives.cast<double,1>(), threshold);
+  return make_tuple(retval.first, retval.second);
+}
+
+static double f_score(bob::python::const_ndarray negatives,
+    bob::python::const_ndarray positives,
+    double threshold,
+    double weight
+){
+  return bob::measure::f_score(negatives.cast<double,1>(), positives.cast<double,1>(), threshold, weight);
+}
+
 static blitz::Array<bool,1> bob_correctly_classified_positives(bob::python::const_ndarray positives, double threshold){
   return bob::measure::correctlyClassifiedPositives(positives.cast<double,1>(), threshold);
 }
@@ -76,6 +93,10 @@ static blitz::Array<double,2> bob_roc(bob::python::const_ndarray negatives, bob:
   return bob::measure::roc(negatives.cast<double,1>(), positives.cast<double,1>(), n_points);
 }
 
+static blitz::Array<double,2> bob_precision_recall_curve(bob::python::const_ndarray negatives, bob::python::const_ndarray positives, int n_points){
+  return bob::measure::precision_recall_curve(negatives.cast<double,1>(), positives.cast<double,1>(), n_points);
+}
+
 static blitz::Array<double,2> bob_rocch(bob::python::const_ndarray negatives, bob::python::const_ndarray positives){
   return bob::measure::rocch(negatives.cast<double,1>(), positives.cast<double,1>());
 }
@@ -104,6 +125,20 @@ void bind_measure_error() {
     &farfrr,
     (arg("negatives"), arg("positives"), arg("threshold")),
     "Calculates the FA ratio and the FR ratio given positive and negative scores and a threshold. 'positives' holds the score information for samples that are labelled to belong to a certain class (a.k.a., 'signal' or 'client'). 'negatives' holds the score information for samples that are labelled *not* to belong to the class (a.k.a., 'noise' or 'impostor').\n\nIt is expected that 'positive' scores are, at least by design, greater than 'negative' scores. So, every positive value that falls bellow the threshold is considered a false-rejection (FR). 'negative' samples that fall above the threshold are considered a false-accept (FA).\n\nPositives that fall on the threshold (exactly) are considered correctly classified. Negatives that fall on the threshold (exactly) are considered *incorrectly* classified. This equivalent to setting the comparision like this pseudo-code:\n\nforeach (positive as K) if K < threshold: falseRejectionCount += 1\nforeach (negative as K) if K >= threshold: falseAcceptCount += 1\n\nThe 'threshold' value does not necessarily have to fall in the range covered by the input scores (negatives and positives altogether), but if it does not, the output will be either (1.0, 0.0) or (0.0, 1.0) depending on the side the threshold falls.\n\nThe output is in form of a std::pair of two double-precision real numbers. The numbers range from 0 to 1. The first element of the pair is the false-accept ratio. The second element of the pair is the false-rejection ratio.\n\nIt is possible that scores are inverted in the negative/positive sense. In some setups the designer may have setup the system so 'positive' samples have a smaller score than the 'negative' ones. In this case, make sure you normalize the scores so positive samples have greater scores before feeding them into this method."
+  );
+  
+  def(
+    "precision_recall",
+    &precision_recall,
+    (arg("negatives"), arg("positives"), arg("threshold")),
+    "Calculates the precision and recall (sensitiveness) values given positive and negative scores and a threshold. 'positives' holds the score information for samples that are labeled to belong to a certain class (a.k.a., 'signal' or 'client'). 'negatives' holds the score information for samples that are labeled *not* to belong to the class (a.k.a., 'noise' or 'impostor'). For more precise details about how the method considers error rates, please refer to the documentation of the method bob.measure.farfrr."
+  );
+
+  def(
+    "f_score",
+    &f_score,
+    (arg("negatives"), arg("positives"), arg("threshold"), arg("weight")=1.0),
+    "This method computes F score of the accuracy of the classification. It is a weighted mean of precision and recall measurements. The weight parameter needs to be non-negative real value. In case the weight parameter is 1, the F-score is called F1 score and is a harmonic mean between precision and recall values."
   );
 
   def(
@@ -171,6 +206,13 @@ void bind_measure_error() {
     &bob_roc,
     (arg("negatives"), arg("positives"), arg("n_points")),
     "Calculates the ROC curve given a set of positive and negative scores and a desired number of points. Returns a two-dimensional blitz::Array of doubles that express the X (FRR) and Y (FAR) coordinates in this order. The points in which the ROC curve are calculated are distributed uniformily in the range [min(negatives, positives), max(negatives, positives)]."
+  );
+
+  def(
+    "precision_recall_curve",
+    &bob_precision_recall_curve,
+    (arg("negatives"), arg("positives"), arg("n_points")),
+    "Calculates the precision-recall curve given a set of positive and negative scores and a number of desired points. Returns a two-dimensional blitz::Array of doubles that express the X (precision) and Y (recall) coordinates in this order. The points in which the curve is calculated are distributed uniformly in the range [min(negatives, positives), max(negatives, positives)]."
   );
 
   def(

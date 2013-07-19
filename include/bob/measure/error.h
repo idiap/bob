@@ -69,6 +69,30 @@ namespace bob { namespace measure {
       const blitz::Array<double,1>& positives, double threshold);
 
   /**
+   * Calculates the precision and recall (sensitiveness) values given positive and negative
+   * scores and a threshold. 'positives' holds the score information for
+   * samples that are labeled to belong to a certain class (a.k.a., "signal"
+   * or "client"). 'negatives' holds the score information for samples that are
+   * labeled *not* to belong to the class (a.k.a., "noise" or "impostor").
+   *
+   * For more precise details about how the method considers error rates, please refer to the documentation of the method bob.measure.farfrr. 
+   *
+   * It is possible that scores are inverted in the negative/positive sense. In
+   * some setups the designer may have setup the system so 'positive' samples
+   * have a smaller score than the 'negative' ones. In this case, make sure you
+   * normalize the scores so positive samples have greater scores before
+   * feeding them into this method.
+   */
+  std::pair<double, double> precision_recall(const blitz::Array<double,1>& negatives,
+      const blitz::Array<double,1>& positives, double threshold);
+
+  /**
+   * This method computes F score of the accuracy of the classification. It is a weighted mean of precision and recall measurements. The weight parameter needs to be non-negative real value. In case the weight parameter is 1, the F-score is called F1 score and is a harmonic mean between precision and recall values.
+   */
+  double f_score(const blitz::Array<double,1>& negatives,
+    const blitz::Array<double,1>& positives, double threshold, double weight) ;
+
+  /**
    * This method returns a blitz::Array composed of booleans that pin-point
    * which positives where correctly classified in a 'positive' score sample,
    * given a threshold. It runs the formula:
@@ -267,6 +291,18 @@ namespace bob { namespace measure {
    * positives)].
    */
   blitz::Array<double,2> roc
+    (const blitz::Array<double,1>& negatives,
+     const blitz::Array<double,1>& positives, size_t points);
+     
+  /**
+   * Calculates the precision-recall curve given a set of positive and negative scores and a
+   * number of desired points. Returns a two-dimensional blitz::Array of
+   * doubles that express the X (precision) and Y (recall) coordinates in this order.
+   * The points in which the curve is calculated are distributed
+   * uniformly in the range [min(negatives, positives), max(negatives,
+   * positives)].
+   */
+  blitz::Array<double,2> precision_recall_curve
     (const blitz::Array<double,1>& negatives,
      const blitz::Array<double,1>& positives, size_t points);
 

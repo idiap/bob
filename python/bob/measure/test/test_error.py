@@ -53,22 +53,49 @@ class ErrorTest(unittest.TestCase):
     maximum = max(positives.max(), negatives.max())
 
     # If we take a threshold on the minimum, the FAR should be 1.0 and the FRR
-    # should be 0.0.
+    # should be 0.0. Precision should be 0.5, recall should be 1.0
     far, frr = bob.measure.farfrr(negatives, positives, minimum-0.1)
     self.assertEqual(far, 1.0)
     self.assertEqual(frr, 0.0)
-
+    prec, recall = bob.measure.precision_recall(negatives, positives, minimum-0.1)
+    self.assertEqual(prec, 0.5)
+    self.assertEqual(recall, 1.0)
+    
     # Similarly, if we take a threshold on the maximum, the FRR should be 1.0
-    # while the FAR should be 0.0
+    # while the FAR should be 0.0. Both precision and recall should be 0.0.
     far, frr = bob.measure.farfrr(negatives, positives, maximum+0.1)
     self.assertEqual(far, 0.0)
     self.assertEqual(frr, 1.0)
+    prec, recall = bob.measure.precision_recall(negatives, positives, maximum+0.1)
+    self.assertEqual(prec, 0.0)
+    self.assertEqual(recall, 0.0)
 
     # If we choose the appropriate threshold, we should get 0.0 for both FAR
-    # and FRR.
+    # and FRR. Precision will be 1.0, recall will be 1.0
     far, frr = bob.measure.farfrr(negatives, positives, 3.0)
     self.assertEqual(far, 0.0)
     self.assertEqual(frr, 0.0)
+    prec, recall = bob.measure.precision_recall(negatives, positives, 3.0)
+    self.assertEqual(prec, 1.0)
+    self.assertEqual(recall, 1.0)
+    
+    # Testing the values of F-score depending on different choices of the threshold
+    f_score = bob.measure.f_score(negatives, positives, minimum-0.1)
+    self.assertAlmostEqual(f_score, 0.66666667)
+    f_score = bob.measure.f_score(negatives, positives, minimum-0.1, 2)
+    self.assertAlmostEqual(f_score, 0.83333333)
+    
+    f_score = bob.measure.f_score(negatives, positives, maximum+0.1)
+    self.assertEqual(f_score, 0.0)
+    f_score = bob.measure.f_score(negatives, positives, maximum+0.1, 2)
+    self.assertEqual(f_score, 0.0)
+    
+    f_score = bob.measure.f_score(negatives, positives, 3.0)
+    self.assertEqual(f_score, 1.0)
+    f_score = bob.measure.f_score(negatives, positives, 3.0, 2)
+    self.assertEqual(f_score, 1.0)
+    
+
 
   def test02_indexing(self):
 
@@ -166,7 +193,14 @@ class ErrorTest(unittest.TestCase):
     # save('nonsep-roc.hdf5', xy)
     xyref = bob.io.load(F('nonsep-roc.hdf5'))
     self.assertTrue( numpy.array_equal(xy, xyref) )
-
+    
+    # This example will test the Precision-Recall plot calculation functionality.
+    xy = bob.measure.precision_recall_curve(negatives, positives, 100)
+    # uncomment the next line to save a reference value
+    # save('nonsep-roc.hdf5', xy)
+    xyref = bob.io.load(F('nonsep-precisionrecall.hdf5'))
+    self.assertTrue( numpy.array_equal(xy, xyref) )
+    
     # This example will test the DET plot calculation functionality.
     det_xyzw = bob.measure.det(negatives, positives, 100)
     # uncomment the next line to save a reference value
