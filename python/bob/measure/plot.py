@@ -3,7 +3,7 @@
 # Chakka Murali Mohan, Trainee, IDIAP Research Institute, Switzerland.
 # Mon 23 May 2011 14:36:14 CEST
 
-"""Methods to plot error analysis figures such as ROC, EPC and DET"""
+"""Methods to plot error analysis figures such as ROC, precision-recall curve, EPC and DET"""
 
 def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   """Plots Receiver Operating Charactaristic (ROC) curve.
@@ -60,6 +60,57 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
     return mpl.plot(100.0*out[0,:], 100.0*out[1,:], **kwargs)
   else:
     return mpl.semilogx(100.0*out[1,:], 100.0*(1-out[0,:]), **kwargs)
+
+def precision_recall_curve(negatives, positives, npoints=100, **kwargs):
+  """Plots Precision-Recall curve.
+
+  This method will call matplotlib to plot the precision-recall curve for a system which
+  contains a particular set of negatives (impostors) and positives (clients)
+  scores. We use the standard matplotlib.pyplot.plot() command. All parameters
+  passed with exeception of the three first parameters of this method will be
+  directly passed to the plot command. If you wish to understand your options,
+  look here:
+
+  http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot
+
+  The plot will represent the false-alarm on the vertical axis and the
+  false-rejection on the horizontal axis.
+
+  Input arguments:
+
+  negatives
+    a blitz array of negative class scores in float64 format
+
+  positives
+    a blitz array of positive class scores in float64 format
+
+  npoints
+    number of points to use when drawing the ROC curve
+
+  kwargs
+    a dictionary of extra plotting parameters, that is passed directly to
+    matplotlib.pyplot.plot().
+
+  .. note::
+
+    This function does not initiate and save the figure instance, it only
+    issues the plotting command. You are the responsible for setting up and
+    saving the figure as you see fit.
+
+  Return value is the matplotlib line that was added as defined by the
+  matplotlib.pyplot.plot() command.
+  """
+
+  try:
+    import matplotlib.pyplot as mpl
+  except ImportError:
+    print("Cannot import matplotlib. This package is not essential, but required if you wish to use the plotting functionality.")
+    raise
+
+  from . import precision_recall_curve as calc
+  out = calc(negatives, positives, npoints)
+  return mpl.plot(100.0*out[0,:], 100.0*out[1,:], **kwargs)
+
 
 def epc(dev_negatives, dev_positives, test_negatives, test_positives,
     npoints=100, **kwargs):

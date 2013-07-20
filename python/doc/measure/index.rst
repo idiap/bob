@@ -36,6 +36,7 @@
    eer_rocch
    eer_threshold
    epc
+   f_score
    far_threshold
    farfrr
    frr_threshold
@@ -43,6 +44,8 @@
    min_weighted_error_rate_threshold
    mse
    ppndf
+   precision_recall
+   precision_recall_curve
    recognition_rate
    relevance
    rmse
@@ -62,6 +65,7 @@
    det
    det_axis
    epc
+   precision_recall_curve
    roc
 
 .. module:: bob.measure.load
