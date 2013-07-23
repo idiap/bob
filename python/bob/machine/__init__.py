@@ -5,7 +5,7 @@ from . import __linear__
 from . import __mlp__
 
 def ztnorm_same_value(vect_a, vect_b):
-  """Computes the matrix of boolean D for the ZT-norm, which indicates where 
+  """Computes the matrix of boolean D for the ZT-norm, which indicates where
      the client ids of the T-Norm models and Z-Norm samples match.
 
      vect_a An (ordered) list of client_id corresponding to the T-Norm models
@@ -20,3 +20,4 @@ def ztnorm_same_value(vect_a, vect_b):
   return sameMatrix
 
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Andre Anjos <andre.anjos@idiap.ch> 
+# Andre Anjos <andre.anjos@idiap.ch>
 # Sun 24 Jul 17:50:01 2011 CEST
 
 from ..core import __from_extension_import__
@@ -17,7 +17,7 @@ class MaxDetector(CVDetector):
   """A class that bridges the Visioner to bob so as to detect the most
   face-like object in still images or video frames"""
 
-  def __init__(self, model_file=None, threshold=0.0, scanning_levels=0, 
+  def __init__(self, model_file=None, threshold=0.0, scanning_levels=0,
       scale_variation=2, clustering=0.05,
       method=DetectionMethod.Scanning):
     """Creates a new face localization object by loading object classification
@@ -27,19 +27,19 @@ class MaxDetector(CVDetector):
 
     model
       file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.
-      
+
     threshold
       object classification threshold
-      
+
     scanning_levels
       scanning levels (the more, the faster)
-      
+
     scale_variation
       scale variation in pixels
-      
+
     clustering
       overlapping threshold for clustering detections
-      
+
     method
       Scanning (default) or GroundTruth (note: this option does not work for
       the time being)
@@ -64,10 +64,10 @@ class MaxDetector(CVDetector):
     return self.detect_max(image)
 
 class Detector(CVDetector):
-  """A class that bridges the Visioner to bob so as to detect faces in 
+  """A class that bridges the Visioner to bob so as to detect faces in
   still images or video frames"""
 
-  def __init__(self, model_file=None, threshold=0.0, scanning_levels=0, 
+  def __init__(self, model_file=None, threshold=0.0, scanning_levels=0,
       scale_variation=2, clustering=0.05,
       method=DetectionMethod.Scanning):
     """Creates a new face localization object by loading object classification
@@ -77,19 +77,19 @@ class Detector(CVDetector):
 
     model
       file containing the model to be loaded; **note**: Serialization will use a native text format by default. Files that have their names suffixed with '.gz' will be automatically decompressed. If the filename ends in '.vbin' or '.vbgz' the format used will be the native binary format.
-      
+
     threshold
       object classification threshold
-      
+
     scanning_levels
       scanning levels (the more, the faster)
-      
+
     scale_variation
       scale variation in pixels
-      
+
     clustering
       overlapping threshold for clustering detections
-      
+
     method
       Scanning (default) or GroundTruth (note: this option does not work for
       the time being)
@@ -118,7 +118,7 @@ class Detector(CVDetector):
     return self.detect(image)
 
 class Localizer(CVLocalizer):
-  """A class that bridges the Visioner to bob to localize keypoints in 
+  """A class that bridges the Visioner to bob to localize keypoints in
   still images or video frames"""
 
   def __init__(self, model_file=None,
@@ -139,15 +139,15 @@ class Localizer(CVLocalizer):
     detector
       Path to a file or a CVDetector (or Max/Detector) object to be used as the
       basis for the localization procedure. If None is given (the default), use
-      the default detector. 
+      the default detector.
     """
 
     if model_file is None: model_file = DEFAULT_LOCALIZATION_MODEL
     CVLocalizer.__init__(self, model_file, method)
 
-    if detector is None: 
+    if detector is None:
       self.detector = Detector()
-    elif isinstance(detector, (str, unicode)): 
+    elif isinstance(detector, (str, unicode)):
       self.detector = Detector(detector)
     elif isinstance(detector, CVDetector):
       self.detector = detector
@@ -156,7 +156,7 @@ class Localizer(CVLocalizer):
 
   def __call__(self, image):
     """Runs the localization machinery, returns the bounding box and points
- 
+
     Keyword parameters:
 
     image
@@ -200,3 +200,4 @@ param.__str__ = param_str
 del param_str
 
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k

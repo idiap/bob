@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# vim: set fileencoding=utf-8 : 
-# Andre Anjos <andre.anjos@idiap.ch> 
+# vim: set fileencoding=utf-8 :
+# Andre Anjos <andre.anjos@idiap.ch>
 # Sat 23 Feb 06:00:13 2013 CET
 
 """Base tools for dealing with arrays, random numbers and our Python/C++ bridge
@@ -75,6 +75,7 @@ __from_extension_import__('._core', __package__, locals())
 from . import array
 from . import random
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k
 
 # get the default logger of Bob
 logger = logging.getLogger('bob')

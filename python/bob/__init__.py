@@ -15,3 +15,4 @@ from . import trainer
 version = __import__('pkg_resources').require('bob')[0].version
 
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k

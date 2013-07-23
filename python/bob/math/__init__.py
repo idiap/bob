@@ -6,3 +6,4 @@ import math
 import numpy
 
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k

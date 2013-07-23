@@ -7,7 +7,7 @@ __from_extension_import__('._core_random', __package__, locals())
 
 class variate_generator:
   """A pure-python version of the boost::variate_generator<> class
-  
+
   Keyword parameters:
 
   engine
@@ -36,3 +36,4 @@ class variate_generator:
     return self.distribution(self.engine)
 
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k
