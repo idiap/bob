@@ -120,3 +120,4 @@ def cmc(cmc_scores):
   return cumulative_match_characteristic
 
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k

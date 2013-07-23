@@ -4,3 +4,4 @@ from .__glcm__ import *
 from .__glcm_prop__ import *
 import flowutils
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k

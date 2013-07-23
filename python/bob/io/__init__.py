@@ -187,3 +187,4 @@ open = File
 from . import utils
 
 __all__ = [k for k in dir() if not k.startswith('_')]
+del k
