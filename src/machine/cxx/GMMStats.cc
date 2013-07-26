@@ -69,7 +69,8 @@ bob::machine::GMMStats::operator!=(const bob::machine::GMMStats& b) const
 bool bob::machine::GMMStats::is_similar_to(const bob::machine::GMMStats& b,
   const double r_epsilon, const double a_epsilon) const
 {
-  return (T == b.T && log_likelihood == b.log_likelihood &&
+  return (T == b.T &&
+          bob::core::array::isClose(log_likelihood, b.log_likelihood, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(n, b.n, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(sumPx, b.sumPx, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(sumPxx, b.sumPxx, r_epsilon, a_epsilon));
