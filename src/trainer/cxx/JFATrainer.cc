@@ -23,14 +23,12 @@
 #include <bob/trainer/JFATrainer.h>
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
-
+#include <bob/core/array_random.h>
 #include <bob/math/inv.h>
 #include <bob/math/linear.h>
 #include <bob/core/check.h>
 #include <bob/core/array_repmat.h>
 #include <algorithm>
-
-#include <random/normal.h>
 
 
 bob::trainer::FABaseTrainer::FABaseTrainer():
@@ -558,23 +556,6 @@ void bob::trainer::FABaseTrainer::updateD(blitz::Array<double,1>& d)
   d = m_acc_D_A2 / m_acc_D_A1;
 }
 
-void bob::trainer::FABaseTrainer::initializeRandom(blitz::Array<double,1>& vector)
-{
-  ranlib::Normal<double> normalGen(0., 1.);
-  for (int i=0; i<vector.extent(0); ++i)
-    vector(i) = normalGen.random();    // normal random number
-}
-
-void bob::trainer::FABaseTrainer::initializeRandom(blitz::Array<double,2>& matrix)
-{
-  ranlib::Normal<double> normalGen(0., 1.);
-  for (int i=0; i<matrix.extent(0); ++i) {
-    blitz::Array<double,1> vec = matrix(i, blitz::Range::all());
-    initializeRandom(vec);
-  }
-}
-
-
 
 
 //////////////////////////// ISVTrainer ///////////////////////////
@@ -635,7 +616,9 @@ void bob::trainer::ISVTrainer::initialize(bob::machine::ISVBase& machine,
   m_base_trainer.initUbmNidSumStatistics(machine.getBase(), ar);
   m_base_trainer.initializeXYZ(ar);
 
-  m_base_trainer.initializeRandom(machine.updateU());
+  blitz::Array<double,2>& U = machine.updateU();
+  bob::core::array::randn(*m_rng, U);
+  //m_base_trainer.initializeRandom(machine.updateU());
   initializeD(machine);
   machine.precompute();
 }
@@ -748,9 +731,15 @@ void bob::trainer::JFATrainer::initialize(bob::machine::JFABase& machine,
   m_base_trainer.initUbmNidSumStatistics(machine.getBase(), ar);
   m_base_trainer.initializeXYZ(ar);
 
-  m_base_trainer.initializeRandom(machine.updateU());
-  m_base_trainer.initializeRandom(machine.updateV());
-  m_base_trainer.initializeRandom(machine.updateD());
+  blitz::Array<double,2>& U = machine.updateU();
+  bob::core::array::randn(*m_rng, U);
+  blitz::Array<double,2>& V = machine.updateV();
+  bob::core::array::randn(*m_rng, V);
+  blitz::Array<double,1>& D = machine.updateD();
+  bob::core::array::randn(*m_rng, D);
+  //m_base_trainer.initializeRandom(machine.updateU());
+  //m_base_trainer.initializeRandom(machine.updateV());
+  //m_base_trainer.initializeRandom(machine.updateD());
   machine.precompute();
 }
 
