@@ -618,7 +618,6 @@ void bob::trainer::ISVTrainer::initialize(bob::machine::ISVBase& machine,
 
   blitz::Array<double,2>& U = machine.updateU();
   bob::core::array::randn(*m_rng, U);
-  //m_base_trainer.initializeRandom(machine.updateU());
   initializeD(machine);
   machine.precompute();
 }
@@ -737,9 +736,6 @@ void bob::trainer::JFATrainer::initialize(bob::machine::JFABase& machine,
   bob::core::array::randn(*m_rng, V);
   blitz::Array<double,1>& D = machine.updateD();
   bob::core::array::randn(*m_rng, D);
-  //m_base_trainer.initializeRandom(machine.updateU());
-  //m_base_trainer.initializeRandom(machine.updateV());
-  //m_base_trainer.initializeRandom(machine.updateD());
   machine.precompute();
 }
 
