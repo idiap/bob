@@ -33,6 +33,7 @@
 #include <string>
 #include <bob/core/array_copy.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/random.hpp>
 #include <bob/core/logging.h>
 
 namespace bob { namespace trainer { 
@@ -219,16 +220,6 @@ class FABaseTrainer
      * @brief Updates d from the accumulators m_acc_D_A1 and m_acc_D_A2
      */
     void updateD(blitz::Array<double,1>& d);
-
-
-    /**
-     * @brief Initializes randomly a 1D vector
-     */
-    static void initializeRandom(blitz::Array<double,1>& vector);
-    /**
-     * @brief Initializes randomly a 2D matrix
-     */
-    static void initializeRandom(blitz::Array<double,2>& matrix);
 
 
     /**

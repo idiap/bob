@@ -268,3 +268,65 @@ class FATrainerTest(unittest.TestCase):
     t.enrol(m, gse, 5)
     self.assertTrue( numpy.allclose(m.z, z_ref, eps) )
 
+  def test06_JFATrainInitialize(self):
+    # Check that the initialization is consistent and using the rng (cf. issue #118)
+
+    eps = 1e-10
+
+    # UBM GMM
+    ubm = bob.machine.GMMMachine(2,3)
+    ubm.mean_supervector = UBM_MEAN
+    ubm.variance_supervector = UBM_VAR
+
+    ## JFA
+    jb = bob.machine.JFABase(ubm, 2, 2)
+    # first round
+    rng = bob.core.random.mt19937(0)
+    jt = bob.trainer.JFATrainer(10)
+    jt.rng = rng
+    jt.initialize(jb, TRAINING_STATS)
+    u1 = jb.u
+    v1 = jb.v
+    d1 = jb.d
+
+    # second round
+    rng = bob.core.random.mt19937(0)
+    jt.rng = rng
+    jt.initialize(jb, TRAINING_STATS)
+    u2 = jb.u
+    v2 = jb.v
+    d2 = jb.d
+    
+    self.assertTrue( numpy.allclose(u1, u2, eps) )
+    self.assertTrue( numpy.allclose(v1, v2, eps) )
+    self.assertTrue( numpy.allclose(d1, d2, eps) )
+
+  def test07_ISVTrainInitialize(self):
+    # Check that the initialization is consistent and using the rng (cf. issue #118)
+
+    eps = 1e-10
+
+    # UBM GMM
+    ubm = bob.machine.GMMMachine(2,3)
+    ubm.mean_supervector = UBM_MEAN
+    ubm.variance_supervector = UBM_VAR
+
+    ## ISV
+    ib = bob.machine.ISVBase(ubm, 2)
+    # first round
+    rng = bob.core.random.mt19937(0)
+    it = bob.trainer.ISVTrainer(10)
+    it.rng = rng
+    it.initialize(ib, TRAINING_STATS)
+    u1 = ib.u
+    d1 = ib.d
+
+    # second round
+    rng = bob.core.random.mt19937(0)
+    it.rng = rng
+    it.initialize(ib, TRAINING_STATS)
+    u2 = ib.u
+    d2 = ib.d
+    
+    self.assertTrue( numpy.allclose(u1, u2, eps) )
+    self.assertTrue( numpy.allclose(d1, d2, eps) )
