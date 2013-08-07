@@ -4,7 +4,7 @@
 # license: LGPL-2.1
 
 #
-# Test insulation module. 
+# Test insulation module.
 #
 # TODO: prints in tests (captured stuff)
 # Copyright (c) 2008 Sungard Front Arena
@@ -14,7 +14,10 @@ import socket, select
 from nose.plugins import Plugin
 from nose.plugins.skip import SkipTest
 from nose.result import TextTestResult
-from cStringIO import StringIO
+try:
+  from io import StringIO
+except ImportError:
+  from cStringIO import StringIO
 
 from subprocess import Popen, PIPE
 
@@ -43,14 +46,14 @@ else:
 class Insulate(Plugin):
     "Master insulation plugin class"
 
-    score = sys.maxint
+    score = sys.maxsize
     name = 'insulate'
     restart_after_crash = True
     show_slave_output = False
     enableOpt = 'insulate'
     testCount = 0
     testSlave = None
-    
+
     def options(self, parser, env=os.environ):
         super(Insulate, self).options(parser, env)
 
@@ -80,7 +83,7 @@ class Insulate(Plugin):
             self.enabled = False
         if self.enabled:
             self.restart_after_crash = options.restart_after_crash
-            self.not_in_slave = options.not_in_slave[:] 
+            self.not_in_slave = options.not_in_slave[:]
             self.in_slave = options.in_slave[:]
 
             self.show_slave_output = options.show_slave_output
@@ -183,7 +186,7 @@ class TestWrapper(object):
                 et = ev.__class__
             else:
                 et = type(ev)
-                
+
             exc_info = et, ev, tb
             if status == ResultCollector.SUCCESS:
                 result.addSuccess(self.orgtest)
@@ -306,7 +309,7 @@ class TestSlave(object):
         if self.noseSlave is not None:
             try:
                 self.sendToSlave(None) # Tell the slave we are finished with it.
-            except (EOFError, IOError, socket.error), e:
+            except (EOFError, IOError, socket.error) as e:
                 pass
             self.noseSlave = None
             self.toSlave.close()
@@ -337,7 +340,7 @@ class TestSlave(object):
 
         try:
             self.sendToSlave(count)
-        except (EOFError, IOError, socket.error), e:
+        except (EOFError, IOError, socket.error) as e:
             _, _, tb = sys.exc_info()
             self.dropSlave()
             return ResultCollector.ERROR, (e, tb), None
@@ -348,7 +351,7 @@ class TestSlave(object):
             sys.stderr.write(stderr)
             return status, exc, data
 
-        except (EOFError, IOError, socket.error), e:
+        except (EOFError, IOError, socket.error) as e:
             _, _, tb = sys.exc_info()
             self.dropSlave()
             return ResultCollector.ERROR, (CrashInTestError(), tb), None
@@ -366,7 +369,7 @@ Infinite = _Infinite()
 
 class InsulateSlave(Plugin):
     "Slave insulation plugin class"
-    score = sys.maxint
+    score = sys.maxsize
     name = 'insulateslave'
     _nextTest = None
 
@@ -388,7 +391,7 @@ class InsulateSlave(Plugin):
             masterFile = masterSock.makefile('rwb')
             self.fromMaster = masterFile
             self.toMaster = masterFile
-            
+
     def prepareTest(self, test):
         """
         Prepare a specific test; set counter to zero in preparation for run,

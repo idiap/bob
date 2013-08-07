@@ -174,14 +174,8 @@ template <typename T> void set_type(bob::io::HDF5Type& t) {
 static bool get_object_type(object o, bob::io::HDF5Type& t) {
   PyObject* op = o.ptr();
 
-  if (PyArray_IsAnyScalar(op)) {
+  if (PyArray_IsScalar(op, Generic)) {
     if (PyArray_IsScalar(op, String)) set_string_type(t, o);
-    else if (PyString_Check(op)) set_string_type(t, o);
-    else if (PyBool_Check(op)) set_type<bool>(t);
-    else if (PyInt_Check(op)) set_type<int32_t>(t);
-    else if (PyLong_Check(op)) set_type<int64_t>(t);
-    else if (PyFloat_Check(op)) set_type<double>(t);
-    else if (PyComplex_Check(op)) set_type<std::complex<double> >(t);
     else if (PyArray_IsScalar(op, Bool)) set_type<bool>(t);
     else if (PyArray_IsScalar(op, Int8)) set_type<int8_t>(t);
     else if (PyArray_IsScalar(op, UInt8)) set_type<uint8_t>(t);
@@ -204,6 +198,17 @@ static bool get_object_type(object o, bob::io::HDF5Type& t) {
     }
     return true;
   }
+
+#if PY_VERSION_HEX >= 0x03000000
+  else if (PyUnicode_Check(op)) set_string_type(t, o);
+#else
+  else if (PyString_Check(op)) set_string_type(t, o);
+  else if (PyInt_Check(op)) set_type<int32_t>(t);
+#endif
+  else if (PyBool_Check(op)) set_type<bool>(t);
+  else if (PyLong_Check(op)) set_type<int64_t>(t);
+  else if (PyFloat_Check(op)) set_type<double>(t);
+  else if (PyComplex_Check(op)) set_type<std::complex<double> >(t);
 
   else if (PyArray_Check(op)) {
     bob::core::array::typeinfo ti;
@@ -242,31 +247,31 @@ static void inner_replace(bob::io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
-      case bob::io::s:  
+      case bob::io::s:
         return inner_replace_scalar<std::string>(f, path, obj, pos);
-      case bob::io::b:  
+      case bob::io::b:
         return inner_replace_scalar<bool>(f, path, obj, pos);
-      case bob::io::i8:  
+      case bob::io::i8:
         return inner_replace_scalar<int8_t>(f, path, obj, pos);
-      case bob::io::i16: 
+      case bob::io::i16:
         return inner_replace_scalar<int16_t>(f, path, obj, pos);
       case bob::io::i32:
         return inner_replace_scalar<int32_t>(f, path, obj, pos);
-      case bob::io::i64: 
+      case bob::io::i64:
         return inner_replace_scalar<int64_t>(f, path, obj, pos);
-      case bob::io::u8:  
+      case bob::io::u8:
         return inner_replace_scalar<uint8_t>(f, path, obj, pos);
-      case bob::io::u16: 
+      case bob::io::u16:
         return inner_replace_scalar<uint16_t>(f, path, obj, pos);
-      case bob::io::u32: 
+      case bob::io::u32:
         return inner_replace_scalar<uint32_t>(f, path, obj, pos);
-      case bob::io::u64: 
+      case bob::io::u64:
         return inner_replace_scalar<uint64_t>(f, path, obj, pos);
-      case bob::io::f32: 
+      case bob::io::f32:
         return inner_replace_scalar<float>(f, path, obj, pos);
-      case bob::io::f64: 
+      case bob::io::f64:
         return inner_replace_scalar<double>(f, path, obj, pos);
-      case bob::io::f128: 
+      case bob::io::f128:
         return inner_replace_scalar<long double>(f, path, obj, pos);
       case bob::io::c64:
         return inner_replace_scalar<std::complex<float> >(f, path, obj, pos);
@@ -306,31 +311,31 @@ static void inner_append(bob::io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
-      case bob::io::s:  
+      case bob::io::s:
         return inner_append_scalar<std::string>(f, path, obj);
-      case bob::io::b:  
+      case bob::io::b:
         return inner_append_scalar<bool>(f, path, obj);
-      case bob::io::i8:  
+      case bob::io::i8:
         return inner_append_scalar<int8_t>(f, path, obj);
-      case bob::io::i16: 
+      case bob::io::i16:
         return inner_append_scalar<int16_t>(f, path, obj);
       case bob::io::i32:
         return inner_append_scalar<int32_t>(f, path, obj);
-      case bob::io::i64: 
+      case bob::io::i64:
         return inner_append_scalar<int64_t>(f, path, obj);
-      case bob::io::u8:  
+      case bob::io::u8:
         return inner_append_scalar<uint8_t>(f, path, obj);
-      case bob::io::u16: 
+      case bob::io::u16:
         return inner_append_scalar<uint16_t>(f, path, obj);
-      case bob::io::u32: 
+      case bob::io::u32:
         return inner_append_scalar<uint32_t>(f, path, obj);
-      case bob::io::u64: 
+      case bob::io::u64:
         return inner_append_scalar<uint64_t>(f, path, obj);
-      case bob::io::f32: 
+      case bob::io::f32:
         return inner_append_scalar<float>(f, path, obj);
-      case bob::io::f64: 
+      case bob::io::f64:
         return inner_append_scalar<double>(f, path, obj);
-      case bob::io::f128: 
+      case bob::io::f128:
         return inner_append_scalar<long double>(f, path, obj);
       case bob::io::c64:
         return inner_append_scalar<std::complex<float> >(f, path, obj);
@@ -389,31 +394,31 @@ static void inner_set(bob::io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
-      case bob::io::s:  
+      case bob::io::s:
         return inner_set_scalar<std::string>(f, path, obj);
-      case bob::io::b:  
+      case bob::io::b:
         return inner_set_scalar<bool>(f, path, obj);
-      case bob::io::i8:  
+      case bob::io::i8:
         return inner_set_scalar<int8_t>(f, path, obj);
-      case bob::io::i16: 
+      case bob::io::i16:
         return inner_set_scalar<int16_t>(f, path, obj);
       case bob::io::i32:
         return inner_set_scalar<int32_t>(f, path, obj);
-      case bob::io::i64: 
+      case bob::io::i64:
         return inner_set_scalar<int64_t>(f, path, obj);
-      case bob::io::u8:  
+      case bob::io::u8:
         return inner_set_scalar<uint8_t>(f, path, obj);
-      case bob::io::u16: 
+      case bob::io::u16:
         return inner_set_scalar<uint16_t>(f, path, obj);
-      case bob::io::u32: 
+      case bob::io::u32:
         return inner_set_scalar<uint32_t>(f, path, obj);
-      case bob::io::u64: 
+      case bob::io::u64:
         return inner_set_scalar<uint64_t>(f, path, obj);
-      case bob::io::f32: 
+      case bob::io::f32:
         return inner_set_scalar<float>(f, path, obj);
-      case bob::io::f64: 
+      case bob::io::f64:
         return inner_set_scalar<double>(f, path, obj);
-      case bob::io::f128: 
+      case bob::io::f128:
         return inner_set_scalar<long double>(f, path, obj);
       case bob::io::c64:
         return inner_set_scalar<std::complex<float> >(f, path, obj);
@@ -465,34 +470,34 @@ static object inner_get_attr(const bob::io::HDF5File& f, const std::string& path
 
   const bob::io::HDF5Shape& shape = type.shape();
 
-  if (type.type() == bob::io::s || (shape.n() == 1 && shape[0] == 1)) { 
+  if (type.type() == bob::io::s || (shape.n() == 1 && shape[0] == 1)) {
     //read as scalar
     switch(type.type()) {
-      case bob::io::s:  
+      case bob::io::s:
         return inner_get_scalar_attr<std::string>(f, path, name, type);
-      case bob::io::b:  
+      case bob::io::b:
         return inner_get_scalar_attr<bool>(f, path, name, type);
-      case bob::io::i8:  
+      case bob::io::i8:
         return inner_get_scalar_attr<int8_t>(f, path, name, type);
-      case bob::io::i16: 
+      case bob::io::i16:
         return inner_get_scalar_attr<int16_t>(f, path, name, type);
       case bob::io::i32:
         return inner_get_scalar_attr<int32_t>(f, path, name, type);
-      case bob::io::i64: 
+      case bob::io::i64:
         return inner_get_scalar_attr<int64_t>(f, path, name, type);
-      case bob::io::u8:  
+      case bob::io::u8:
         return inner_get_scalar_attr<uint8_t>(f, path, name, type);
-      case bob::io::u16: 
+      case bob::io::u16:
         return inner_get_scalar_attr<uint16_t>(f, path, name, type);
-      case bob::io::u32: 
+      case bob::io::u32:
         return inner_get_scalar_attr<uint32_t>(f, path, name, type);
-      case bob::io::u64: 
+      case bob::io::u64:
         return inner_get_scalar_attr<uint64_t>(f, path, name, type);
-      case bob::io::f32: 
+      case bob::io::f32:
         return inner_get_scalar_attr<float>(f, path, name, type);
-      case bob::io::f64: 
+      case bob::io::f64:
         return inner_get_scalar_attr<double>(f, path, name, type);
-      case bob::io::f128: 
+      case bob::io::f128:
         return inner_get_scalar_attr<long double>(f, path, name, type);
       case bob::io::c64:
         return inner_get_scalar_attr<std::complex<float> >(f, path, name, type);
@@ -550,7 +555,7 @@ static object hdf5file_get_attribute(const bob::io::HDF5File& f, const std::stri
 BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_get_attribute_overloads, hdf5file_get_attribute, 2, 3)
 
 template <typename T>
-static void inner_set_scalar_attr(bob::io::HDF5File& f, 
+static void inner_set_scalar_attr(bob::io::HDF5File& f,
   const std::string& path, const std::string& name, const bob::io::HDF5Type& type,
   object obj) {
   T value = extract<T>(obj);
@@ -558,7 +563,7 @@ static void inner_set_scalar_attr(bob::io::HDF5File& f,
 }
 
 template <>
-void inner_set_scalar_attr<std::string>(bob::io::HDF5File& f, 
+void inner_set_scalar_attr<std::string>(bob::io::HDF5File& f,
   const std::string& path, const std::string& name, const bob::io::HDF5Type& type,
   object obj) {
   std::string value = extract<std::string>(obj);
@@ -573,31 +578,31 @@ static void inner_set_attr(bob::io::HDF5File& f, const std::string& path,
 
   if (scalar) { //write as a scalar
     switch(type.type()) {
-      case bob::io::s:  
+      case bob::io::s:
         return inner_set_scalar_attr<std::string>(f, path, name, type, obj);
-      case bob::io::b:  
+      case bob::io::b:
         return inner_set_scalar_attr<bool>(f, path, name, type, obj);
-      case bob::io::i8:  
+      case bob::io::i8:
         return inner_set_scalar_attr<int8_t>(f, path, name, type, obj);
-      case bob::io::i16: 
+      case bob::io::i16:
         return inner_set_scalar_attr<int16_t>(f, path, name, type, obj);
       case bob::io::i32:
         return inner_set_scalar_attr<int32_t>(f, path, name, type, obj);
-      case bob::io::i64: 
+      case bob::io::i64:
         return inner_set_scalar_attr<int64_t>(f, path, name, type, obj);
-      case bob::io::u8:  
+      case bob::io::u8:
         return inner_set_scalar_attr<uint8_t>(f, path, name, type, obj);
-      case bob::io::u16: 
+      case bob::io::u16:
         return inner_set_scalar_attr<uint16_t>(f, path, name, type, obj);
-      case bob::io::u32: 
+      case bob::io::u32:
         return inner_set_scalar_attr<uint32_t>(f, path, name, type, obj);
-      case bob::io::u64: 
+      case bob::io::u64:
         return inner_set_scalar_attr<uint64_t>(f, path, name, type, obj);
-      case bob::io::f32: 
+      case bob::io::f32:
         return inner_set_scalar_attr<float>(f, path, name, type, obj);
-      case bob::io::f64: 
+      case bob::io::f64:
         return inner_set_scalar_attr<double>(f, path, name, type, obj);
-      case bob::io::f128: 
+      case bob::io::f128:
         return inner_set_scalar_attr<long double>(f, path, name, type, obj);
       case bob::io::c64:
         return inner_set_scalar_attr<std::complex<float> >(f, path, name, type, obj);

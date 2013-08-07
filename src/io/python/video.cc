@@ -6,16 +6,16 @@
  * @brief Binds Video constructions to python
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -112,7 +112,11 @@ static object videoreader_getslice (bob::io::VideoReader& v, slice sobj) {
   size_t start = 0;
   PySliceObject* sl = (PySliceObject*)sobj.ptr();
   if (sl->start != Py_None) {
+#if PY_VERSION_HEX >= 0x03000000
+    Py_ssize_t sstart = PyLong_AsLong(sl->start);
+#else
     Py_ssize_t sstart = PyInt_AsLong(sl->start);
+#endif
     start = sstart;
     if (sstart < 0) start = v.numberOfFrames() + sstart;
   }
@@ -124,7 +128,11 @@ static object videoreader_getslice (bob::io::VideoReader& v, slice sobj) {
   //the stop value may be None
   size_t stop = v.numberOfFrames();
   if (sl->stop != Py_None) {
+#if PY_VERSION_HEX >= 0x03000000
+    Py_ssize_t sstop = PyLong_AsLong(sl->stop);
+#else
     Py_ssize_t sstop = PyInt_AsLong(sl->stop);
+#endif
     stop = sstop;
     if (sstop < 0) stop = v.numberOfFrames() + sstop;
   }
@@ -133,7 +141,11 @@ static object videoreader_getslice (bob::io::VideoReader& v, slice sobj) {
   //the step value may be None
   int64_t step = 1;
   if (sl->step != Py_None) {
+#if PY_VERSION_HEX >= 0x03000000
+    step = PyLong_AsLong(sl->step);
+#else
     step = PyInt_AsLong(sl->step);
+#endif
   }
 
   //length of the sequence
@@ -149,12 +161,12 @@ static object videoreader_getslice (bob::io::VideoReader& v, slice sobj) {
     it.read(tmp); //throw if a problem occurs while reading the video
     retval.append(tmp.pyobject());
   }
- 
+
   bob::python::py_array py_retval(retval, str("uint8"));
   return py_retval.pyobject();
 }
 
-static object videoreader_load(bob::io::VideoReader& reader, 
+static object videoreader_load(bob::io::VideoReader& reader,
   bool raise_on_error=false) {
   bob::python::py_array tmp(reader.video_type());
   size_t frames_read = 0;
@@ -230,7 +242,7 @@ static object describe_codec(const AVCodec* codec) {
 # endif
   retval["encode"] = (bool)(avcodec_find_encoder(codec->id));
   retval["decode"] = (bool)(avcodec_find_decoder(codec->id));
-  
+
   return retval;
 }
 

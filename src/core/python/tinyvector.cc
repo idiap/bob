@@ -6,16 +6,16 @@
  * @brief Automatic converters to-from python for blitz::TinyVectors
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,7 +46,7 @@ struct tinyvec_from_sequence {
    * Registers converter from any python sequence into a blitz::TinyVector<T,N>
    */
   tinyvec_from_sequence() {
-    boost::python::converter::registry::push_back(&convertible, &construct, 
+    boost::python::converter::registry::push_back(&convertible, &construct,
         boost::python::type_id<container_type>());
   }
 
@@ -68,21 +68,22 @@ struct tinyvec_from_sequence {
      * - a tuple
      * - an iterable
      * - a range
-     * - is not a string _and_ is not an unicode string _and_ 
-     *   (is a valid object pointer _or_ (too long to continue... ;-) 
+     * - is not a string _and_ is not an unicode string _and_
+     *   (is a valid object pointer _or_ (too long to continue... ;-)
      */
     if (!(PyList_Check(obj_ptr)
           || PyTuple_Check(obj_ptr)
           || PyIter_Check(obj_ptr)
           || PyRange_Check(obj_ptr)
-          || ( !PyString_Check(obj_ptr)
-            && !PyUnicode_Check(obj_ptr)
-            && ( obj_ptr->ob_type == 0
-              || obj_ptr->ob_type->ob_type == 0
-              || obj_ptr->ob_type->ob_type->tp_name == 0
+          || ( !PyUnicode_Check(obj_ptr)
+#if PY_VERSION_HEX < 0x03000000
+            && !PyString_Check(obj_ptr)
+#endif
+            && ( Py_TYPE(obj_ptr) == 0
+              || Py_TYPE(Py_TYPE(obj_ptr)) == 0
+              || Py_TYPE(Py_TYPE(obj_ptr))->tp_name == 0
               || std::strcmp(
-                obj_ptr->ob_type->ob_type->tp_name,
-                "Boost.Python.class") != 0)
+                 Py_TYPE(Py_TYPE(obj_ptr))->tp_name, "Boost.Python.class") != 0)
             && PyObject_HasAttrString(obj_ptr, "__len__")
             && PyObject_HasAttrString(obj_ptr, "__getitem__")))) return 0;
 
@@ -177,7 +178,7 @@ struct tinyvec_to_tuple {
 
 template <typename T, int N>
 void register_tinyvec_to_tuple() {
-  boost::python::to_python_converter<typename blitz::TinyVector<T,N>, 
+  boost::python::to_python_converter<typename blitz::TinyVector<T,N>,
                           tinyvec_to_tuple<T,N>
 #if defined BOOST_PYTHON_SUPPORTS_PY_SIGNATURES
                           ,true
@@ -197,7 +198,7 @@ void bind_core_tinyvector () {
    * b) blitz::TinyVector<T,N> (pass by value)
    *
    * Please note that the last case:
-   * 
+   *
    * c) blitz::TinyVector<T,N>& (pass by non-const reference)
    *
    * is NOT covered by these converters. The reason being that because the

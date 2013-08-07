@@ -1,18 +1,18 @@
 .. vim: set fileencoding=utf-8 :
 .. Andre Anjos <andre.anjos@idiap.ch>
-.. Tue 27 Mar 2012 10:58:49 CEST 
+.. Tue 27 Mar 2012 10:58:49 CEST
 ..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -50,7 +50,7 @@ Required at runtime
 +----------------------+--------------+---------------------------------------+
 | `Lapack`_            | any          | BSD-style                             |
 +----------------------+--------------+---------------------------------------+
-| `Python`_            | 2.5          | `Python-2.0`_                         |
+| `Python`_            | 2.6          | `Python-2.0`_                         |
 +----------------------+--------------+---------------------------------------+
 | `Boost`_             | 1.34         | `BSL-1.0`_                            |
 +----------------------+--------------+---------------------------------------+
@@ -175,7 +175,7 @@ Core dependencies
 * `Boost`_: is used for our unit test framework and python bindings. Any
   version superior to 1.34 will work.
 * `Python`_: if you want to compile our python bindings we recommend using
-  Python 2.5 or up.
+  Python 2.6 or up.
 * `NumPy`_: this dependence is used to bridge blitz::Arrays to python.
 * `SciPy`_: a set of scientific-related python-based utilities.
 * `Matplotlib`_: a `MATLAB`_-like python plotting environment.
@@ -203,11 +203,11 @@ Data access
   currently compile against version 6.2, but older versions might work.
 * `libnetpbm`_: is used for reading and writing PBM/PGM/PMM images. We
   currently compile against version 10.0, but older versions might work.
-* `libpng`_: is used for reading and writing PNG images. We currently compile 
+* `libpng`_: is used for reading and writing PNG images. We currently compile
   against version 1.2.42, but older versions might work.
-* `libtiff`_: is used for reading and writing TIFF images. We currently compile 
+* `libtiff`_: is used for reading and writing TIFF images. We currently compile
   against version 3.9.2, but older versions might work.
-* `giflib`_: is used for reading and writing GIF images. We currently compile 
+* `giflib`_: is used for reading and writing GIF images. We currently compile
   against version 4.1.6-9, but older versions might work.
 * `HDF5`_: HDF5 is the format of choice for binary representation of data
   or configuration items in bob. We currently compile against version 1.8.6,
@@ -293,8 +293,8 @@ A single command line that will install all required packages under Ubuntu:
   Valgrind or other profiling tools of your choice.
 
 .. note::
-  
-  Ubuntu does not provide a version independent pacakge for libjpeg. In ubuntu 10.04 LTS, 
+
+  Ubuntu does not provide a version independent pacakge for libjpeg. In ubuntu 10.04 LTS,
   a different version of this library is available whose package name is libjpeg62-dev.
 
 .. note::
@@ -322,11 +322,11 @@ This recipe assumes you have already gone through the standard,
 well-documented, `MacPorts installation instructions`_ and have a prompt just
 in front of you and a checkout of bob you want to try out. Then, just do, at
 your shell prompt (for using Python 2.7 as the default interpreter):
-   
+
 .. code-block:: sh
 
   $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio jpeg netpbm libpng tiff giflib py27-ipython py27-matplotlib google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas fftw-3 vlfeat libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-pillow py27-setuptools
-  $ # go for a long coffee 
+  $ # go for a long coffee
 
 **Or**, for Python 2.6 as the default interpreter:
 

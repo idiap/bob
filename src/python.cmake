@@ -4,12 +4,12 @@
 # If the user has not opted for something fixed, just get the first one
 find_program(PYTHON_EXECUTABLE ${WITH_PYTHON} python DOC "Default python interpreter")
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print '%d.%d' % (sys.version_info[0], sys.version_info[1])" OUTPUT_VARIABLE PYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print('%d.%d' % (sys.version_info[0], sys.version_info[1]))" OUTPUT_VARIABLE PYTHON_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(PYTHON_VERSION "${PYTHON_VERSION}" CACHE STRING "Python version")
 
 string(REPLACE "." "" PYVER ${PYTHON_VERSION})
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print sys.version_info[0]" OUTPUT_VARIABLE PYTHON_MAJOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print(sys.version_info[0])" OUTPUT_VARIABLE PYTHON_MAJOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 set(PYTHON_MAJOR_VERSION "${PYTHON_MAJOR_VERSION}" CACHE STRING "Python major version")
 
 include(FindPackageHandleStandardArgs)
@@ -25,7 +25,7 @@ function(find_python_module module)
 		# A module's location is usually a directory, but for binary modules
 		# it's a .so file.
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" 
-			"import re, ${module}; print re.compile('/__init__.py.*').sub('',${module}.__file__)"
+			"import re, ${module}; print(re.compile('/__init__.py.*').sub('',${module}.__file__))"
 			RESULT_VARIABLE _${module}_status 
 			OUTPUT_VARIABLE _${module}_location
 			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -70,10 +70,10 @@ set(CMAKE_SYSTEM_PREFIX_PATH ${CMAKE_SYSTEM_PREFIX_OLD}) #reset to old path
 
 # This calculates the correct python installation prefix for the current
 # interpreter
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print sys.prefix" OUTPUT_VARIABLE PYTHON_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print(sys.prefix)" OUTPUT_VARIABLE PYTHON_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # This will calculate the include path for numpy
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print numpy.get_include()" OUTPUT_VARIABLE PYTHON_NUMPY_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.get_include())" OUTPUT_VARIABLE PYTHON_NUMPY_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # Do not use the include dir path found by FindPythonLibs as it does not
 # work properly on OSX (we end up getting the system path if another python
@@ -81,9 +81,9 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print numpy.get_i
 set(python_INCLUDE_DIRS "${PYTHON_NUMPY_INCLUDE_DIR};${PYTHON_PREFIX}/include/python${PYTHON_VERSION}" CACHE INTERNAL "incdirs")
 get_filename_component(python_LIBRARY_DIRS ${PYTHON_LIBRARY} PATH CACHE)
   
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])" OUTPUT_VARIABLE PYTHON_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print('%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2]))" OUTPUT_VARIABLE PYTHON_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print numpy.version.version" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.version.version)" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(PYTHON_VERSION_COMPLETE AND NUMPY_VERSION_COMPLETE)
   find_package_message(PYTHON "Found Python ${PYTHON_VERSION_COMPLETE} and NumPy ${NUMPY_VERSION_COMPLETE}: interpreter@${PYTHON_EXECUTABLE}; library@${PYTHON_LIBRARY}; includes@${python_INCLUDE_DIRS}" "[${PYTHON_LIBRARY}][${python_INCLUDE_DIRS}]")

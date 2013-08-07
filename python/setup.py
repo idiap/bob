@@ -24,7 +24,7 @@ try:
   import pkg_resources
   pkg_resources.require('pillow')
   EXTRA_REQUIREMENTS.append('pillow')
-except pkg_resources.DistributionNotFound, e:
+except pkg_resources.DistributionNotFound as e:
   EXTRA_REQUIREMENTS.append('pil')
 
 # Installing in a caged environment
@@ -69,19 +69,21 @@ def pkgconfig(package):
       stderr=subprocess.STDOUT)
 
   output = proc.communicate()[0]
+  if isinstance(output, bytes) and not isinstance(output, str):
+    output = output.decode('utf8')
 
   if proc.returncode != 0: return {}
 
   kw = {}
 
   for token in output.split():
-    if flag_map.has_key(token[:2]):
+    if token[:2] in flag_map:
       kw.setdefault(flag_map.get(token[:2]), []).append(token[2:])
 
     else: # throw others to extra_link_args
       kw.setdefault('extra_compile_args', []).append(token)
 
-  for k, v in kw.iteritems(): # remove duplicated
+  for k, v in kw.items(): # remove duplicated
       kw[k] = uniq(v)
 
   return kw
@@ -97,6 +99,8 @@ def bob_variables():
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
     var = proc.communicate()[0].strip()
+    if isinstance(var, bytes) and not isinstance(var, str):
+      var = var.decode('utf8')
     if proc.returncode != 0: return None
     return var
 
@@ -111,13 +115,15 @@ def bob_variables():
       stderr=subprocess.STDOUT)
 
   output = proc.communicate()[0].strip()
+  if isinstance(output, bytes) and not isinstance(output, str):
+    output = output.decode('utf8')
 
   kw = {}
   kw['version'] = output if proc.returncode == 0 else None
 
   if kw['version'] is None:
-    raise RuntimeError, 'Cannot retrieve Bob version from pkg-config:\n%s' % \
-        output
+    raise RuntimeError('Cannot retrieve Bob version from pkg-config:\n%s' % \
+        output)
 
   kw['soversion'] = get_var('soversion')
 
@@ -152,6 +158,8 @@ class build_ext(build_ext_base):
       proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
           stderr=subprocess.STDOUT)
       output = proc.communicate()[0]
+      if not isinstance(output,str) and isinstance(output,bytes):
+        output = output.decode('utf8')
       if os.path.exists(name): os.unlink(name)
       return True if proc.returncode == 0 else False
 

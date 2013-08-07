@@ -6,16 +6,16 @@
  * @brief Implementation of the ndarray class
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,6 +38,18 @@
 #define NUMPY16_API 0x00000006
 #define NUMPY14_API 0x00000004
 
+#if PY_VERSION_HEX >= 0x03000000
+static void* wrap_import_array() {
+  import_array();
+  return 0;
+}
+#else
+static void wrap_import_array() {
+  import_array();
+  return;
+}
+#endif
+
 void bob::python::setup_python(const char* module_docstring) {
 
   // Documentation options
@@ -54,7 +66,7 @@ void bob::python::setup_python(const char* module_docstring) {
   tstate->interp->dlopenflags = old_value & (~RTLD_GLOBAL);
 
   // Loads numpy with the RTLD_GLOBAL flag unset
-  import_array();
+  wrap_import_array();
 
   // Resets the RTLD_GLOBAL flag
   tstate->interp->dlopenflags = old_value;
@@ -208,21 +220,21 @@ bob::core::array::ElementType bob::python::num_to_type(int num) {
 
 }
 
-template <> int bob::python::ctype_to_num<bool>(void) 
+template <> int bob::python::ctype_to_num<bool>(void)
 { return NPY_BOOL; }
 
 //! @cond SKIP_DOXYGEN_WARNINGS
-template <> int bob::python::ctype_to_num<int8_t>(void) 
+template <> int bob::python::ctype_to_num<int8_t>(void)
 { return NPY_INT8; }
-template <> int bob::python::ctype_to_num<uint8_t>(void) 
+template <> int bob::python::ctype_to_num<uint8_t>(void)
 { return NPY_UINT8; }
-template <> int bob::python::ctype_to_num<int16_t>(void) 
+template <> int bob::python::ctype_to_num<int16_t>(void)
 { return NPY_INT16; }
-template <> int bob::python::ctype_to_num<uint16_t>(void) 
+template <> int bob::python::ctype_to_num<uint16_t>(void)
 { return NPY_UINT16; }
-template <> int bob::python::ctype_to_num<int32_t>(void) 
+template <> int bob::python::ctype_to_num<int32_t>(void)
 { return NPY_INT32; }
-template <> int bob::python::ctype_to_num<uint32_t>(void) 
+template <> int bob::python::ctype_to_num<uint32_t>(void)
 { return NPY_UINT32; }
 template <> int bob::python::ctype_to_num<int64_t>(void)
 { return NPY_INT64; }
@@ -230,18 +242,18 @@ template <> int bob::python::ctype_to_num<uint64_t>(void)
 { return NPY_UINT64; }
 template <> int bob::python::ctype_to_num<float>(void)
 { return NPY_FLOAT32; }
-template <> int bob::python::ctype_to_num<double>(void) 
+template <> int bob::python::ctype_to_num<double>(void)
 { return NPY_FLOAT64; }
 #ifdef NPY_FLOAT128
-template <> int bob::python::ctype_to_num<long double>(void) 
+template <> int bob::python::ctype_to_num<long double>(void)
 { return NPY_FLOAT128; }
 #endif
 template <> int bob::python::ctype_to_num<std::complex<float> >(void)
 { return NPY_COMPLEX64; }
-template <> int bob::python::ctype_to_num<std::complex<double> >(void) 
+template <> int bob::python::ctype_to_num<std::complex<double> >(void)
 { return NPY_COMPLEX128; }
 #ifdef NPY_COMPLEX256
-template <> int bob::python::ctype_to_num<std::complex<long double> >(void) 
+template <> int bob::python::ctype_to_num<std::complex<long double> >(void)
 { return NPY_COMPLEX256; }
 #endif
 //! @endcond SKIP_DOXYGEN_WARNINGS
@@ -310,10 +322,10 @@ bool bob::python::dtype::has_type(bob::core::array::ElementType _eltype) const {
 }
 
 bob::core::array::ElementType bob::python::dtype::eltype() const {
-  return TPY_ISNONE(m_self)? bob::core::array::t_unknown : 
+  return TPY_ISNONE(m_self)? bob::core::array::t_unknown :
     bob::python::num_to_type(TP_DESCR(m_self)->type_num);
 }
-      
+
 int bob::python::dtype::type_num() const {
   return TPY_ISNONE(m_self)? -1 : TP_DESCR(m_self)->type_num;
 }
@@ -353,17 +365,17 @@ void bob::python::typeinfo_ndarray (const boost::python::object& o, bob::core::a
  * NumPy >= 1.6 and is used when compiling and liking against older versions of
  * NumPy.
  */
-static int _GetArrayParamsFromObject(PyObject* op, 
-    PyArray_Descr* requested_dtype, 
-    npy_bool writeable, 
-    PyArray_Descr** out_dtype, 
+static int _GetArrayParamsFromObject(PyObject* op,
+    PyArray_Descr* requested_dtype,
+    npy_bool writeable,
+    PyArray_Descr** out_dtype,
     int* out_ndim,
-    npy_intp* out_dims, 
-    PyArrayObject** out_arr, 
+    npy_intp* out_dims,
+    PyArrayObject** out_arr,
     PyObject*) {
-  
+
   if (PyArray_Check(op)) { //it is already an array, easy
-    
+
     PyArrayObject* arr = reinterpret_cast<PyArrayObject*>(op);
 
     if (requested_dtype && !PyArray_EquivTypes(PyArray_DESCR(arr), requested_dtype)) {
@@ -376,12 +388,12 @@ static int _GetArrayParamsFromObject(PyObject* op,
         (*out_arr) = 0;
         (*out_dtype) = PyArray_DESCR(arr);
         (*out_ndim) = PyArray_NDIM(arr);
-        for (int i=0; i<PyArray_NDIM(arr); ++i) 
+        for (int i=0; i<PyArray_NDIM(arr); ++i)
           out_dims[i] = PyArray_DIM(arr,i);
         // we need to cast the array, write-ability will not hold...
         return writeable? 1 : 0;
       }
-      
+
       else {
         return 1;
       }
@@ -401,14 +413,14 @@ static int _GetArrayParamsFromObject(PyObject* op,
     TDEBUG1("[non-optimal] using NumPy version < 1.6 requires we convert input data for convertibility check - compile against NumPy >= 1.6 to improve performance");
     boost::python::handle<> hdl(boost::python::allow_null(PyArray_FromAny(op, requested_dtype, 0, 0, 0, 0)));
     boost::python::object array(hdl);
-    
+
     if (TPY_ISNONE(array)) return 1;
 
     //if the conversion worked, you can now fill in the parameters
     (*out_arr) = 0;
     (*out_dtype) = PyArray_DESCR(TP_ARRAY(array));
     (*out_ndim) = PyArray_NDIM(TP_ARRAY(array));
-    for (int i=0; i<PyArray_NDIM(TP_ARRAY(array)); ++i) 
+    for (int i=0; i<PyArray_NDIM(TP_ARRAY(array)); ++i)
       out_dims[i] = PyArray_DIM(TP_ARRAY(array),i);
 
     //in this mode, the resulting object will never be write-able.
@@ -447,7 +459,7 @@ bob::python::convert_t bob::python::convertible(boost::python::object array_like
   if (not_convertible) return bob::python::IMPOSSIBLE;
 
   convert_t retval = bob::python::BYREFERENCE;
-    
+
   if (arr) { //the passed object is an array
 
     //checks behavior.
@@ -469,7 +481,7 @@ bob::python::convert_t bob::python::convertible(boost::python::object array_like
 
 bob::python::convert_t bob::python::convertible_to (boost::python::object array_like,
     const bob::core::array::typeinfo& info, bool writeable, bool behaved) {
-  
+
   bob::python::dtype req_dtype(info.dtype);
 
   int ndim = 0;
@@ -496,9 +508,9 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
   if (not_convertible) return bob::python::IMPOSSIBLE;
 
   convert_t retval = bob::python::BYREFERENCE;
-    
+
   if (arr) { //the passed object is an array -- check compatibility
-  
+
     if (info.nd) { //check number of dimensions and shape, if needs to
       if (PyArray_NDIM(arr) != (int)info.nd) {
         Py_XDECREF(arr);
@@ -534,7 +546,7 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = bob::python::WITHARRAYCOPY;
     }
-    
+
     Py_XDECREF(arr);
 
   }
@@ -545,8 +557,8 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
 
     if (info.nd) { //check number of dimensions and shape
       if (ndim != (int)info.nd) return bob::python::IMPOSSIBLE;
-      for (size_t i=0; i<info.nd; ++i) 
-        if (info.shape[i] && 
+      for (size_t i=0; i<info.nd; ++i)
+        if (info.shape[i] &&
             (int)info.shape[i] != dims[i]) return bob::python::IMPOSSIBLE;
     }
 
@@ -559,7 +571,7 @@ bob::python::convert_t bob::python::convertible_to (boost::python::object array_
 #else
           !PyArray_CanCastTo(dtype, req_dtype.descr())
 #endif
-         ) 
+         )
       {
         return bob::python::IMPOSSIBLE;
       }
@@ -600,7 +612,7 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
   if (not_convertible) return bob::python::IMPOSSIBLE;
 
   convert_t retval = bob::python::BYREFERENCE;
-    
+
   if (arr) { //the passed object is an array -- check compatibility
 
     //checks dtype
@@ -628,7 +640,7 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = bob::python::WITHARRAYCOPY;
     }
-        
+
     Py_XDECREF(arr);
 
   }
@@ -646,7 +658,7 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
 #else
           !PyArray_CanCastTo(dtype, req_dtype.descr())
 #endif
-         ) 
+         )
       {
         return bob::python::IMPOSSIBLE;
       }
@@ -685,14 +697,14 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
   if (not_convertible) return bob::python::IMPOSSIBLE;
 
   convert_t retval = bob::python::BYREFERENCE;
-    
+
   if (arr) { //the passed object is an array -- check compatibility
 
     //checks behavior.
     if (behaved) {
       if (!PyArray_ISCARRAY_RO(arr)) retval = bob::python::WITHARRAYCOPY;
     }
-        
+
     Py_XDECREF(arr);
 
   }
@@ -718,7 +730,7 @@ bob::python::convert_t bob::python::convertible_to(boost::python::object array_l
  * 1. The array type description type_num matches
  * 2. The array is C-style, contiguous and aligned
  */
-static boost::python::object try_refer_ndarray (boost::python::object array_like, 
+static boost::python::object try_refer_ndarray (boost::python::object array_like,
     boost::python::object dtype_like) {
 
   PyArrayObject* candidate = TP_ARRAY(array_like);
@@ -758,7 +770,7 @@ static void derefer_ndarray (PyArrayObject* array) {
 }
 
 static boost::shared_ptr<void> shared_from_ndarray (boost::python::object& o) {
-  boost::shared_ptr<PyArrayObject> cache(TP_ARRAY(o), 
+  boost::shared_ptr<PyArrayObject> cache(TP_ARRAY(o),
       std::ptr_fun(derefer_ndarray));
   Py_XINCREF(TP_OBJECT(o)); ///< makes sure it outlives this scope!
   return cache; //casts to b::shared_ptr<void>
@@ -800,7 +812,7 @@ bob::python::py_array::~py_array() {
  */
 static boost::python::object wrap_data (void* data, const bob::core::array::typeinfo& ti,
     bool writeable=true) {
-  
+
   npy_intp shape[NPY_MAXDIMS];
   npy_intp stride[NPY_MAXDIMS];
   for (size_t k=0; k<ti.nd; ++k) {
@@ -825,7 +837,7 @@ static boost::python::object wrap_data (void* data, const bob::core::array::type
  * New wrapper of the array
  */
 static boost::python::object wrap_ndarray (const boost::python::object& a) {
-  PyObject* tmp = PyArray_FromArray(TP_ARRAY(a), 0, 0); 
+  PyObject* tmp = PyArray_FromArray(TP_ARRAY(a), 0, 0);
   boost::python::handle<> hdl(tmp); //< raises if NULL
   boost::python::object retval(hdl);
   return retval;
@@ -861,7 +873,7 @@ static boost::python::object copy_data (const void* data, const bob::core::array
 }
 
 void bob::python::py_array::set(const bob::core::array::interface& other) {
-  TDEBUG1("[non-optimal] buffer copying operation being performed for " 
+  TDEBUG1("[non-optimal] buffer copying operation being performed for "
       << other.type().str());
 
   //performs a copy of the data into a numpy array
@@ -896,7 +908,7 @@ static boost::python::object new_from_type (const bob::core::array::typeinfo& ti
     shape[k] = ti.shape[k];
     stride[k] = ti.item_size()*ti.stride[k];
   }
-  PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd, &shape[0], 
+  PyObject* tmp = PyArray_New(&PyArray_Type, ti.nd, &shape[0],
       bob::python::type_to_num(ti.dtype), &stride[0], 0, 0, 0, 0);
   boost::python::handle<> hdl(tmp); //< raises if NULL
   boost::python::object retval(hdl);
@@ -905,7 +917,7 @@ static boost::python::object new_from_type (const bob::core::array::typeinfo& ti
 
 void bob::python::py_array::set (const bob::core::array::typeinfo& req) {
   if (m_type.is_compatible(req)) return; ///< nothing to do!
-  
+
   TDEBUG1("[non-optimal?] buffer re-size being performed from " << m_type.str()
       << " to " << req.str());
 
@@ -935,10 +947,20 @@ boost::python::object bob::python::py_array::copy(const boost::python::object& d
  * But a better allocation strategy (that actually works) is posted here:
  * http://stackoverflow.com/questions/2924827/numpy-array-c-api
  */
+// PyCapsule is only available on Python2.7 or Python3.1 and up
+#if ((PY_VERSION_HEX <  0x02070000) \
+    || ((PY_VERSION_HEX >= 0x03000000) \
+      && (PY_VERSION_HEX <  0x03010000)) )
 static void DeleteSharedPointer (void* ptr) {
   typedef boost::shared_ptr<const void> type;
   delete static_cast<type*>(ptr);
 }
+#else
+static void DeleteSharedPointer (PyObject* ptr) {
+  typedef boost::shared_ptr<const void> type;
+  delete static_cast<type*>(PyCapsule_GetPointer(ptr, NULL));
+}
+#endif
 
 static boost::python::object make_readonly (const void* data, const bob::core::array::typeinfo& ti,
     boost::shared_ptr<const void> owner) {
@@ -947,7 +969,13 @@ static boost::python::object make_readonly (const void* data, const bob::core::a
 
   //creates the shared pointer deallocator
   boost::shared_ptr<const void>* ptr = new boost::shared_ptr<const void>(owner);
+#if ((PY_VERSION_HEX <  0x02070000) \
+    || ((PY_VERSION_HEX >= 0x03000000) \
+      && (PY_VERSION_HEX <  0x03010000)) )
   PyObject* py_sharedptr = PyCObject_FromVoidPtr(ptr, DeleteSharedPointer);
+#else
+  PyObject* py_sharedptr = PyCapsule_New((void*)ptr, NULL, DeleteSharedPointer);
+#endif
 
   if (!py_sharedptr) {
     PYTHON_ERROR(RuntimeError, "could not allocate space for deallocation object in read-only array::interface wrapping");
@@ -979,15 +1007,15 @@ bool bob::python::py_array::is_writeable() const {
 }
 
 bob::python::ndarray::ndarray(boost::python::object array_like, boost::python::object dtype_like)
-  : px(new bob::python::py_array(array_like, dtype_like)) { 
+  : px(new bob::python::py_array(array_like, dtype_like)) {
 }
 
 bob::python::ndarray::ndarray(boost::python::object array_like)
-  : px(new bob::python::py_array(array_like, boost::python::object())) { 
+  : px(new bob::python::py_array(array_like, boost::python::object())) {
   }
 
 bob::python::ndarray::ndarray(const bob::core::array::typeinfo& info)
-  : px(new bob::python::py_array(info)) { 
+  : px(new bob::python::py_array(info)) {
   }
 
 bob::python::ndarray::~ndarray() { }
@@ -999,7 +1027,7 @@ const bob::core::array::typeinfo& bob::python::ndarray::type() const {
 boost::python::object bob::python::ndarray::self() { return px->pyobject(); }
 
 bob::python::const_ndarray::const_ndarray(boost::python::object array_like)
-  : bob::python::ndarray(array_like) { 
+  : bob::python::ndarray(array_like) {
   }
 
 bob::python::const_ndarray::~const_ndarray() { }

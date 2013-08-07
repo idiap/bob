@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.dos.anjos@gmail.com>
-# Tue  4 Sep 21:43:59 2012 
+# Tue  4 Sep 21:43:59 2012
 
 """Sort headers in the following order:
 
@@ -20,7 +20,7 @@
 import os
 import sys
 
-def uniq(seq, idfun=None): 
+def uniq(seq, idfun=None):
   # order preserving
   if idfun is None:
     def idfun(x): return x
@@ -52,13 +52,13 @@ if prefixes:
 
   # Remove group 1 directories from input list
   dirs = [k for k in dirs if k not in path_group_1]
-#print "Group 1 (on prefixes):", path_group_1
+#print("Group 1 (on prefixes):", path_group_1)
 
 path_group_2 = uniq([k for k in dirs if not share_root(cxx_basepath, k)])
-#print "Group 1 (not on compiler):", path_group_2
+#print("Group 1 (not on compiler):", path_group_2)
 
 # Remove group 2 directories from input list
 path_group_3 = uniq([k for k in dirs if k not in path_group_2])
-#print "Group 3 (everything else):", path_group_3
+#print("Group 3 (everything else):", path_group_3)
 
-print ';'.join(path_group_1 + path_group_2 + path_group_3)
+print(*(path_group_1 + path_group_2 + path_group_3), sep=';')
