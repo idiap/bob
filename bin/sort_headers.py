@@ -22,8 +22,6 @@ from __future__ import print_function
 import os
 import sys
 
-from __future__ import print_function
-
 def uniq(seq, idfun=None):
   # order preserving
   if idfun is None:
