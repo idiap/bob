@@ -167,6 +167,23 @@ template <typename T> void set_type(bob::io::HDF5Type& t) {
 }
 
 /**
+ * A function to check for python scalars that works with numpy-1.6.x
+ */
+static bool is_python_scalar(PyObject* obj) {
+  return (
+    PyBool_Check(obj) ||
+    PyString_Check(obj) ||
+#if PY_VERSION_HEX < 0x03000000
+    PyUnicode_Check(obj) ||
+    PyInt_Check(obj) ||
+#endif
+    PyLong_Check(obj) ||
+    PyFloat_Check(obj) ||
+    PyComplex_Check(obj)
+    );
+}
+
+/**
  * Sets at 't', the type of the object 'o' according to our support types.
  * Raise in case of problems. Furthermore, returns 'true' if the object is as
  * simple scalar.
@@ -174,8 +191,17 @@ template <typename T> void set_type(bob::io::HDF5Type& t) {
 static bool get_object_type(object o, bob::io::HDF5Type& t) {
   PyObject* op = o.ptr();
 
-  if (PyArray_IsScalar(op, Generic)) {
+  if (PyArray_IsScalar(op, Generic) || is_python_scalar(op)) {
     if (PyArray_IsScalar(op, String)) set_string_type(t, o);
+    else if (PyBool_Check(op)) set_type<bool>(t);
+    else if (PyString_Check(op)) set_string_type(t, o);
+#if PY_VERSION_HEX < 0x03000000
+    else if (PyUnicode_Check(op)) set_string_type(t, o);
+    else if (PyInt_Check(op)) set_type<int32_t>(t);
+#endif
+    else if (PyLong_Check(op)) set_type<int64_t>(t);
+    else if (PyFloat_Check(op)) set_type<double>(t);
+    else if (PyComplex_Check(op)) set_type<std::complex<double> >(t);
     else if (PyArray_IsScalar(op, Bool)) set_type<bool>(t);
     else if (PyArray_IsScalar(op, Int8)) set_type<int8_t>(t);
     else if (PyArray_IsScalar(op, UInt8)) set_type<uint8_t>(t);
@@ -198,17 +224,6 @@ static bool get_object_type(object o, bob::io::HDF5Type& t) {
     }
     return true;
   }
-
-#if PY_VERSION_HEX >= 0x03000000
-  else if (PyUnicode_Check(op)) set_string_type(t, o);
-#else
-  else if (PyString_Check(op)) set_string_type(t, o);
-  else if (PyInt_Check(op)) set_type<int32_t>(t);
-#endif
-  else if (PyBool_Check(op)) set_type<bool>(t);
-  else if (PyLong_Check(op)) set_type<int64_t>(t);
-  else if (PyFloat_Check(op)) set_type<double>(t);
-  else if (PyComplex_Check(op)) set_type<std::complex<double> >(t);
 
   else if (PyArray_Check(op)) {
     bob::core::array::typeinfo ti;
