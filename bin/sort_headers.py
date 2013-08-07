@@ -17,6 +17,8 @@
   3. The list of headers directories to parse
 """
 
+from __future__ import print_function
+
 import os
 import sys
 
