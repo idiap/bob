@@ -75,10 +75,13 @@ struct tinyvec_from_sequence {
           || PyTuple_Check(obj_ptr)
           || PyIter_Check(obj_ptr)
           || PyRange_Check(obj_ptr)
-          || ( !PyUnicode_Check(obj_ptr)
+          || (
 #if PY_VERSION_HEX < 0x03000000
-            && !PyString_Check(obj_ptr)
+               !PyString_Check(obj_ptr)
+#else
+               !PyBytes_Check(obj_ptr)
 #endif
+            && !PyUnicode_Check(obj_ptr)
             && ( Py_TYPE(obj_ptr) == 0
               || Py_TYPE(Py_TYPE(obj_ptr)) == 0
               || Py_TYPE(Py_TYPE(obj_ptr))->tp_name == 0

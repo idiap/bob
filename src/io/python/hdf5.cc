@@ -172,9 +172,13 @@ template <typename T> void set_type(bob::io::HDF5Type& t) {
 static bool is_python_scalar(PyObject* obj) {
   return (
     PyBool_Check(obj) ||
-    PyString_Check(obj) ||
 #if PY_VERSION_HEX < 0x03000000
+    PyString_Check(obj) ||
+#else
+    PyBytes_Check(obj) ||
+#endif
     PyUnicode_Check(obj) ||
+#if PY_VERSION_HEX < 0x03000000
     PyInt_Check(obj) ||
 #endif
     PyLong_Check(obj) ||
@@ -194,9 +198,13 @@ static bool get_object_type(object o, bob::io::HDF5Type& t) {
   if (PyArray_IsScalar(op, Generic) || is_python_scalar(op)) {
     if (PyArray_IsScalar(op, String)) set_string_type(t, o);
     else if (PyBool_Check(op)) set_type<bool>(t);
-    else if (PyString_Check(op)) set_string_type(t, o);
 #if PY_VERSION_HEX < 0x03000000
+    else if (PyString_Check(op)) set_string_type(t, o);
+#else
+    else if (PyBytes_Check(op)) set_string_type(t, o);
+#endif
     else if (PyUnicode_Check(op)) set_string_type(t, o);
+#if PY_VERSION_HEX < 0x03000000
     else if (PyInt_Check(op)) set_type<int32_t>(t);
 #endif
     else if (PyLong_Check(op)) set_type<int64_t>(t);
