@@ -1,5 +1,5 @@
 from ..core import __from_extension_import__
-__from_extension_import__('._ip', __name__, locals(),
+__from_extension_import__('._ip', __package__, locals(),
     ['__GLCM_uint8__', '__GLCM_uint16__'])
 
 import numpy
@@ -94,7 +94,7 @@ class GLCM(object):
       elif (num_levels == None and min_level == None and max_level == None):
         self.G = __GLCM_uint8__()
       else:
-        raise RuntimeError, 'Unknown configuration for creating GLCM object'
+        raise RuntimeError('Unknown configuration for creating GLCM object')
 
     elif dt == numpy.uint16:
       if (num_levels != None and min_level == None and max_level == None and quantization_table == None):
@@ -106,10 +106,10 @@ class GLCM(object):
       elif (num_levels == None and min_level == None and max_level == None):
         self.G = __GLCM_uint16__()
       else:
-        raise RuntimeError, 'Unknown configuration for creating GLCM object'
+        raise RuntimeError('Unknown configuration for creating GLCM object')
 
     else:
-      raise RuntimeError, 'GLCM does not support data of type ', dt
+      raise RuntimeError('GLCM does not support data of type %s' % dt)
 
     self._offset = self.G.offset
     self._quantization_table = self.G.quantization_table

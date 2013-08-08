@@ -135,7 +135,7 @@ def session_try_readonly(dbtype, dbfile, echo=False):
   """
 
   if dbtype != 'sqlite':
-    raise NotImplementedError, "Read-only sessions are only currently supported for SQLite databases"
+    raise NotImplementedError("Read-only sessions are only currently supported for SQLite databases")
 
   connector = SQLiteConnector(dbfile, readonly=True, lock='unix-none')
   return connector.session(echo=echo)
@@ -150,7 +150,7 @@ def create_engine_try_nolock(dbtype, dbfile, echo=False):
   """
 
   if dbtype != 'sqlite':
-    raise NotImplementedError, "Unlocked engines are only currently supported for SQLite databases"
+    raise NotImplementedError("Unlocked engines are only currently supported for SQLite databases")
 
   connector = SQLiteConnector(dbfile, lock='unix-none')
   return connector.create_engine(echo=echo)
@@ -165,7 +165,7 @@ def session_try_nolock(dbtype, dbfile, echo=False):
   """
 
   if dbtype != 'sqlite':
-    raise NotImplementedError, "Unlocked sessions are only currently supported for SQLite databases"
+    raise NotImplementedError("Unlocked sessions are only currently supported for SQLite databases")
 
   connector = SQLiteConnector(dbfile, lock='unix-none')
   return connector.session(echo=echo)

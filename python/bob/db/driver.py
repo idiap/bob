@@ -16,12 +16,12 @@ def dbshell(arguments):
   """Drops you into a database shell"""
 
   if len(arguments.files) != 1:
-    raise RuntimeError, "Something is wrong this database is supposed to be of type SQLite, but you have more than one data file available: %s" % argument.files
+    raise RuntimeError("Something is wrong this database is supposed to be of type SQLite, but you have more than one data file available: %s" % argument.files)
 
   if arguments.type == 'sqlite':
     prog = 'sqlite3'
   else:
-    raise RuntimeError, "Error auxiliary database file '%s' cannot be used to initiate a database shell connection (type='%s')" % (dbfile, arguments.type)
+    raise RuntimeError("Error auxiliary database file '%s' cannot be used to initiate a database shell connection (type='%s')" % (dbfile, arguments.type))
 
   cmdline = [prog, arguments.files[0]]
 

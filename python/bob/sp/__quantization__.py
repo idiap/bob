@@ -1,5 +1,5 @@
 from ..core import __from_extension_import__
-__from_extension_import__('._sp', __name__, locals(),
+__from_extension_import__('._sp', __package__, locals(),
     ['__quantization_uint8__', '__quantization_uint16__', 'quantization_type'])
 
 import numpy
