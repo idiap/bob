@@ -31,14 +31,13 @@ def four_column(filename):
     if len(s) == 0 or s[0] == '#': continue #empty or comment
     field = [k.strip() for k in s.split()]
     if len(field) < 4:
-      raise SyntaxError, 'Line %d of file "%s" is invalid: %s' % \
-          (i, filename, l)
+      raise SyntaxError('Line %d of file "%s" is invalid: %s' % (i, filename, l))
     try:
       score = float(field[3])
       t = (field[0], field[1], field[2], score)
       retval.append(t)
     except:
-      raise SyntaxError, 'Cannot convert score to float at line %d of file "%s": %s' % (i, filename, l)
+      raise SyntaxError('Cannot convert score to float at line %d of file "%s": %s' % (i, filename, l))
 
   return retval
 
@@ -68,7 +67,7 @@ def split_four_column(filename):
       else:
         neg.append(score)
     except:
-      raise SyntaxError, 'Cannot convert score "%s" to float' % score_str
+      raise SyntaxError('Cannot convert score "%s" to float' % score_str)
 
   return (numpy.array(neg, numpy.float64), numpy.array(pos, numpy.float64))
 
@@ -102,7 +101,7 @@ def cmc_four_column(filename):
       else:
         correct_dict[probe_name] = [score]
     except:
-      raise SyntaxError, "Cannot convert score '%s' to float" % score_str
+      raise SyntaxError("Cannot convert score '%s' to float" % score_str)
 
   # convert to lists of tuples of ndarrays
   retval = []
@@ -145,14 +144,13 @@ def five_column(filename):
     if len(s) == 0 or s[0] == '#': continue #empty or comment
     field = [k.strip() for k in s.split()]
     if len(field) < 5:
-      raise SyntaxError, 'Line %d of file "%s" is invalid: %s' % \
-          (i, filename, l)
+      raise SyntaxError('Line %d of file "%s" is invalid: %s' % (i, filename, l))
     try:
       score = float(field[4])
       t = (field[0], field[1], field[2], field[3], score)
       retval.append(t)
     except:
-      raise SyntaxError, 'Cannot convert score to float at line %d of file "%s": %s' % (i, filename, l)
+      raise SyntaxError('Cannot convert score to float at line %d of file "%s": %s' % (i, filename, l))
 
   return retval
 
@@ -182,7 +180,7 @@ def split_five_column(filename):
       else:
         neg.append(score)
     except:
-      raise SyntaxError, 'Cannot convert score "%s" to float' % score_str
+      raise SyntaxError('Cannot convert score "%s" to float' % score_str)
 
   return (numpy.array(neg, numpy.float64), numpy.array(pos, numpy.float64))
 
@@ -216,7 +214,7 @@ def cmc_five_column(filename):
       else:
         correct_dict[probe_name] = [score]
     except:
-      raise SyntaxError, 'Cannot convert score "%s" to float' % score_str
+      raise SyntaxError('Cannot convert score "%s" to float' % score_str)
 
   # convert to lists of tuples of ndarrays
   retval = []

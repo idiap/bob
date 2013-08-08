@@ -75,7 +75,7 @@ __from_extension_import__('._core', __name__, locals())
 from . import array
 from . import random
 __all__ = [k for k in dir() if not k.startswith('_')]
-del k
+if 'k' in locals(): del k
 
 # get the default logger of Bob
 logger = logging.getLogger('bob')

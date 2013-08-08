@@ -3,7 +3,7 @@
 
 
 from .. import __from_extension_import__
-__from_extension_import__('._core_random', __package__, locals())
+__from_extension_import__('._core_random', __name__, locals())
 
 class variate_generator:
   """A pure-python version of the boost::variate_generator<> class
@@ -36,4 +36,4 @@ class variate_generator:
     return self.distribution(self.engine)
 
 __all__ = [k for k in dir() if not k.startswith('_')]
-del k
+if 'k' in locals(): del k

@@ -1,5 +1,5 @@
 from ..core import __from_extension_import__
-__from_extension_import__('._machine', __package__, locals())
+__from_extension_import__('._machine', __name__, locals())
 
 from . import __linear__
 from . import __mlp__
@@ -20,4 +20,4 @@ def ztnorm_same_value(vect_a, vect_b):
   return sameMatrix
 
 __all__ = [k for k in dir() if not k.startswith('_')]
-del k
+if 'k' in locals(): del k

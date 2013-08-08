@@ -7,11 +7,11 @@ include(FindBoost)
 set(Boost_USE_MULTITHREADED ON)
 
 # Determine here the components you need so the system can verify
-find_package(Boost 1.40.0 REQUIRED 
-  COMPONENTS 
-    python 
+find_package(Boost 1.40.0 REQUIRED
+  COMPONENTS
+    python
     unit_test_framework
-    iostreams 
+    iostreams
     serialization
     thread
     filesystem
@@ -20,6 +20,10 @@ find_package(Boost 1.40.0 REQUIRED
     system
     regex
   )
+
+# Specific python support, only if installed
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print('%d%d' % (sys.version_info[0], sys.version_info[1]))" OUTPUT_VARIABLE PY_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+find_package(Boost 1.40.0 QUIET COMPONENTS python-py${PY_VERSION})
 
 # Renaming so all works automagically
 set(boost_INCLUDE_DIRS ${Boost_INCLUDE_DIRS} CACHE INTERNAL "incdirs")

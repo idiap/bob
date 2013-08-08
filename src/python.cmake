@@ -24,13 +24,13 @@ function(find_python_module module)
 		endif()
 		# A module's location is usually a directory, but for binary modules
 		# it's a .so file.
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c" 
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "-c"
 			"import re, ${module}; print(re.compile('/__init__.py.*').sub('',${module}.__file__))"
-			RESULT_VARIABLE _${module}_status 
+			RESULT_VARIABLE _${module}_status
 			OUTPUT_VARIABLE _${module}_location
 			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 		if(NOT _${module}_status)
-      set(PYTHON_${module_upper} ${_${module}_location} CACHE STRING 
+      set(PYTHON_${module_upper} ${_${module}_location} CACHE STRING
 				"Location of Python module ${module}")
 		endif(NOT _${module}_status)
   endif(NOT PYTHON_${module_upper})
@@ -38,9 +38,9 @@ function(find_python_module module)
 endfunction(find_python_module)
 
 # *************************** READ THIS ***********************************
-# IMPORTANT: When you update this file, think about updating both the 
+# IMPORTANT: When you update this file, think about updating both the
 # ubuntu/debian control file and our Portfile (OSX installation) so the
-# package installations for those systems continue to work properly. 
+# package installations for those systems continue to work properly.
 # *************************** READ THIS ***********************************
 
 # Now double-check for all required python modules

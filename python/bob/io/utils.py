@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.dos.anjos@gmail.com>
-# Thu 14 Mar 17:00:58 2013 
+# Thu 14 Mar 17:00:58 2013
 
 """Some utilities to generate fake patterns
 """
@@ -35,7 +35,7 @@ def estimate_fontsize(height, width, format):
     best_size -= 1
 
   if best_size <= 0:
-    raise RuntimeError, "Cannot find best size for font"
+    raise RuntimeError("Cannot find best size for font")
 
   return best_size
 
@@ -70,7 +70,7 @@ def generate_colors(height, width, shift):
   """Generates an image that serves as a test pattern for encoding/decoding and
   accuracy tests."""
 
-  retval = numpy.ndarray((3, height, width), dtype='uint8') 
+  retval = numpy.ndarray((3, height, width), dtype='uint8')
 
   # standard color test pattern
   w = width / 7; w2 = 2*w; w3 = 3*w; w4 = 4*w; w5 = 5*w; w6 = 6*w

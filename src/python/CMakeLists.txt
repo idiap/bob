@@ -2,7 +2,11 @@ project(bob_python)
 
 # This defines the dependencies of this package
 set(bob_deps "bob_core")
-set(shared "${bob_deps};${Boost_PYTHON_LIBRARY_RELEASE};${PYTHON_LIBRARIES}")
+if(Boost_PYTHON-PY${PY_VERSION}_LIBRARY_RELEASE)
+  set(shared "${bob_deps};${Boost_PYTHON-PY${PY_VERSION}_LIBRARY_RELEASE};${PYTHON_LIBRARIES}")
+else()
+  set(shared "${bob_deps};${Boost_PYTHON_LIBRARY_RELEASE};${PYTHON_LIBRARIES}")
+endif()
 set(incdir ${py_incdir})
 
 # Python bindings

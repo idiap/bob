@@ -1,8 +1,8 @@
 from ..core import __from_extension_import__
-__from_extension_import__('._io', __package__, locals())
+__from_extension_import__('._io', __name__, locals())
 
 # Some specific hidden functionality
-__from_extension_import__('._io', __package__, locals(), [
+__from_extension_import__('._io', __name__, locals(), [
   '__get_ignore_double_registration__',
   '__set_ignore_double_registration__'
   ])
@@ -187,4 +187,4 @@ open = File
 from . import utils
 
 __all__ = [k for k in dir() if not k.startswith('_')]
-del k
+if 'k' in locals(): del k
