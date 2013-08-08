@@ -14,10 +14,10 @@ import socket, select
 from nose.plugins import Plugin
 from nose.plugins.skip import SkipTest
 from nose.result import TextTestResult
-try:
-  from io import StringIO
-except ImportError:
+if sys.version_info[0] < 3:
   from cStringIO import StringIO
+else:
+  from io import StringIO
 
 from subprocess import Popen, PIPE
 

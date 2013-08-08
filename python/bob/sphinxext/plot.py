@@ -110,8 +110,13 @@ The plot directive has the following configuration options:
 
 """
 
-import sys, os, glob, shutil, imp, warnings, cStringIO, re, textwrap, \
+import sys, os, glob, shutil, imp, warnings, re, textwrap, \
        traceback, exceptions
+
+if sys.version_info[0] < 3:
+  from cStringIO import StringIO
+else:
+  from io import StringIO
 
 from docutils.parsers.rst import directives
 from docutils import nodes
