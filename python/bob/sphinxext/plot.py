@@ -459,7 +459,7 @@ def run_code(code, code_path, ns=None, function_name=None):
 
     # Redirect stdout
     stdout = sys.stdout
-    sys.stdout = cStringIO.StringIO()
+    sys.stdout = StringIO()
 
     # Reset sys.argv
     old_sys_argv = sys.argv
