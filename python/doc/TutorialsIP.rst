@@ -52,12 +52,12 @@ The signal processing unit of |project| is not very large by now. Currently, bas
 
   >>> fft_example = numpy.array ( [0, 1, 0, -1], dtype = numpy.complex128 )
   >>> fft_result = bob.sp.fft ( fft_example )
-  >>> print fft_result
+  >>> print(fft_result)
   [ 0.+0.j  0.-2.j  0.+0.j  0.+2.j]
 
   >>> dct_example = numpy.array ( [-1, 0, 1], dtype = numpy.float64 )
   >>> dct_result = bob.sp.dct ( dct_example )
-  >>> print dct_result
+  >>> print(dct_result)
   [ 0.    -1.414  0.   ]
 
 
@@ -77,7 +77,7 @@ below an image is up-scaled by first creating the image and then initialising th
   :options: +NORMALIZE_WHITESPACE
 
   >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = numpy.uint8 ) # A small image of size 2x3
-  >>> print A
+  >>> print(A)
   [[1 2 3]
    [4 5 6]]
   >>> B = numpy.ndarray( (3, 5), dtype = numpy.float64 )               # A larger image of size 3x5
@@ -88,7 +88,7 @@ the scale function of |project| is then called to up-scale the image:
   :options: +NORMALIZE_WHITESPACE
 
   >>> bob.ip.scale( A, B )
-  >>> print B
+  >>> print(B)
   [[ 1.   1.5  2.   2.5  3. ]
    [ 2.5  3.   3.5  4.   4.5]
    [ 4.   4.5  5.   5.5  6. ]]
@@ -100,7 +100,7 @@ which bi-linearly interpolates image A to image B. Of course, scaling factors ca
 
   >>> C = numpy.ndarray( (2, 5), dtype = numpy.float64 )
   >>> bob.ip.scale( A, C )
-  >>> print C
+  >>> print(C)
   [[ 1.   1.5  2.   2.5  3. ]
    [ 4.   4.5  5.   5.5  6. ]]
 
@@ -114,11 +114,11 @@ The rotation of an image is slightly more difficult since the resulting image si
   :options: +NORMALIZE_WHITESPACE
 
   >>> A = numpy.array( [ [1, 2, 3], [4, 5, 6] ], dtype = numpy.uint8 ) # A small image of size 3x3
-  >>> print A
+  >>> print(A)
   [[1 2 3]
    [4 5 6]]
   >>> rotated_shape = bob.ip.get_rotated_output_shape( A, 90 )
-  >>> print rotated_shape
+  >>> print(rotated_shape)
   (3, 2)
 
 After the creation of the image in the desired size, the :py:func:`bob.ip.rotate` function can be executed:
@@ -128,7 +128,7 @@ After the creation of the image in the desired size, the :py:func:`bob.ip.rotate
 
   >>> A_rotated = numpy.ndarray( rotated_shape, dtype = numpy.float64 ) # A small image of rotated size
   >>> bob.ip.rotate(A, A_rotated, 90)      # execute the rotation
-  >>> print A_rotated
+  >>> print(A_rotated)
   [[ 3.  6.]
    [ 2.  5.]
    [ 1.  4.]]
@@ -186,7 +186,7 @@ Now, let's see what happens to a small test image:
   >>> test_image = numpy.array([[1, 0, 0, 0, 1], [0, 1, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 1, 0], [1, 0, 0, 0, 1]], dtype = numpy.float64)
   >>> filtered_image = numpy.ndarray(test_image.shape, dtype = numpy.float64)
   >>> filter(test_image, filtered_image)
-  >>> print filtered_image
+  >>> print(filtered_image)
   [[ 0.936  0.063  0.002  0.063  0.936]
    [ 0.063  0.873  0.093  0.873  0.063]
    [ 0.002  0.093  0.876  0.093  0.002]
@@ -270,7 +270,7 @@ or you can extract the LBP features for all pixels in the image. In this case yo
   :options: +NORMALIZE_WHITESPACE
 
   >>> lbp_output_image_shape = lbp_extractor.get_lbp_shape(cropped_image)
-  >>> print lbp_output_image_shape
+  >>> print(lbp_output_image_shape)
   (126, 126)
   >>> lbp_output_image = numpy.ndarray ( lbp_output_image_shape, dtype = numpy.uint16 )
   >>> lbp_extractor ( cropped_image,  lbp_output_image )

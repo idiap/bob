@@ -43,7 +43,6 @@ class FaceExtractTest(unittest.TestCase):
   """Performs various combined filter tests."""
 
   def test01_shiftColorImage(self):
-    print ""
 
     img = bob.io.Array(F(os.path.join('faceextract', 'test_001.png')))
     A = img.get()
@@ -59,7 +58,6 @@ class FaceExtractTest(unittest.TestCase):
     bob.io.Array(B).save(os.path.join('faceextract', 'test_001.shift.png'))
 
   def test02_shiftToCenterBlue(self):
-    print ""
 
     img = bob.io.Array(F(os.path.join('faceextract', 'test_001.png')))
     A = img.get()
@@ -72,7 +70,6 @@ class FaceExtractTest(unittest.TestCase):
     bob.io.Array(B).save(os.path.join('faceextract', 'test_001.blue.answer.png'))
 
   def test03_shiftToCenterBlue_And_LevelOut(self):
-    print ""
 
     img = bob.io.Array(F(os.path.join('faceextract', 'test_001.gray.png')))
     A = img.get()[1,:,:]
@@ -92,7 +89,6 @@ class FaceExtractTest(unittest.TestCase):
     bob.io.Array(C).save(F(os.path.join('faceextract', 'test_001.blue.level.answer.png')))
 
   def test04_geoNormBlue(self):
-    print ""
 
     # read up image
     img = bob.io.Array(F(os.path.join('faceextract', 'test_001.gray.png')))
@@ -111,7 +107,7 @@ class FaceExtractTest(unittest.TestCase):
 
     # normalise
     previous_eye_distance = math.sqrt((RH - LH) * (RH - LH) + (RW - LW) * (RW - LW))
-    print previous_eye_distance
+    print(previous_eye_distance)
 
     scale_factor = GOAL_EYE_DISTANCE / previous_eye_distance
 
@@ -120,7 +116,6 @@ class FaceExtractTest(unittest.TestCase):
     bob.ip.scale(C, D)
 
   def test05_geoNormFace(self):
-    print ""
 
     # read up image
     img = bob.io.Array(F(os.path.join('faceextract', 'test-faces.jpg')))
@@ -129,7 +124,7 @@ class FaceExtractTest(unittest.TestCase):
     # read up the eye coordinates
     f = open(F(os.path.join('faceextract', 'test-faces.txt')))
     coord = f.readline().split('\n')[0].split(' ')
-    print coord
+    print(coord)
 
     LH = int(coord[0])
     LW = int(coord[1])
@@ -149,7 +144,7 @@ class FaceExtractTest(unittest.TestCase):
 
     # normalise
     previous_eye_distance = math.sqrt((RH - LH) * (RH - LH) + (RW - LW) * (RW - LW))
-    print previous_eye_distance
+    print(previous_eye_distance)
 
     scale_factor = GOAL_EYE_DISTANCE / previous_eye_distance
 

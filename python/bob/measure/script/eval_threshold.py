@@ -131,7 +131,7 @@ def main(user_input=None):
 
   neg, pos = options.parser(options.ifile)
   t = calculate(neg, pos, options.crit, options.cost)
-  print "Threshold:", t
+  print("Threshold:", t)
   apthres(neg, pos, t)
 
   return 0

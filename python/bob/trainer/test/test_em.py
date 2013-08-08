@@ -162,7 +162,7 @@ class GMMTest(unittest.TestCase):
     gmm_adapted.weights = weights
 
     map_adapt.max_iterations = 1
-    print data.shape
+    print(data.shape)
     map_adapt.train(gmm_adapted, data)
 
     new_means = bob.io.load(F('new_adapted_mean.hdf5'))

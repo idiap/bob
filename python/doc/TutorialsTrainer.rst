@@ -57,7 +57,7 @@ this container is a 2D :py:class:`numpy.ndarray`.
    :options: +NORMALIZE_WHITESPACE
 
    >>> data = numpy.array([[3,-3,100], [4,-4,50], [3.5,-3.5,-50], [3.8,-3.7,-100]], dtype='float64')
-   >>> print data
+   >>> print(data)
    [[   3.    -3.   100. ]
     [   4.    -4.    50. ]
     [   3.5   -3.5  -50. ]
@@ -74,7 +74,7 @@ note that the concepts remains very similar for most of the other
 
    >>> trainer = bob.trainer.PCATrainer() # Creates a PCA trainer
    >>> [machine, eig_vals] = trainer.train(data)  # Trains the machine with the given data
-   >>> print machine.weights  # The weights of the returned LinearMachine after the training procedure
+   >>> print(machine.weights)  # The weights of the returned LinearMachine after the training procedure
    [[ 0.002 -0.706 -0.708]
     [-0.002  0.708 -0.706]
     [-1.    -0.003 -0.   ]]
@@ -86,7 +86,7 @@ Next, input data can be projected using this learned projection matrix
    :options: +NORMALIZE_WHITESPACE
 
    >>> e = numpy.array([3.2,-3.3,-10], 'float64')
-   >>> print machine(e)
+   >>> print(machine(e))
    [ 9.999 0.47 0.092]
 
 
@@ -116,10 +116,10 @@ for **PCA**. This is shown below.
    
    >>> trainer = bob.trainer.FisherLDATrainer()
    >>> [machine,eig_vals] = trainer.train(data)  # Trains the machine with the given data
-   >>> print eig_vals  # doctest: +SKIP
+   >>> print(eig_vals)  # doctest: +SKIP
    [ 13.10097786 0. ]
    >>> machine.resize(3,1)  # Make the output space of dimension 1
-   >>> print machine.weights  # The new weights after the training procedure
+   >>> print(machine.weights)  # The new weights after the training procedure
    [[ 0.609]
     [ 0.785]
     [ 0.111]]
@@ -222,7 +222,7 @@ training set for a two class problem.
      >>> pos = numpy.array([[1,-1,1], [0.5,-0.5,0.5], [0.75,-0.75,0.8]], 'float64')
      >>> neg = numpy.array([[-1,1,-0.75], [-0.25,0.5,-0.8]], 'float64')
      >>> data = [pos,neg]
-     >>> print data # doctest: +SKIP
+     >>> print(data) # doctest: +SKIP
 
 .. ifconfig:: not has_libsvm
 
@@ -231,7 +231,7 @@ training set for a two class problem.
      >>> pos = numpy.array([[1,-1,1], [0.5,-0.5,0.5], [0.75,-0.75,0.8]], 'float64')
      >>> neg = numpy.array([[-1,1,-0.75], [-0.25,0.5,-0.8]], 'float64')
      >>> data = [pos,neg]
-     >>> print data # doctest: +SKIP
+     >>> print(data) # doctest: +SKIP
 
 .. note:: 
 
@@ -265,7 +265,7 @@ for classification, as explained in :doc:`TutorialsMachine`.
   .. doctest::
 
      >>> predicted_label = machine(numpy.array([1.,-1.,1.]))
-     >>> print predicted_label
+     >>> print(predicted_label)
      1
 
 .. ifconfig:: not has_libsvm
@@ -273,7 +273,7 @@ for classification, as explained in :doc:`TutorialsMachine`.
   .. code-block:: python
 
      >>> predicted_label = machine(numpy.array([1.,-1.,1.]))
-     >>> print predicted_label
+     >>> print(predicted_label)
      1
 
 The `training` procedure allows several different options. For 
@@ -331,7 +331,7 @@ be called.
    >>> kmeansTrainer.convergence_threshold = 1e-5
 
    >>> kmeansTrainer.train(kmeans, data) # Train the KMeansMachine
-   >>> print kmeans.means
+   >>> print(kmeans.means)
    [[ -6.   6.  -100.5]
     [  3.5 -3.5   99. ]]  
 
@@ -367,7 +367,7 @@ used to determine if the parameters have converged.
    >>> trainer.convergence_threshold = 1e-5
    >>> trainer.max_iterations = 200
    >>> trainer.train(gmm, data)
-   >>> print gmm # doctest: +SKIP
+   >>> print(gmm) # doctest: +SKIP
 
 
 MAP-adaptation for Gaussian mixture model
@@ -384,7 +384,7 @@ Let's consider that the previously trained GMM [9]_ is our prior model.
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
 
-   >>> print gmm # doctest: +SKIP
+   >>> print(gmm) # doctest: +SKIP
 
 The training data used to compute the MAP estimate [11]_ is again stored in a
 2D :py:class:`numpy.ndarray` container.
@@ -415,7 +415,7 @@ set.
    True
    >>> gmmAdapted = bob.machine.GMMMachine(2,3) # Create a new machine for the MAP estimate
    >>> trainer.train(gmmAdapted, dataMAP)
-   >>> print gmmAdapted # doctest: +SKIP
+   >>> print(gmmAdapted) # doctest: +SKIP
 
 
 Joint Factor Analysis

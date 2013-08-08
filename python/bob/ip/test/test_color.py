@@ -168,7 +168,7 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(r2 - r) <= mx)
           self.assertTrue(abs(g2 - g) <= mx)
           self.assertTrue(abs(b2 - b) <= mx)
-    #print "uint8_t RGB/HSV/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.)
+    #print("uint8_t RGB/HSV/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.))
 
     mx = 5
     for r in range(0,5) + range(120,130) + range(253,256):
@@ -182,7 +182,7 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(r2 - r) <= mx)
           self.assertTrue(abs(g2 - g) <= mx)
           self.assertTrue(abs(b2 - b) <= mx)
-    #print "uint8_t RGB/HSL/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.)
+    #print("uint8_t RGB/HSL/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.))
 
     mx = 2
     for r in range(0,5) + range(120,130) + range(253,256):
@@ -196,7 +196,7 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(r2 - r) <= mx)
           self.assertTrue(abs(g2 - g) <= mx)
           self.assertTrue(abs(b2 - b) <= mx)
-    #print "uint8_t RGB/YCbCr/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.)
+    #print("uint8_t RGB/YCbCr/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.))
 
     # Just test a subrange or the test will take too long
     mx = 3
@@ -210,7 +210,7 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(r2 - r) <= mx)
           self.assertTrue(abs(g2 - g) <= mx)
           self.assertTrue(abs(b2 - b) <= mx)
-    #print "16-bit unsigned integer RGB/HSV/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.)
+    #print("16-bit unsigned integer RGB/HSV/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.))
 
     mx = 4
     for r in range(0,5) + range(30000,30005) + range(65530,65536):
@@ -223,7 +223,7 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(r2 - r) <= mx)
           self.assertTrue(abs(g2 - g) <= mx)
           self.assertTrue(abs(b2 - b) <= mx)
-    #print "16-bit unsigned integer RGB/HSL/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.)
+    #print("16-bit unsigned integer RGB/HSL/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.))
 
     mx = 4
     for r in range(0,10) + range(120,130) + range(250,256):
@@ -236,7 +236,7 @@ class ColorTest(unittest.TestCase):
           self.assertTrue(abs(r2 - r) <= mx)
           self.assertTrue(abs(g2 - g) <= mx)
           self.assertTrue(abs(b2 - b) <= mx)
-    #print "16-bit unsigned integer RGB/YCbCr/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.)
+    #print("16-bit unsigned integer RGB/YCbCr/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.))
 
   def test05_gray_halves(self):
 

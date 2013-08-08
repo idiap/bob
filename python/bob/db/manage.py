@@ -27,7 +27,7 @@ def create_all(args):
   sqlite_dbs = [k.name() for k in args.modules if k.type() in ('sqlite',)]
 
   if args.verbose >= 1:
-    print '### Running %d SQLite database creation commands...' % len(sqlite_dbs)
+    print('### Running %d SQLite database creation commands...' % len(sqlite_dbs))
 
   for name in sqlite_dbs:
     
@@ -39,7 +39,7 @@ def create_all(args):
     parsed.verbose = args.verbose
 
     if args.verbose >= 1:
-      print '>>> Creating "%s" SQLite database...' % name
+      print('>>> Creating "%s" SQLite database...' % name)
 
     try:
       parsed.func(parsed)
@@ -50,10 +50,10 @@ def create_all(args):
 
       if args.keep_going:
         if args.verbose >= 1:
-          print 'Warning: Error while creating "%s" SQLite database' % name
+          print('Warning: Error while creating "%s" SQLite database' % name)
         __import__('traceback').print_exc()
         if args.verbose >= 1:
-          print '*** Keep going on user request...'
+          print('*** Keep going on user request...')
 
       else:
         raise
@@ -61,12 +61,12 @@ def create_all(args):
     finally:
 
       if args.verbose >= 1:
-        print '<<< Finished creation of "%s" SQLite database (%.2f seconds).' % \
-            (name, time.time()-start_time)
+        print('<<< Finished creation of "%s" SQLite database (%.2f seconds).' \
+            % (name, time.time()-start_time))
 
   if args.verbose >= 1:
-    print '### %d SQLite databases created in %.2f seconds, %d errors' % \
-        (databases, time.time()-total_start, errors)
+    print('### %d SQLite databases created in %.2f seconds, %d errors' % \
+        (databases, time.time()-total_start, errors))
 
 def version_all(args):
   """Executes all the default version commands from individual databases"""

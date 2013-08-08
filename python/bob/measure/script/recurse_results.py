@@ -166,7 +166,7 @@ results = []
 
 def add_results(args, nonorm, ztnorm = None):
   r = Result(os.path.dirname(nonorm).replace(os.getcwd()+"/", ""), args)
-  print "Adding results from directory",r.dir
+  print("Adding results from directory", r.dir)
   # check if the results files are there
   dev_file = os.path.join(nonorm, args.dev)
   eval_file = os.path.join(nonorm, args.eval)
@@ -226,4 +226,4 @@ def main():
     f.writelines(table())
     f.close()
   else:
-    print table()
+    print(table())

@@ -74,7 +74,7 @@ def sig_norm(win_length, frame, flag):
 
 def pre_emphasis(frame, win_length, a):
   if (a < 0.0) or (a >= 1.0):
-    print "Error: The emphasis coeff. should be between 0 and 1"
+    print("Error: The emphasis coeff. should be between 0 and 1")
   if (a == 0.0):
     return frame
   else:

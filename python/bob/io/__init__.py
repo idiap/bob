@@ -32,7 +32,7 @@ def create_directories_save(directory, dryrun=False):
   """
   try:
     if dryrun:
-      print "[dry-run] mkdir -p '%s'" % directory
+      print("[dry-run] mkdir -p '%s'" % directory)
     else:
       if directory and not os.path.exists(directory): os.makedirs(directory)
 

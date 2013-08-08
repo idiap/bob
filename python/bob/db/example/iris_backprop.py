@@ -21,6 +21,8 @@
 3-class classifier based on Neural Networks (Multi-Layer Perceptrons - MLP).
 """
 
+from __future__ import print_function
+
 import os
 import sys
 import bob
@@ -93,8 +95,8 @@ def create_machine(data, training_steps):
     # checks! See the MLPBackPropTrainer documentation for details on this
     # before choosing the wrong approach.
     trainer.train_(mlp, input, target)
-    print "|RMSE| @%d:" % k,
-    print numpy.linalg.norm(bob.measure.rmse(mlp(AllData), AllTargets))
+    print("|RMSE| @%d:" % (k,), end=' ')
+    print(numpy.linalg.norm(bob.measure.rmse(mlp(AllData), AllTargets)))
     retval.append(bob.machine.MLP(mlp))
 
   return retval #all machines => nice plotting!
@@ -196,7 +198,7 @@ def makemovie(machines, data, filename=None):
     orows = 2*(refimage.shape[1]/2)
     ocols = 2*(refimage.shape[2]/2)
     output = bob.io.VideoWriter(filename, orows, ocols, 5) #5 Hz
-    print "Saving %d frames to %s" % (len(machines), filename)
+    print("Saving %d frames to %s" % (len(machines), filename))
 
   for i, k in enumerate(machines):
     # test output size

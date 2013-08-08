@@ -328,19 +328,19 @@ def main(user_input=None):
   if not args.test: args.test = test_choices
 
   if args.list_codecs:
-    print list_codecs()
+    print(list_codecs())
     sys.exit(0)
 
   if args.list_all_codecs:
-    print list_all_codecs()
+    print(list_all_codecs())
     sys.exit(0)
 
   if args.list_formats:
-    print list_formats()
+    print(list_formats())
     sys.exit(0)
 
   if args.list_all_formats:
-    print list_all_formats()
+    print(list_all_formats())
     sys.exit(0)
 
   if 'user' in args.test and args.user_video is None:
@@ -362,12 +362,12 @@ def main(user_input=None):
   table = {}
 
   # report results in a readable way
-  print version_info
-  print "Settings:"
-  print "  Width    : %d pixels" % args.width
-  print "  Height   : %d pixels" % args.height
-  print "  Length   : %d frames" % args.length
-  print "  Framerate: %f Hz"     % args.framerate
+  print(version_info)
+  print("Settings:")
+  print("  Width    : %d pixels" % args.width)
+  print("  Height   : %d pixels" % args.height)
+  print("  Length   : %d frames" % args.length)
+  print("  Framerate: %f Hz"     % args.framerate)
 
   print("Legend:")
   for k, (f, code) in test_function.iteritems():
@@ -464,15 +464,15 @@ def main(user_input=None):
   sep  = test_cover + ' ' + fmt_cover + ' ' + codec_cover + ' ' + figure_cover
   line = " %s   %s   %s   %s"
 
-  print ""
-  print sep
-  print line % (
+  print("")
+  print(sep)
+  print(line % (
       'test'.ljust(test_size),
       'fmt'.center(fmt_size),
       'codec'.center(codec_size),
       'figure (lower means better quality)'.ljust(figure_size),
-      )
-  print sep
+      ))
+  print(sep)
 
   for test in sorted(table.iterkeys()):
     test_table = table[test]
@@ -480,18 +480,18 @@ def main(user_input=None):
       format_table = test_table[format]
       for codec in sorted(format_table.iterkeys()):
         figure = format_table[codec]
-        print line % (
+        print(line % (
             test.ljust(test_size),
             format.center(fmt_size),
             codec.ljust(codec_size),
             figure.ljust(figure_size),
-            )
+            ))
 
-  print sep
+  print(sep)
 
   # only printed if unsupported combinations of formats and codecs are used
   if need_notes:
-    print ""
-    print "Notes:"
-    print "  [!F] Format is available, but not supported by this build"
-    print "  [!F+C] Format is supported, but not in combination with this codec"
+    print("")
+    print("Notes:")
+    print("  [!F] Format is available, but not supported by this build")
+    print("  [!F+C] Format is supported, but not in combination with this codec")

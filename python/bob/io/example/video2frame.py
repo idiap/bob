@@ -38,13 +38,13 @@ def video2frame(movie, outputdir):
 
   # To read the input we use the VideoReader class and its iterability
   v = bob.io.VideoReader(movie)
-  print "Loading", v.info
+  print("Loading", v.info)
   for i, frame in enumerate(v):
     sys.stdout.write('.')
     sys.stdout.flush()
     bob.io.write(frame, template % i)
   sys.stdout.write('\n')
-  print "Wrote %d frames to %s" % (i, outputdir)
+  print("Wrote %d frames to %s" % (i, outputdir))
 
 def main(user_input=None):
 

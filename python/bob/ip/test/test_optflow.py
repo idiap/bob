@@ -110,7 +110,7 @@ class FlowTest(unittest.TestCase):
       cxx_avg_err = (cxx_se2 * (alpha**2) + cxx_be**2).sum()
       py_avg_err = (py_se2 * (alpha**2) + py_be**2).sum()
       '''
-      print "Error %2d: %.3e (%.3e) %.3e (%.3e) %.3e (%.3e)" % \
+      print("Error %2d: %.3e (%.3e) %.3e (%.3e) %.3e (%.3e)" % \
           (
            i, 
            cxx_se2.sum()**0.5,
@@ -119,6 +119,7 @@ class FlowTest(unittest.TestCase):
            py_be.sum(), 
            cxx_avg_err**0.5,
            py_avg_err**0.5
+          )
           )
       '''
     self.assertTrue( numpy.allclose(u_cxx, u_py, atol=1e-15) )
@@ -144,14 +145,15 @@ class FlowTest(unittest.TestCase):
       se2 = flow.eval_ec2(u, v)
       be = flow.eval_eb(i1, i2, u, v)
       avg_err = (se2 * (alpha**2) + be**2).sum()
-      print "Error %2d| Ec2: %.3e Eb: %.3e E2 (avg.): %.3e" % \
+      print("Error %2d| Ec2: %.3e Eb: %.3e E2 (avg.): %.3e" % \
           (
            i, 
            se2.sum()**0.5,
            be.sum(), 
            avg_err**0.5,
           )
-      #print "error:", (bob.ip.flowError(i1, i2, u, v)**2).sum()
+          )
+      #print("error:", (bob.ip.flowError(i1, i2, u, v)**2).sum())
 
   def notest03_VanillaHornAndSchunckAgainstOpenCV(self):
     
@@ -184,7 +186,7 @@ class FlowTest(unittest.TestCase):
     se2 = flow.eval_ec2(u_cxx, v_cxx)
     be = flow.eval_eb(i1, i2, u_cxx, v_cxx)
     avg_err = (se2 * (alpha**2) + be**2).sum()
-    print "bob H&S Error (%2d iterations) : %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5)
+    print("bob H&S Error (%2d iterations) : %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5))
 
     u_ocv1, v_ocv1 = compute_flow_opencv(alpha, N/4, if1, if2)
     u_ocv2, v_ocv2 = compute_flow_opencv(alpha, N/2, if1, if2)
@@ -192,11 +194,11 @@ class FlowTest(unittest.TestCase):
     se2 = flow.eval_ec2(u_ocv, v_ocv)
     be = flow.eval_eb(i1, i2, u_ocv, v_ocv)
     avg_err = (se2 * (alpha**2) + be**2).sum()
-    print "OpenCV H&S Error (%2d iterations): %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5)
+    print("OpenCV H&S Error (%2d iterations): %.3e %.3e %.3e" % (N, se2.sum()**0.5, be.sum(), avg_err**0.5))
 
     u_c = u_cxx/u_ocv
     v_c = v_cxx/v_ocv
     self.assertTrue(u_c.mean() < 1.1) #check for within 10%
     self.assertTrue(v_c.mean() < 1.1) #check for within 10%
-    print "mean(u_ratio), mean(v_ratio): %.3e %.3e" % (u_c.mean(), v_c.mean()),
-    print "(as close to 1 as possible)"
+    print("mean(u_ratio), mean(v_ratio): %.3e %.3e" % (u_c.mean(), v_c.mean()),
+        "(as close to 1 as possible)")

@@ -205,7 +205,7 @@ be using :py:meth:`bob.io.HDF5File.lread` instead. Here is an example:
   >>> f = bob.io.HDF5File('testfile1.hdf5') #read only
   >>> f.read('my_integer') #reads integer
   5
-  >>> print f.read('my_array') # reads the array
+  >>> print(f.read('my_array')) # reads the array
   [[0 1]
    [2 3]]
   >>> del f
@@ -221,9 +221,9 @@ variables to a dataset.
   >>> f.append('arrayset', numpy.array(range(10), 'float64'))
   >>> f.append('arrayset', 2*numpy.array(range(10), 'float64'))
   >>> f.append('arrayset', 3*numpy.array(range(10), 'float64'))
-  >>> print f.lread('arrayset', 0)
+  >>> print(f.lread('arrayset', 0))
   [ 0.  1.  2.  3.  4.  5.  6.  7.  8.  9.]
-  >>> print f.lread('arrayset', 2)
+  >>> print(f.lread('arrayset', 2))
   [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]
   >>> del f
 
@@ -253,7 +253,7 @@ shot:
 .. doctest::
   
   >>> f = bob.io.HDF5File('testfile2.hdf5')
-  >>> print f.read('arrayset')
+  >>> print(f.read('arrayset'))
   [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
@@ -463,9 +463,9 @@ For instance, to read a wave file, just use the
    >>> import scipy.io.wavfile
    >>> filename = '/home/user/sample.wav'
    >>> samplerate, data = scipy.io.wavfile.read(filename)
-   >>> print type(data)
+   >>> print(type(data))
    <type 'numpy.ndarray'>
-   >>> print data.shape
+   >>> print(data.shape)
    (132474, 2)
 
 In the above example, the stereo audio signal is represented as a 2D `NumPy`

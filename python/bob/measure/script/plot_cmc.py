@@ -50,7 +50,7 @@ def parse_command_line(command_line_options):
     import tempfile
     temp_dir = tempfile.mkdtemp(prefix="bobtest_")
     args.output_pdf_file = os.path.join(temp_dir, "cmc.pdf")
-    print "temporary using file",args.output_pdf_file
+    print("temporary using file", args.output_pdf_file)
 
   return args
 
@@ -65,7 +65,7 @@ def main(command_line_options = None):
 
   # compute recognition rate
   rr = bob.measure.recognition_rate(data)
-  print "Recognition rate for score file", args.score_file, "is %3.2f%%" % (rr * 100)
+  print("Recognition rate for score file", args.score_file, "is %3.2f%%" % (rr * 100))
 
   if not args.no_plot:
     # compute CMC

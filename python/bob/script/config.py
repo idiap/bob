@@ -61,50 +61,50 @@ def version_table():
   build = pkg_resources.require('bob')[0]
 
   bob_version = "'%s' (%s)" % (build.version, platform.platform())
-  print 75*'='
-  print (" bob %s" % bob_version).center(75)
-  print 75*'='
-  print ""
+  print(75*'=')
+  print((" bob %s" % bob_version).center(75))
+  print(75*'=')
+  print("")
 
   distribution = pkg_resources.require('bob')[0]
 
-  print "Python Egg Properties"
-  print "---------------------\n"
-  print " * Version         : '%s'" % build.version
-  print " * System          : '%s'" % platform.system()
-  print " * Platform        : '%s'" % platform.platform()
-  print " * Python Version  : '%s'" % platform.python_version()
-  print " * Egg Dependencies: "
+  print("Python Egg Properties")
+  print("---------------------\n")
+  print(" * Version         : '%s'" % build.version)
+  print(" * System          : '%s'" % platform.system())
+  print(" * Platform        : '%s'" % platform.platform())
+  print(" * Python Version  : '%s'" % platform.python_version())
+  print(" * Egg Dependencies: ")
   for egg in my_eggs():
-    print "   - %s, version '%s'" % (egg.key, egg.version)
-  print ""
+    print("   - %s, version '%s'" % (egg.key, egg.version))
+  print("")
 
-  print "Compiled-in Dependencies"
-  print "------------------------\n"
+  print("Compiled-in Dependencies")
+  print("------------------------\n")
 
   sep = space + packsize*'=' + space + descsize*'='
   fmt = 2*space + ('%%%ds' % packsize) + space + ('%%%ds' % descsize)
-  print sep
-  print fmt % ('Package'.ljust(packsize), 'Version'.ljust(descsize))
-  print sep
+  print(sep)
+  print(fmt % ('Package'.ljust(packsize), 'Version'.ljust(descsize)))
+  print(sep)
   for k in sorted(version_dict.keys()):
     v = version_dict[k]
     if k.lower() == 'numpy': v = '%s (%s)' % (numpy.version.version, v)
     if k.lower() == 'compiler': v = '-'.join(v)
     elif k.lower() == 'ffmpeg':
-      if v.has_key('ffmpeg'): v = v['ffmpeg']
-      else: v = ';'.join(['%s-%s' % (x, v[x]) for x in v.keys()])
+      if 'ffmpeg' in v: v = v['ffmpeg']
+      else: v = ';'.join(['%s-%s' % (x, v[x]) for x in list(v.keys())])
     elif k.lower() == 'qt4': v = '%s (from %s)' % v
     elif k.lower() == 'fftw': v = '%s (%s)' % v[:2]
-    print fmt % (k.ljust(packsize), v.ljust(descsize))
-  print sep
+    print(fmt % (k.ljust(packsize), v.ljust(descsize)))
+  print(sep)
 
 def print_codecs():
   """Prints all installed codecs and the extensions they cover"""
  
-  print ""
-  print "Available Codecs"
-  print "----------------\n"
+  print("")
+  print("Available Codecs")
+  print("----------------\n")
 
   space = ' '
   packsize = 20
@@ -112,14 +112,14 @@ def print_codecs():
 
   sep = space + packsize*'=' + space + descsize*'='
   fmt = 2*space + ('%%%ds' % packsize) + space + ('%%%ds' % descsize)
-  print sep
-  print fmt % ('Extension'.ljust(packsize), 'Description'.ljust(descsize))
-  print sep
+  print(sep)
+  print(fmt % ('Extension'.ljust(packsize), 'Description'.ljust(descsize)))
+  print(sep)
 
   for k in sorted(bob.io.extensions().keys()):
     v = bob.io.extensions()[k]
-    print fmt % (k.ljust(packsize), v.ljust(descsize))
-  print sep
+    print(fmt % (k.ljust(packsize), v.ljust(descsize)))
+  print(sep)
 
 def main():
   version_table()

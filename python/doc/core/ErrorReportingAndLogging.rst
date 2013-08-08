@@ -178,8 +178,8 @@ like this:
 
   try:
   #some bob construction
-  except bob.core.Exception, e:
-  print "Did not execute propertly: %s" % e
+  except bob.core.Exception as e:
+  print("Did not execute propertly: %s" % e)
 
 If you develop new exceptions and need them bound into python for specific
 actions, please make sure to follow the recipe used to bind the C++

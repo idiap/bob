@@ -417,7 +417,7 @@ data is the closest as well as the min distance.
    :options: +NORMALIZE_WHITESPACE
 
    >>> sample = numpy.array([2,1,-2], 'float64')
-   >>> print machine.get_closest_mean(sample) # Returns the index of the closest mean and the distance to it at the power of 2
+   >>> print(machine.get_closest_mean(sample)) # Returns the index of the closest mean and the distance to it at the power of 2
    (0, 6.0)
 
 
@@ -510,7 +510,7 @@ follows:
   >>> gs = bob.machine.GMMStats(2,3)
   >>> sample = numpy.array([0.5, 4.5, 1.5])
   >>> gmm.acc_statistics(sample, gs)
-  >>> print gs # doctest: +SKIP
+  >>> print(gs) # doctest: +SKIP
 
 Then, the sufficient statistics can be accessed (or set as below), by considering the
 following attributes.

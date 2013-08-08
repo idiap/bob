@@ -29,7 +29,7 @@ def dbshell(arguments):
 
   try:
     if arguments.dryrun:
-      print "[dry-run] exec '%s'" % ' '.join(cmdline)
+      print("[dry-run] exec '%s'" % ' '.join(cmdline))
       return 0
     else:
       p = subprocess.Popen(cmdline)
@@ -61,7 +61,7 @@ def dbshell_command(subparsers):
 def print_files(arguments):
   """Prints the current location of raw database files."""
 
-  for k in arguments.files: print k
+  for k in arguments.files: print(k)
 
   return 0
 
@@ -76,7 +76,7 @@ def files_command(subparsers):
 def version(arguments):
   """Outputs the database version"""
 
-  print '%s == %s' % (arguments.name, arguments.version)
+  print('%s == %s' % (arguments.name, arguments.version))
 
   return 0
 

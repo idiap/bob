@@ -79,7 +79,7 @@ array with initialized content:
 .. doctest::
 
   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
-  >>> print A
+  >>> print(A)
   [[1 2 3 4]
    [5 6 7 8]]
 
@@ -90,7 +90,7 @@ It is also possible just to allocate the array in memory.
 
   >>> B = numpy.ndarray((2,4)) # Creates a 2D array with uninitialized values
   >>> B.fill(7) # Fill it in with a constant value 7
-  >>> print B
+  >>> print(B)
   [[ 7. 7. 7. 7.]
    [ 7. 7. 7. 7.]]
 
@@ -107,11 +107,11 @@ an :py:class:`numpy.ndarray` object are:
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
 
-  >>> print A.ndim
+  >>> print(A.ndim)
   2
-  >>> print A.shape
+  >>> print(A.shape)
   (2, 4)
-  >>> print A.dtype # doctest: +SKIP
+  >>> print(A.dtype) # doctest: +SKIP
   int64
 
 Accessing array elements
@@ -124,7 +124,7 @@ at 0.
 .. doctest::
 
   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
-  >>> print A[0,1]
+  >>> print(A[0,1])
   2
 
 It is also possible to iterate over an array. In the case of a 
@@ -133,7 +133,7 @@ multi-dimensional array, this is done with respect to the first dimension.
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
 
-  >>> for row in A: print row
+  >>> for row in A: print(row)
   [1 2 3 4]
   [5 6 7 8]
 
@@ -146,7 +146,7 @@ The type of the elements of an array can be specified at the creation time.
 .. doctest::
 
   >>> C = numpy.array( [[1,2], [3,4]], dtype='float64' )
-  >>> print C.dtype
+  >>> print(C.dtype)
   float64
 
 
@@ -156,7 +156,7 @@ do this by using the NumPy_ function :py:attr:`numpy.ndarray.astype`.
 .. doctest::
 
   >>> D = C.astype('uint8')
-  >>> print D.dtype
+  >>> print(D.dtype)
   uint8
 
 In addition, |project| provides the :py:func:`bob.core.convert` function 
@@ -170,10 +170,10 @@ grayscale image) into a float64 2D array with a ``[0,1]`` range.
 
   >>> img = numpy.array([[0,1,2,3,4],[255,254,253,252,251]], dtype='uint8')
   >>> img_d = bob.core.convert(img, dtype='float64', dest_range=(0.,1.))
-  >>> print img_d 
+  >>> print(img_d)
   [[ 0. 0.004 0.008 0.012 0.016]
    [ 1. 0.996 0.992 0.988 0.984]]
-  >>> print img_d.dtype
+  >>> print(img_d.dtype)
   float64
 
 
@@ -187,16 +187,16 @@ NumPy_ provides several features to reshape or stack arrays, such as the
 .. doctest::
 
   >>> E = D.reshape((1,4))
-  >>> print E.shape
+  >>> print(E.shape)
   (1, 4)
   >>> a = numpy.array( [1,2], dtype='uint8' )
   >>> b = numpy.array( [3,4], dtype='uint8' )
   >>> F = numpy.vstack((a,b))
-  >>> print F
+  >>> print(F)
   [[1 2]
    [3 4]]
   >>> G = numpy.hstack((a,b))
-  >>> print G
+  >>> print(G)
   [1 2 3 4]
 
 
@@ -212,13 +212,13 @@ NumPy_ provides numerous mathematical operations. Most of them are performed
   >>> a = numpy.array([1,2,3,4])
   >>> b = numpy.array([4,3,2,1])
   >>> c = a+b
-  >>> print c
+  >>> print(c)
   [5 5 5 5]
   >>> d = a*b
-  >>> print d
+  >>> print(d)
   [4 6 6 4]
   >>> e = numpy.exp(a)
-  >>> print e
+  >>> print(e)
   [ 2.718 7.389 20.086 54.598]
 
 
@@ -227,9 +227,9 @@ NumPy_ also provides reduction operations.
 .. doctest::
   :options: +NORMALIZE_WHITESPACE
    
-  >>> print a.sum()
+  >>> print(a.sum())
   10
-  >>> print a.max()
+  >>> print(a.max())
   4
 
 Partial reductions along a specific dimension are also possible.
@@ -238,9 +238,9 @@ Partial reductions along a specific dimension are also possible.
   :options: +NORMALIZE_WHITESPACE
    
   >>> A = numpy.array([[1,2,3,4],[5,6,7,8]]) # Creates a 2D array with initialized values
-  >>> print A.sum(axis=0)
+  >>> print(A.sum(axis=0))
   [ 6 8 10 12]
-  >>> print A.max(axis=1)
+  >>> print(A.max(axis=1))
   [4 8]
 
 Linear algebra is also supported through the bridges to the optimized ATLAS_
@@ -254,12 +254,12 @@ examples: matrix multiplication and matrix inversion.
   >>> A = numpy.array([[1,2],[3,4]]) # Creates a 2D array / matrix
   >>> B = numpy.array([[5,6],[7,8]]) # Creates a 2D array / matrix
   >>> C = numpy.dot(A,B) # Computes the matrix multiplication A*B
-  >>> print C
+  >>> print(C)
   [[19 22]
    [43 50]]
   >>> import scipy.linalg
   >>> D = scipy.linalg.inv(C) # Computes the inverse of C
-  >>> print D
+  >>> print(D)
   [[ 12.5 -5.5 ]
    [-10.75 4.75]]
 
@@ -274,7 +274,7 @@ at the assignment operator "=".
 
   >>> a = numpy.array([1,2,3,4], dtype='uint8')
   >>> b = a # Asignment -> No copy at all
-  >>> print b is a # a and b are two names for the same ndarray object
+  >>> print(b is a) # a and b are two names for the same ndarray object
   True
 
 The assignment operator only creates an **alias** to the same 
@@ -286,10 +286,10 @@ points to the same memory block. This is known as a **shallow copy**.
   :options: +NORMALIZE_WHITESPACE
 
   >>> c = a.view()
-  >>> print c is a  # a and c are two different ndarray objects
+  >>> print(c is a) # a and c are two different ndarray objects
   False
   >>> c[2] = 7  # but they share the same data in memory
-  >>> print a
+  >>> print(a)
   [1 2 7 4]
 
 In a similar way, an :py:class:`numpy.ndarray` might be sliced, and in this 
@@ -300,12 +300,12 @@ instances.
   :options: +NORMALIZE_WHITESPACE
 
   >>> d = a[0:3] # d is a slice of a (elements 0 to 3 excluded)
-  >>> print d is a  # a and d are two different ndarray objects
+  >>> print(d is a) # a and d are two different ndarray objects
   False
-  >>> print len(d)
+  >>> print(len(d))
   3
   >>> d[0] = 0 # but they share the same data in memory
-  >>> print a
+  >>> print(a)
   [0 2 7 4]
 
 If we would like to do a **deep copy**, we could use the 
@@ -316,7 +316,7 @@ If we would like to do a **deep copy**, we could use the
 
   >>> e = a.copy() # e is a complete copy of a
   >>> e[0] = 7
-  >>> print a
+  >>> print(a)
   [0 2 7 4]
 
 For a more exhaustive introduction about NumPy_, please have a look at its 
@@ -341,11 +341,11 @@ second dimension to the columns.
   :options: +NORMALIZE_WHITESPACE
 
   >>> A = numpy.array([[1, 2, 3], [4, 5, 6]], dtype='uint8') # A is a matrix 2x3
-  >>> print A
+  >>> print(A)
   [[1 2 3]
    [4 5 6]]
   >>> b = numpy.array([1, 2, 3], dtype='uint8') # b is a vector of length 3
-  >>> print b
+  >>> print(b)
   [1 2 3]
 
 Images

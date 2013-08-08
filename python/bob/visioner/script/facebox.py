@@ -60,15 +60,15 @@ def process_video_data(args):
   input = bob.io.VideoReader(args.input)
 
   if args.start_frame < 0 or args.start_frame >= len(input):
-    raise RuntimeError, "start frame has to set to a value between 0 and %d (inclusive)" % (len(input)-1,)
+    raise RuntimeError("start frame has to set to a value between 0 and %d (inclusive)" % (len(input)-1,))
 
   if args.end_frame <= 0: args.end_frame = len(input)
 
   if args.end_frame < 0 or args.end_frame > len(input):
-    raise RuntimeError, "end frame has to set to a value between 1 and %d (inclusive)" % (len(input),)
+    raise RuntimeError("end frame has to set to a value between 1 and %d (inclusive)" % (len(input),))
 
   if args.start_frame >= args.end_frame:
-    raise RuntimeError, "start frame (%d) has to be smaller than end frame (%d)" % (args.start_frame, args.end_frame)
+    raise RuntimeError("start frame (%d) has to be smaller than end frame (%d)" % (args.start_frame, args.end_frame))
 
   gray_buffer = numpy.ndarray((input.height, input.width), 'uint8')
   data = []
@@ -77,7 +77,7 @@ def process_video_data(args):
     sys.stdout.write("Detecting (single) faces in %d frames from file %s" % \
         (input.number_of_frames, args.input))
 
-  valid_range = range(args.start_frame, args.end_frame)
+  valid_range = list(range(args.start_frame, args.end_frame))
 
   for i, k in enumerate(input):
     if i not in valid_range: continue
@@ -94,8 +94,8 @@ def process_video_data(args):
   if args.verbose: sys.stdout.write('\n')
 
   if args.verbose:
-    print "Total detection time was %.2f seconds" % total
-    print " -> Per image/frame %.3f seconds" % (total/len(valid_range))
+    print("Total detection time was %.2f seconds" % total)
+    print(" -> Per image/frame %.3f seconds" % (total/len(valid_range)))
 
   if not args.output:
     for k, det in enumerate(data):
@@ -135,7 +135,7 @@ def process_video_data(args):
 def process_image_data(args):
   """Process any kind of image data"""
 
-  if args.verbose: print "Loading file %s..." % args.input
+  if args.verbose: print("Loading file %s..." % args.input)
   input = bob.io.load(args.input) #load the image
 
   if len(input.shape) == 3: #it is a color image
@@ -147,7 +147,7 @@ def process_image_data(args):
   data = args.processor(graydata)
   total = time.clock() - start
   if args.verbose:
-    print "Total detection time was %.3f seconds" % total
+    print("Total detection time was %.3f seconds" % total)
 
   if not args.output:
     
@@ -174,7 +174,7 @@ def process_image_data(args):
     bob.io.save(input, args.output)
 
     if args.verbose:
-      print "Output file (with detections, if any) saved at %s" % args.output
+      print("Output file (with detections, if any) saved at %s" % args.output)
 
 def main(user_input=None):
 
@@ -234,7 +234,7 @@ def main(user_input=None):
   total = time.clock() - start
 
   if args.verbose:
-    print "Model loading took %.2f seconds" % total
+    print("Model loading took %.2f seconds" % total)
 
   is_video = (os.path.splitext(args.input)[1] in ('.avi', '.h261', '.h263', '.h264', '.mov', '.m4v', '.mjpeg', '.mpeg', '.ogg', '.rawvideo'))
 

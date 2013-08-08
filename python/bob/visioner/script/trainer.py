@@ -115,29 +115,29 @@ def main():
   param = as_parameter(args)
   model = bob.visioner.Model(param)
 
-  if args.verbose: print "Loading training and validation data..."
+  if args.verbose: print("Loading training and validation data...")
   start = time.clock()
   training = bob.visioner.Sampler(param, bob.visioner.SamplerType.Train,
       args.threads)
   validation = bob.visioner.Sampler(param, bob.visioner.SamplerType.Validation,
       args.threads)
   total = time.clock() - start
-  if args.verbose: print "Ok. Loading time was %.2f seconds" % total
+  if args.verbose: print("Ok. Loading time was %.2f seconds" % total)
 
-  if args.verbose: print "Training the model..."
+  if args.verbose: print("Training the model...")
   train_ok = model.train(training, validation)
   
   if not train_ok:
-    raise RuntimeError, "A training error was detected... Cannot save model."
+    raise RuntimeError("A training error was detected... Cannot save model.")
 
   total = time.clock() - start
-  if args.verbose: print "Ok. Training time was %.2f seconds" % total
+  if args.verbose: print("Ok. Training time was %.2f seconds" % total)
 
-  if args.verbose: print "Saving the model at '%s'..." % args.model
+  if args.verbose: print("Saving the model at '%s'..." % args.model)
   save_ok = model.save(args.model)
   if not save_ok:
-    raise RuntimeError, "Could not save model."
+    raise RuntimeError("Could not save model.")
 
-  if args.verbose: print "Ok. Model saved." % total
+  if args.verbose: print("Ok. Model saved." % total)
 
   sys.exit(0)

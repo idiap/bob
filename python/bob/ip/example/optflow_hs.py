@@ -58,7 +58,7 @@ def optflow_hs(movie, iterations, alpha, template, stop=0):
 
   # To read the input we use the VideoReader class and its iterability
   video = bob.io.VideoReader(movie)
-  print "Loading", video.info
+  print("Loading", video.info)
 
   # The images for the optical flow computation must be grayscale
   previous = None
@@ -70,8 +70,8 @@ def optflow_hs(movie, iterations, alpha, template, stop=0):
   # Creates the output video (frame rate by default)
   outvideo = bob.io.VideoWriter(output, video.height, video.width)
 
-  print "Horn & Schunck Optical Flow: alpha = %.2f; iterations = %d" % \
-      (alpha, iterations)
+  print("Horn & Schunck Optical Flow: alpha = %.2f; iterations = %d" % \
+      (alpha, iterations))
   flow = bob.ip.VanillaHornAndSchunckFlow((video.height, video.width))
   for k, frame in enumerate(video):
     if previous is None:
@@ -97,7 +97,7 @@ def optflow_hs(movie, iterations, alpha, template, stop=0):
 
     if stop and k > stop: break #for testing purposes, only run a subset
 
-  print "\nWrote %d frames to %s" % (k, output)
+  print("\nWrote %d frames to %s" % (k, output))
 
 def main(user_input=None):
 

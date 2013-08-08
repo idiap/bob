@@ -63,9 +63,9 @@ The usual native formats can be read with **scipy.io.wavfile** module. Other wav
   
   >>> import scipy.io.wavfile #doctest: +SKIP
   >>> rate, signal = scipy.io.wavfile.read(str(wave_path)) #doctest: +SKIP
-  >>> print rate
+  >>> print(rate)
   8000
-  >>> print signal
+  >>> print(signal)
   [  28   72   58 ..., -301   89  230]
 
 In the above example, the sampling rate of the audio signal is **8 KHz** and the signal array is of type **int16**.
@@ -75,7 +75,7 @@ User can directly compute the duration of signal (in seconds):
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
   
-  >>> print len(signal)/rate 
+  >>> print(len(signal)/rate)
   2
 
 
@@ -106,9 +106,9 @@ Once the parameters are precised, :py:func:`bob.ap.Ceps` can be called as follow
   >>> c = bob.ap.Ceps(rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coef, mel_scale, dct_norm)
   >>> signal = numpy.cast['float'](signal) # vector should be in **float**
   >>> mfcc = c(signal)
-  >>> print len(mfcc)
+  >>> print(len(mfcc))
   199
-  >>> print len(mfcc[0])
+  >>> print(len(mfcc[0]))
   19
 
 LFCCs can be computed instead of MFCCs by setting **mel_scale** to **False**
@@ -126,9 +126,9 @@ User can also choose to extract the energy. This is typically used for Voice Act
   
   >>> c.with_energy = True
   >>> lfcc_e = c(signal)
-  >>> print len(lfcc_e)
+  >>> print(len(lfcc_e))
   199
-  >>> print len(lfcc_e[0])
+  >>> print(len(lfcc_e[0]))
   20
 
 It is also possible to compute first and second derivatives for those features:
@@ -139,8 +139,8 @@ It is also possible to compute first and second derivatives for those features:
   >>> c.with_delta = True
   >>> c.with_delta_delta = True
   >>> lfcc_e_d_dd = c(signal)
-  >>> print len(lfcc_e_d_dd)
+  >>> print(len(lfcc_e_d_dd))
   199
-  >>> print len(lfcc_e_d_dd[0])
+  >>> print(len(lfcc_e_d_dd[0]))
   60
   
