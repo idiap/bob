@@ -16,7 +16,7 @@ def __resolve_name__(name, package, level):
   if not hasattr(package, 'rindex'):
     raise ValueError("'package' not set to a string")
   dot = len(package)
-  for x in xrange(level, 1, -1):
+  for x in range(level, 1, -1):
     try:
       dot = package.rindex('.', 0, dot)
     except ValueError:
@@ -71,7 +71,7 @@ def __from_extension_import__(name, package, locals, fromlist=['*']):
   else:
     for name in fromlist: locals[name] = getattr(module, name)
 
-__from_extension_import__('._core', __package__, locals())
+__from_extension_import__('._core', __name__, locals())
 from . import array
 from . import random
 __all__ = [k for k in dir() if not k.startswith('_')]
