@@ -49,7 +49,7 @@ def optflow_hs(movie, iterations, alpha, template, stop=0):
 
   # Makes sure we don't overwrite the original file
   if (os.path.realpath(movie) == os.path.realpath(output)):
-    raise RuntimeError, "Input and output refer to the same file '%s'" % output
+    raise RuntimeError("Input and output refer to the same file '%s'" % output)
 
   outputdir = os.path.dirname(output)
 

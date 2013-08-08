@@ -242,7 +242,7 @@ def mark_plot_labels(app, document):
     the "htmlonly" (or "latexonly") node to the actual figure node
     itself.
     """
-    for name, explicit in document.nametypes.iteritems():
+    for name, explicit in document.nametypes.items():
         if not explicit:
             continue
         labelid = document.nameids[name]
@@ -472,15 +472,15 @@ def run_code(code, code_path, ns=None, function_name=None):
                 ns = {}
             if not ns:
                 if setup.config.plot_pre_code is None:
-                    exec "import numpy as np\nfrom matplotlib import pyplot as plt\n" in ns
+                    exec("import numpy as np\nfrom matplotlib import pyplot as plt\n", ns)
                 else:
-                    exec setup.config.plot_pre_code in ns
+                    exec(setup.config.plot_pre_code, ns)
             if "__main__" in code:
-                exec "__name__ = '__main__'" in ns
-            exec code in ns
+                exec("__name__ = '__main__'", ns)
+            exec(code, ns)
             if function_name is not None:
-                exec function_name + "()" in ns
-        except (Exception, SystemExit), err:
+                exec(function_name + "()", ns)
+        except (Exception, SystemExit) as err:
             raise PlotError(traceback.format_exc())
     finally:
         os.chdir(pwd)
@@ -509,7 +509,7 @@ def render_figures(code, code_path, output_dir, output_base, context,
     default_dpi = {'png': 80, 'hires.png': 200, 'pdf': 200}
     formats = []
     plot_formats = config.plot_formats
-    if isinstance(plot_formats, (str, unicode)):
+    if isinstance(plot_formats, str):
         plot_formats = eval(plot_formats)
     for fmt in plot_formats:
         if isinstance(fmt, str):
@@ -541,7 +541,7 @@ def render_figures(code, code_path, output_dir, output_base, context,
     all_exists = True
     for i, code_piece in enumerate(code_pieces):
         images = []
-        for j in xrange(1000):
+        for j in range(1000):
             if len(code_pieces) > 1:
                 img = ImageFile('%s_%02d_%02d' % (output_base, i, j), output_dir)
             else:
@@ -591,7 +591,7 @@ def render_figures(code, code_path, output_dir, output_base, context,
             for format, dpi in formats:
                 try:
                     figman.canvas.figure.savefig(img.filename(format), dpi=dpi)
-                except Exception,err:
+                except Exception as err:
                     raise PlotError(traceback.format_exc())
                 img.formats.append(format)
 
@@ -609,10 +609,10 @@ def run(arguments, content, options, state_machine, state, lineno):
 
     document = state_machine.document
     config = document.settings.env.config
-    nofigs = options.has_key('nofigs')
+    nofigs = 'nofigs' in options
 
     options.setdefault('include-source', config.plot_include_source)
-    context = options.has_key('context')
+    context = 'context' in options
 
     rst_file = document.attributes['source']
     rst_dir = os.path.dirname(rst_file)
@@ -659,7 +659,7 @@ def run(arguments, content, options, state_machine, state, lineno):
 
     # is it in doctest format?
     is_doctest = contains_doctest(code)
-    if options.has_key('format'):
+    if 'format' in options:
         if options['format'] == 'python':
             is_doctest = False
         else:
@@ -699,7 +699,7 @@ def run(arguments, content, options, state_machine, state, lineno):
         results = render_figures(code, source_file_name, build_dir, output_base,
                                  context, function_name, config)
         errors = []
-    except PlotError, err:
+    except PlotError as err:
         reporter = state.memo.reporter
         sm = reporter.system_message(
             2, "Exception occurred in plotting %s\n from %s:\n%s" % (output_base,
@@ -730,7 +730,7 @@ def run(arguments, content, options, state_machine, state, lineno):
         if nofigs:
             images = []
 
-        opts = [':%s: %s' % (key, val) for key, val in options.items()
+        opts = [':%s: %s' % (key, val) for key, val in list(options.items())
                 if key in ('alt', 'height', 'width', 'scale', 'align', 'class')]
 
         only_html = ".. only:: html"

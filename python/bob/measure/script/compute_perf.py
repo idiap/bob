@@ -197,7 +197,7 @@ def get_options(user_input):
     mod, fct = args.parser.rsplit('.', 1)
     try:
       args.parser = getattr(__import__(mod, fromlist=['*']), fct)
-    except Exception, e:
+    except Exception as e:
       parser.error("error importing '%s': %s" % (args.parser, e))
 
   return args

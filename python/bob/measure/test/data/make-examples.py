@@ -44,7 +44,7 @@ def loaddata(filename, column):
     elif s[iris_columns['class']] == 'Iris-virginica':
       retval['virginica'].append(float(s[iris_columns[column]]))
     else:
-      raise RuntimeError, 'Unknown data class: %s' % l
+      raise RuntimeError('Unknown data class: %s' % l)
   return retval
 
 def example1():

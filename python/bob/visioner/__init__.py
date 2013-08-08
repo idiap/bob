@@ -147,12 +147,14 @@ class Localizer(CVLocalizer):
 
     if detector is None:
       self.detector = Detector()
-    elif isinstance(detector, (str, unicode)):
+    elif sys.version_info[0] < 3 and isinstance(detector, (str, unicode)):
+      self.detector = Detector(detector)
+    elif sys.version_info[0] >= 3 and isinstance(detector, (bytes, str)):
       self.detector = Detector(detector)
     elif isinstance(detector, CVDetector):
       self.detector = detector
     else:
-      raise RuntimeError, 'input detector has to be either None, a file path or Detector object'
+      raise RuntimeError('input detector has to be either None, a file path or Detector object')
 
   def __call__(self, image):
     """Runs the localization machinery, returns the bounding box and points

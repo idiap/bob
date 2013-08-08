@@ -370,7 +370,7 @@ def main(user_input=None):
   print("  Framerate: %f Hz"     % args.framerate)
 
   print("Legend:")
-  for k, (f, code) in test_function.iteritems():
+  for k, (f, code) in test_function.items():
     print("  %s: %s test" % (code, k.capitalize()))
 
   sys.stdout.write("Running %d test(s)..." %
@@ -390,7 +390,7 @@ def main(user_input=None):
 
         # cautionary settings
         notes = ""
-        if not FORMATS.has_key(format):
+        if format not in FORMATS:
           if args.force:
             notes += "[!F] "
             need_notes = True
@@ -402,7 +402,7 @@ def main(user_input=None):
             continue
 
         else:
-          if codec not in FORMATS[format]['supported_codecs'].keys():
+          if codec not in FORMATS[format]['supported_codecs']:
             if args.force:
               notes += "[!F+C] "
               need_notes = True
@@ -425,7 +425,7 @@ def main(user_input=None):
                 args.framerate, format, codec, outdir)
             sys.stdout.write(code)
             sys.stdout.flush()
-          except Exception, e:
+          except Exception as e:
             result = str(e)
             sys.stdout.write(code)
             sys.stdout.flush()
@@ -439,7 +439,7 @@ def main(user_input=None):
                 args.framerate, format, codec)
             sys.stdout.write(code)
             sys.stdout.flush()
-          except Exception, e:
+          except Exception as e:
             result = str(e)
             sys.stdout.write(code)
             sys.stdout.flush()
@@ -474,11 +474,11 @@ def main(user_input=None):
       ))
   print(sep)
 
-  for test in sorted(table.iterkeys()):
+  for test in sorted(table.keys()):
     test_table = table[test]
-    for format in sorted(test_table.iterkeys()):
+    for format in sorted(test_table.keys()):
       format_table = test_table[format]
-      for codec in sorted(format_table.iterkeys()):
+      for codec in sorted(format_table.keys()):
         figure = format_table[codec]
         print(line % (
             test.ljust(test_size),

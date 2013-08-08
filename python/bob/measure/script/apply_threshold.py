@@ -94,13 +94,13 @@ def get_options(user_input):
     import imp
     try:
       fp, pathname, description = imp.find_module(mod, ['.'] + sys.path)
-    except Exception, e:
+    except Exception as e:
       parser.error("import error for '%s': %s" % (args.parser, e))
 
     try:
       pmod = imp.load_module(mod, fp, pathname, description)
       args.parser = getattr(pmod, fct)
-    except Exception, e:
+    except Exception as e:
       parser.error("loading error for '%s': %s" % (args.parser, e))
     finally:
       fp.close()
