@@ -83,15 +83,15 @@ namespace bob {
 
 
     /**
-      * Norm used for normalizing the descriptor blocks
+      * @brief Norm used for normalizing the descriptor blocks
       * - L2: Euclidean norm
       * - L2Hys: L2 norm with clipping of high values
       * - L1: L1 norm (Manhattan distance)
       * - L1sqrt: Square root of the L1 norm
-      * - None: no norm used
+      * - Nonorm: no norm used
       * TODO: ZeroMean/UnitVariance normalization?
       */
-    typedef enum BlockNorm_ { L2, L2Hys, L1, L1sqrt, None } BlockNorm;
+    typedef enum BlockNorm_ { L2, L2Hys, L1, L1sqrt, Nonorm } BlockNorm;
 
 
     /**
@@ -119,7 +119,7 @@ namespace bob {
       double sumInv;
       switch(block_norm)
       {
-        case None:
+        case Nonorm:
           detail::vectorizeMultArray(descr, norm_descr);
           break;
         case L2Hys:
@@ -286,7 +286,7 @@ namespace bob {
           * Disable block normalization. This is performed by setting
           * parameters such that the cells are not further processed, that is
           * block_y=1, block_x=1, block_ov_y=0, block_ov_x=0, and
-          * block_norm=None.
+          * block_norm=Nonorm.
           */
         void disableBlockNormalization();
 
@@ -501,7 +501,7 @@ namespace bob {
       m_block_x = 1;
       m_block_ov_y = 0;
       m_block_ov_x = 0;
-      m_block_norm = None;
+      m_block_norm = Nonorm;
       resizeBlockCache();
     }
 

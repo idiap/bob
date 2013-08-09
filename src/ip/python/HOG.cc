@@ -498,7 +498,7 @@ void bind_ip_hog()
     .value("L2Hys", bob::ip::L2Hys)
     .value("L1", bob::ip::L1)
     .value("L1sqrt", bob::ip::L1sqrt)
-    .value("None", bob::ip::None);
+    .value("Nonorm", bob::ip::Nonorm);
 
   def("hog_compute_histogram_", &hog_compute_histogram__c, 
     hog_compute_histogram__c_overloads((arg("mag"), arg("ori"), arg("hist"),

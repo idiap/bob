@@ -179,9 +179,9 @@ class HOGTest(unittest.TestCase):
     # Declares 1D output histogram of size 20
     hist = numpy.ndarray(shape=(20,), dtype='float64')
     # No norm
-    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.None)
+    bob.ip.normalize_block(HIST_3D, hist, bob.ip.BlockNorm.Nonorm)
     self.assertTrue( numpy.allclose(hist, HIST_1D, EPSILON) )
-    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.None)
+    bob.ip.normalize_block_(HIST_3D, hist, bob.ip.BlockNorm.Nonorm)
     self.assertTrue( numpy.allclose(hist, HIST_1D, EPSILON) )
     # L2 Norm
     py_L2ref = HIST_1D / numpy.linalg.norm(HIST_1D)
@@ -249,7 +249,7 @@ class HOGTest(unittest.TestCase):
     self.assertTrue( hog.block_x == 1)
     self.assertTrue( hog.block_ov_y == 0)
     self.assertTrue( hog.block_ov_x == 0)
-    self.assertTrue( hog.block_norm == bob.ip.BlockNorm.None)
+    self.assertTrue( hog.block_norm == bob.ip.BlockNorm.Nonorm)
 
     # Get the dimensionality of the output
     self.assertTrue( numpy.array_equal( hog.get_output_shape(), numpy.array([3,4,8]) ))
