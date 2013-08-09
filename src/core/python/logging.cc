@@ -24,6 +24,7 @@
 #include <boost/python.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <bob/python/ndarray.h>
 #include <bob/python/gil.h>
@@ -46,7 +47,7 @@ using namespace boost::python;
 
 #define PYTHON_LOGGING_DEBUG 0
 
-static bob::core::OutputStream static_log("stdout");
+static boost::iostreams::stream<bob::core::AutoOutputDevice> static_log("stdout");
 
 /**
  * Objects of this class are able to redirect the data injected into a
@@ -122,13 +123,17 @@ struct PythonLoggingOutputDevice: public bob::core::OutputDevice {
       return n;
     }
 
+  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
+    return boost::make_shared<PythonLoggingOutputDevice>(*this);
+  }
+
   private:
     object m_callable; ///< the callable we use to stream the data out.
     boost::shared_ptr<boost::mutex> m_mutex; ///< multi-threading guardian
 };
 
 struct message_info_t {
-  bob::core::OutputStream* s;
+  boost::iostreams::stream<bob::core::AutoOutputDevice>* s;
   std::string message;
   bool exit;
   unsigned int ntimes;
@@ -161,7 +166,7 @@ static void* log_message_inner(void* cookie) {
 /**
  * A test function for your python bindings
  */
-static void log_message(unsigned int ntimes, bob::core::OutputStream& s, const char* message) {
+static void log_message(unsigned int ntimes, boost::iostreams::stream<bob::core::AutoOutputDevice>& s, const char* message) {
   bob::python::no_gil unlock;
   message_info_t mi = {&s, message, false, ntimes, 0};
   log_message_inner((void*)&mi);
@@ -171,7 +176,9 @@ static void log_message(unsigned int ntimes, bob::core::OutputStream& s, const c
 /**
  * Logs a number of messages from a separate thread
  */
-static void log_message_mt(unsigned int nthreads, unsigned int ntimes, bob::core::OutputStream& s, const char* message) {
+static void log_message_mt(unsigned int nthreads, unsigned int ntimes,
+    boost::iostreams::stream<bob::core::AutoOutputDevice>& s,
+    const char* message) {
   bob::python::no_gil unlock;
 
   boost::shared_array<pthread_t> threads(new pthread_t[nthreads]);
@@ -200,27 +207,40 @@ static void log_message_mt(unsigned int nthreads, unsigned int ntimes, bob::core
   static_log << "(thread 0) Returning to caller" << std::endl;
 }
 
-/**
- * Gets rid of the Python stuff before we destroy the Python interpreter
- */
-static void outputstream_del(bob::core::OutputStream& os) {
-  os.reset("null");
+static void ostream_open_1(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, const std::string& config) {
+  s.open(config);
+}
+
+static void ostream_open_2(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, const bob::core::OutputDevice& device) {
+  s.open(device);
+}
+
+static void ostream_reset_1(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, const std::string& config) {
+  s.close();
+  s.open(config);
+}
+
+static void ostream_reset_2(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, const bob::core::OutputDevice& device) {
+  s.close();
+  s.open(device);
 }
 
 void bind_core_logging() {
-  class_<bob::core::OutputDevice, boost::shared_ptr<bob::core::OutputDevice>, boost::noncopyable>("OutputDevice", "OutputDevices act like sinks for the messages emitted from within C++", no_init);
+  class_<bob::core::OutputDevice, boost::noncopyable>("OutputDevice", "OutputDevices act like sinks for the messages emitted from within C++", no_init);
 
   class_<PythonLoggingOutputDevice, boost::shared_ptr<PythonLoggingOutputDevice>, bases<bob::core::OutputDevice> >("PythonLoggingOutputDevice", "The PythonLoggingOutputDevice is the default logging class for bob.core.OutputStream objects to be used in python. It diverges the output of logged messages in C++ into the pythonic logging module.", init<object>("Initializes the PythonLoggingOutputDevice with a new callable that will be used to emit messages."))
     .def("__del__", &PythonLoggingOutputDevice::close, (arg("self")), "Resets this stream before calling the C++ destructor")
     ;
 
-  class_<bob::core::OutputStream, boost::shared_ptr<bob::core::OutputStream> >("OutputStream", "The OutputStream object represents a normal C++ stream and is used as the basis for configuring the message output re-direction inside bob.", init<>("Constructs a new OutputStream using no parameters. Ignores any input received."))
-    .def(init<const std::string&>((arg("configuration")), "Initializes this stream with one of the default C++ methods available: stdout, stderr, null or a filename (if the filename ends in '.gz', it will be compressed on the fly)."))
-    .def(init<boost::shared_ptr<bob::core::OutputDevice> >((arg("device")), "Constructs a new OutputStream using the given existing OutputDevice."))
-    .def("__del__", &outputstream_del, (arg("self")), "Resets the OutputStream before the C++ destructor goes into action")
-    .def("reset", &bob::core::OutputStream::reset<const std::string>, (arg("self"), arg("configuration")), "Resets the current stream to use a new method for output instead of the currently configured.")
-    .def("reset", &bob::core::OutputStream::reset<boost::shared_ptr<bob::core::OutputDevice> >, (arg("self"), arg("device")), "Resets the current stream to use a new method for output instead of the currently configured. This version of the API allows you to pass an existing OutputDevice to be used for output data.")
-    .def("log", &log_message, (arg("self"), arg("message")), "This method logs an arbitrary message to the current log stream")
+  class_<boost::iostreams::stream<bob::core::AutoOutputDevice>, boost::noncopyable>("OutputStream", "The OutputStream object represents a normal C++ stream and is used as the basis for configuring the message output re-direction inside bob.", init<>("Initializes a stream w/o a device (it should be closed by default)"))
+    .def(init<const std::string&>((arg("config")), "Initializes this stream with one of the default C++ methods available: ``stdout``, ``stderr``, ``null`` or a filename (if the filename ends in ``.gz``, it will be compressed on the fly)."))
+    .def(init<const bob::core::OutputDevice&>((arg("device")), "Initializes this stream with an existing device"))
+    .def("open", &ostream_open_1, (arg("self"), arg("config")), "Opens a connection to a new output device as defined by the parameter ``config``.\n\nCommon values for the parameter ``config`` are ``stdout``, ``stderr``, ``null`` or a filename (possibly ending in ``.gz`` for on-the-fly compression).")
+    .def("open", &ostream_open_2, (arg("self"), arg("device")), "Connects to an existing device by copying the device information.")
+    .def("reset", &ostream_reset_1, (arg("self"), arg("config")), "Closes the current device and then opens a connection to a new output device as defined by the parameter ``config``.\n\nCommon values for the parameter ``config`` are ``stdout``, ``stderr``, ``null`` or a filename (possibly ending in ``.gz`` for on-the-fly compression).")
+    .def("reset", &ostream_reset_2, (arg("self"), arg("device")), "Closes the current device and then connects to an existing device by copying the device information.")
+    .def("close", &boost::iostreams::stream<bob::core::AutoOutputDevice>::close, (arg("self")), "Closes the this output stream")
+    .def("is_open", &boost::iostreams::stream<bob::core::AutoOutputDevice>::is_open, (arg("self")), "Tells if this stream is attached to a device and ready to output data.")
     ;
 
   //binds the standard C++ streams for logging output to python

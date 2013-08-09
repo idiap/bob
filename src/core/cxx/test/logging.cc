@@ -6,16 +6,16 @@
  * @brief Multiple C++ tests for the logging infrastructure.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -80,16 +80,18 @@ std::string get_contents(const std::string& fname) {
   return retval.str();
 }
 
-//tests if I can easily switch streams 
+//tests if I can easily switch streams
 BOOST_AUTO_TEST_CASE( test_switch )
 {
   std::string testfile = bob::core::tmpfile("");
   std::string gztestfile = testfile + ".gz";
   std::string teststring = "** info test **";
 
-  info.reset(testfile);
+  info.close();
+  info.open(testfile);
   info << teststring << std::endl;
-  info.reset(gztestfile);
+  info.close();
+  info.open(gztestfile);
 
   //at this point checks if "testfile" is filled
   BOOST_CHECK(boost::filesystem::exists(testfile));
@@ -97,8 +99,9 @@ BOOST_AUTO_TEST_CASE( test_switch )
   boost::filesystem::remove(testfile);
 
   info << teststring << std::endl;
-  info.reset("null");
-  
+  info.close();
+  info.open("null");
+
   //at this point checks if "testfile.gz" is filled
   BOOST_CHECK(boost::filesystem::exists(gztestfile));
   BOOST_CHECK_EQUAL(get_contents(gztestfile), teststring + "\n");
@@ -111,11 +114,11 @@ BOOST_AUTO_TEST_CASE( test_switch )
 BOOST_AUTO_TEST_CASE( test_input )
 {
   std::string testfilename = bob::core::tmpfile("");
-  bob::core::OutputStream ofile(testfilename);
+  boost::iostreams::stream<bob::core::AutoOutputDevice> ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
   ofile << testdata << std::endl;
   ofile.close();
-  bob::core::InputStream ifile(testfilename);
+  boost::iostreams::stream<bob::core::AutoInputDevice> ifile(testfilename);
   std::string back;
   ifile >> back;
   BOOST_CHECK_EQUAL(testdata, back);
@@ -127,11 +130,11 @@ BOOST_AUTO_TEST_CASE( test_input )
 BOOST_AUTO_TEST_CASE( test_compressed_input )
 {
   std::string testfilename = bob::core::tmpfile(".gz");
-  bob::core::OutputStream ofile(testfilename);
+  boost::iostreams::stream<bob::core::AutoOutputDevice> ofile(testfilename);
   std::string testdata = "12345678,a_single_sentence";
   ofile << testdata << std::endl;
   ofile.close();
-  bob::core::InputStream ifile(testfilename);
+  boost::iostreams::stream<bob::core::AutoInputDevice> ifile(testfilename);
   std::string back;
   ifile >> back;
   BOOST_CHECK_EQUAL(testdata, back);

@@ -9,16 +9,16 @@
  * http://www.boost.org/doc/libs/release/libs/iostreams/doc/index.html
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -50,7 +50,7 @@ namespace bob {
 
     /**
      * @brief The device is what tells the sink where to actually send the
-     * messages to. If the AutoOutputDevice does not have a device, the 
+     * messages to. If the AutoOutputDevice does not have a device, the
      * messages are discarded.
      */
     struct OutputDevice {
@@ -68,11 +68,16 @@ namespace bob {
        * @brief Closes this device
        */
       virtual void close() {}
+
+      /**
+       * @brief Clones this device and all its properties
+       */
+      virtual boost::shared_ptr<OutputDevice> clone() const =0;
     };
 
     /**
      * @brief The device is what tells the source where to actually read the
-     * messages from. If the AutoInputDevice does not have a device, the 
+     * messages from. If the AutoInputDevice does not have a device, the
      * messages are discarded.
      */
     struct InputDevice {
@@ -94,9 +99,9 @@ namespace bob {
 
     /**
      * @brief Use this sink always in bob C++ programs. You can configure it
-     * to send messages to stdout, stderr, to a file or discard them. 
+     * to send messages to stdout, stderr, to a file or discard them.
      */
-    class AutoOutputDevice: public boost::iostreams::sink { 
+    class AutoOutputDevice: public boost::iostreams::sink {
 
       public:
 
@@ -127,20 +132,12 @@ namespace bob {
         /**
          * @brief Intializes with a device.
          */
-        AutoOutputDevice(const boost::shared_ptr<OutputDevice>& device);
+        AutoOutputDevice(const OutputDevice& device);
 
         /**
          * @brief D'tor
          */
         virtual ~AutoOutputDevice();
-
-        /**
-         * @brief Resets the current sink and use a new strategy according to
-         * the possible settings in 
-         * `AutoOutputDevice(const std::string& configuration)`.
-         */
-        void reset(const std::string& configuration);
-        void reset(const boost::shared_ptr<OutputDevice>& device);
 
         /**
          * @brief Forwards call to underlying OutputDevice
@@ -162,7 +159,7 @@ namespace bob {
      * @brief Use this source always in bob C++ programs. You can configure it
      * to read messages from stdin or a file.
      */
-    class AutoInputDevice: public boost::iostreams::source { 
+    class AutoInputDevice: public boost::iostreams::source {
 
       public:
 
@@ -199,14 +196,6 @@ namespace bob {
         virtual ~AutoInputDevice();
 
         /**
-         * @brief Resets the current source and use a new strategy according
-         * to the possible settings in 
-         * `AutoInputDevice(const std::string& configuration)`.
-         */
-        void reset(const std::string& configuration);
-        void reset(const boost::shared_ptr<InputDevice>& device);
-
-        /**
          * @brief Forwards call to underlying InputDevice
          */
         virtual std::streamsize read(char* s, std::streamsize n);
@@ -222,82 +211,11 @@ namespace bob {
 
     };
 
-    /**
-     * @brief Usage example: Re-setting the output error stream
-     *
-     * bob::core::error->reset("null");
-     */
-    struct OutputStream: public boost::iostreams::stream<AutoOutputDevice> {
-
-      /**
-       * @brief Constructs an empty version of the stream, uses NullOutputDevice.
-       */
-      OutputStream()
-        : boost::iostreams::stream<AutoOutputDevice>() {}
-
-      /**
-       * @brief Copy construct the current stream.
-       */
-      OutputStream(const OutputStream& other)
-        : boost::iostreams::stream<AutoOutputDevice>(*const_cast<OutputStream&>(other)) {}
-
-      /**
-       * @brief Constructs the current stream 
-       */
-      template <typename T> OutputStream(const T& value)
-        : boost::iostreams::stream<AutoOutputDevice>(value) {}
-
-      virtual ~OutputStream();
-
-      /**
-       * @brief Resets the current sink and use a new strategy according to
-       * the possible settings in `AutoOutputDevice()`.
-       */
-      template <typename T> void reset(const T& value) {
-        (*this)->reset(value);
-      }
-
-    };
-
-    /**
-     * @brief Create streams of this type to input data into bob
-     */
-    struct InputStream: public boost::iostreams::stream<AutoInputDevice> {
-
-      /**
-       * @brief Constructs an empty version of the stream, uses NullInputDevice.
-       */
-      InputStream()
-        : boost::iostreams::stream<AutoInputDevice>() {}
-
-      /**
-       * @brief Copy construct the current stream.
-       */
-      InputStream(const InputStream& other)
-        : boost::iostreams::stream<AutoInputDevice>(*const_cast<InputStream&>(other)) {}
-
-      /**
-       * @brief Constructs the current stream 
-       */
-      template <typename T> InputStream(const T& value)
-        : boost::iostreams::stream<AutoInputDevice>(value) {}
-
-      virtual ~InputStream();
-
-      /**
-       * @brief Resets the current sink and use a new strategy according to
-       * the possible settings in `AutoInputDevice()`.
-       */
-      template <typename T> void reset(const T& value) {
-        (*this)->reset(value);
-      }
-
-    };
-
-    extern OutputStream debug; ///< default debug stream
-    extern OutputStream info; ///< default info stream
-    extern OutputStream warn; ///< default warning stream
-    extern OutputStream error; ///< default error stream
+    // standard streams
+    extern boost::iostreams::stream<AutoOutputDevice> debug;
+    extern boost::iostreams::stream<AutoOutputDevice> info;
+    extern boost::iostreams::stream<AutoOutputDevice> warn;
+    extern boost::iostreams::stream<AutoOutputDevice> error;
 
     /**
      * @brief This method is used by our TDEBUGX macros to define if the

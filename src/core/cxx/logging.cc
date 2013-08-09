@@ -6,16 +6,16 @@
  * @brief Implements all logging infrastructure.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,6 +29,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/shared_array.hpp>
+#include <boost/make_shared.hpp>
 
 #ifdef _WIN32
 #include <io.h> //definition of mktemp
@@ -49,11 +50,14 @@
 
 bob::core::OutputDevice::~OutputDevice() {}
 bob::core::InputDevice::~InputDevice() {}
-    
+
 struct NullOutputDevice: public bob::core::OutputDevice {
   virtual ~NullOutputDevice() {}
   virtual std::streamsize write(const char*, std::streamsize n) {
     return n;
+  }
+  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
+    return boost::make_shared<NullOutputDevice>();
   }
 };
 
@@ -67,6 +71,9 @@ struct StdoutOutputDevice: public bob::core::OutputDevice {
     std::cout.write(s, n);
     return n;
   }
+  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
+    return boost::make_shared<StdoutOutputDevice>();
+  }
 };
 
 struct StderrOutputDevice: public bob::core::OutputDevice {
@@ -78,6 +85,9 @@ struct StderrOutputDevice: public bob::core::OutputDevice {
 #endif
     std::cerr.write(s, n);
     return n;
+  }
+  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
+    return boost::make_shared<StderrOutputDevice>();
   }
 };
 
@@ -106,34 +116,48 @@ struct FileOutputDevice: public bob::core::OutputDevice {
   FileOutputDevice(const std::string& filename)
     : m_filename(filename),
       m_file(),
-      m_ostream(),
-      m_mutex()
+      m_ostream(new boost::iostreams::filtering_ostream),
+      m_mutex(new boost::mutex)
   {
     //this first bit creates the output file handle
     std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc;
     if (is_dot_gz(filename)) mode |= std::ios_base::binary;
-    m_file.open(filename.c_str(), mode);
+    m_file = boost::make_shared<std::ofstream>(filename.c_str(), mode);
     //this second part configures gzip'ing if necessary and associates the
     //output file with the filtering stream.
-    if (is_dot_gz(filename)) 
-      m_ostream.push(boost::iostreams::basic_gzip_compressor<>());
-    m_ostream.push(m_file);
+    if (is_dot_gz(filename))
+      m_ostream->push(boost::iostreams::basic_gzip_compressor<>());
+    m_ostream->push(*m_file);
   }
+
+  FileOutputDevice(const FileOutputDevice& other)
+    : m_filename(other.m_filename),
+      m_file(other.m_file),
+      m_ostream(other.m_ostream),
+      m_mutex(other.m_mutex)
+  {
+  }
+
   virtual ~FileOutputDevice() {}
+
   virtual std::streamsize write(const char* s, std::streamsize n) {
 #if ((BOOST_VERSION / 100) % 1000) > 35
-    boost::lock_guard<boost::mutex> lock(m_mutex);
+    boost::lock_guard<boost::mutex> lock(*m_mutex);
 #endif
-    m_ostream.write(s, n);
+    m_ostream->write(s, n);
     return n;
+  }
+
+  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
+    return boost::make_shared<FileOutputDevice>(*this);
   }
 
   //internal representation
   private:
     std::string m_filename; ///< the name of the file I'm writing to
-    std::ofstream m_file; ///< the file output stream
-    boost::iostreams::filtering_ostream m_ostream; ///< the output stream
-    boost::mutex m_mutex; ///< multi-threading guardian
+    boost::shared_ptr<std::ofstream> m_file; ///< the file output stream
+    boost::shared_ptr<boost::iostreams::filtering_ostream> m_ostream; ///< the output stream
+    boost::shared_ptr<boost::mutex> m_mutex; ///< multi-threading guardian
 
 };
 
@@ -150,7 +174,7 @@ struct FileInputDevice: public bob::core::InputDevice {
     m_file.open(filename.c_str(), mode);
     //this second part configures gzip'ing if necessary and associates the
     //input file with the filtering stream.
-    if (is_dot_gz(filename)) 
+    if (is_dot_gz(filename))
       m_istream.push(boost::iostreams::basic_gzip_decompressor<>());
     m_istream.push(m_file);
   }
@@ -183,25 +207,22 @@ bool bob::core::debug_level(unsigned int i) {
 
 bob::core::AutoOutputDevice::AutoOutputDevice()
 : m_device(new NullOutputDevice)
-{}
-
-bob::core::AutoOutputDevice::AutoOutputDevice(const AutoOutputDevice& other)
-: m_device(other.m_device)
-{}
-
-bob::core::AutoOutputDevice::AutoOutputDevice(const boost::shared_ptr<OutputDevice>& device)
-: m_device(device)
-{}
-
-bob::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration) 
-: m_device()
 {
-  reset(configuration);
 }
 
-bob::core::AutoOutputDevice::~AutoOutputDevice() {}
+bob::core::AutoOutputDevice::AutoOutputDevice(const AutoOutputDevice& other)
+: m_device(other.m_device->clone())
+{
+}
 
-void bob::core::AutoOutputDevice::reset(const std::string& configuration) {
+bob::core::AutoOutputDevice::AutoOutputDevice(const OutputDevice& device)
+: m_device(device.clone())
+{
+}
+
+bob::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration)
+: m_device()
+{
   std::string str(configuration);
   str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
   if (str == "null" || str.size()==0) m_device.reset(new NullOutputDevice);
@@ -210,8 +231,7 @@ void bob::core::AutoOutputDevice::reset(const std::string& configuration) {
   else m_device.reset(new FileOutputDevice(configuration));
 }
 
-void bob::core::AutoOutputDevice::reset(const boost::shared_ptr<OutputDevice>& device) {
-  m_device = device;
+bob::core::AutoOutputDevice::~AutoOutputDevice() {
 }
 
 std::streamsize bob::core::AutoOutputDevice::write(const char* s, std::streamsize n) {
@@ -222,8 +242,6 @@ void bob::core::AutoOutputDevice::close() {
   m_device->close();
 }
 
-bob::core::OutputStream::~OutputStream() {}
-
 bob::core::AutoInputDevice::AutoInputDevice()
 : m_device(new StdinInputDevice)
 {}
@@ -232,28 +250,16 @@ bob::core::AutoInputDevice::AutoInputDevice(const AutoInputDevice& other)
 : m_device(other.m_device)
 {}
 
-bob::core::AutoInputDevice::AutoInputDevice(const boost::shared_ptr<InputDevice>& device)
-: m_device(device)
-{}
-
-bob::core::AutoInputDevice::AutoInputDevice(const std::string& configuration) 
+bob::core::AutoInputDevice::AutoInputDevice(const std::string& configuration)
 : m_device()
 {
-  reset(configuration);
-}
-
-bob::core::AutoInputDevice::~AutoInputDevice() {}
-
-void bob::core::AutoInputDevice::reset(const std::string& configuration) {
   std::string str(configuration);
   str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
   if (str == "stdin" || str.size() == 0) m_device.reset(new StdinInputDevice);
   else m_device.reset(new FileInputDevice(configuration));
 }
 
-void bob::core::AutoInputDevice::reset(const boost::shared_ptr<InputDevice>& device) {
-  m_device = device;
-}
+bob::core::AutoInputDevice::~AutoInputDevice() {}
 
 std::streamsize bob::core::AutoInputDevice::read(char* s, std::streamsize n) {
   return m_device->read(s, n);
@@ -263,12 +269,10 @@ void bob::core::AutoInputDevice::close() {
   m_device->close();
 }
 
-bob::core::InputStream::~InputStream() {}
-
-bob::core::OutputStream bob::core::debug("stdout");
-bob::core::OutputStream bob::core::info("stdout");
-bob::core::OutputStream bob::core::warn("stderr");
-bob::core::OutputStream bob::core::error("stderr");
+boost::iostreams::stream<bob::core::AutoOutputDevice> bob::core::debug("stdout");
+boost::iostreams::stream<bob::core::AutoOutputDevice> bob::core::info("stdout");
+boost::iostreams::stream<bob::core::AutoOutputDevice> bob::core::warn("stderr");
+boost::iostreams::stream<bob::core::AutoOutputDevice> bob::core::error("stderr");
 
 std::string bob::core::tmpdir() {
   const char* value = getenv("TMPDIR");
@@ -287,7 +291,7 @@ std::string bob::core::tmpfile(const std::string& extension) {
   int fd = mkstemp(char_tpl.get());
   close(fd);
   boost::filesystem::remove(char_tpl.get());
-#endif 
+#endif
   std::string res = char_tpl.get();
   res += extension;
   return res;
