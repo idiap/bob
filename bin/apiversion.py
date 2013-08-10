@@ -5,8 +5,8 @@
 
 import sys
 if len(sys.argv) != 2:
-  print "You need to pass the Bob version to create an API version"
-  print "e.g.: %s 1.2.0b3" % sys.argv[0]
+  print("You need to pass the Bob version to create an API version")
+  print("e.g.: %s 1.2.0b3" % sys.argv[0])
   sys.exit(1)
 from distutils.version import StrictVersion
 v = StrictVersion(sys.argv[1])
