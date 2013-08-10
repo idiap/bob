@@ -34,8 +34,8 @@ def git_remote_version_branches(verbose):
     return [k for k in cand if BRANCH_RE.match(k)]
 
   except:
-    if verbose: 
-      print "Warning: could retrieve remote branch list"
+    if verbose:
+      print("Warning: could retrieve remote branch list")
 
 def git_version_branches(verbose):
   """Get the branches available on the origin"""
@@ -52,7 +52,7 @@ def git_version_branches(verbose):
 
   except:
     if verbose:
-      print "Warning: could retrieve branch list"
+      print("Warning: could retrieve branch list")
 
 def git_current_branch(verbose):
   """Get the current branch we are sitting on"""
@@ -73,7 +73,7 @@ def git_current_branch(verbose):
 
   except:
     if verbose:
-      print "Warning: could not determine in which branch I'm on"
+      print("Warning: could not determine in which branch I'm on")
 
 def git_next_minor_version(branch, verbose):
   """Gets the next minor version"""
@@ -97,7 +97,7 @@ def git_next_minor_version(branch, verbose):
 
   except:
     if verbose:
-      print "Warning: could not determine latest tag on branch (%s). Assuming it is %s.0" % (branch, branch)
+      print("Warning: could not determine latest tag on branch (%s). Assuming it is %s.0" % (branch, branch))
     return branch + '.0'
 
 def git_next_major_version(verbose):
@@ -105,7 +105,7 @@ def git_next_major_version(verbose):
 
   env = 'BOB_VERSION_ONLY_REMOTE'
   candidates = None
-  if not os.environ.has_key(env) or (os.environ.has_key(env) and os.environ[env].lower() in ('', '0', 'false', 'off', 'no')):
+  if env not in os.environ or (env in os.environ and os.environ[env].lower() in ('', '0', 'false', 'off', 'no')):
     # try local
     candidates = sorted([StrictVersion(k) for k in git_version_branches(verbose)])
 
@@ -153,7 +153,7 @@ def git_count(branch, verbose):
 
   except:
     if verbose:
-      print "Warning: could not determine commit count on branch '%s'" % branch
+      print("Warning: could not determine commit count on branch '%s'" % branch)
 
 def package_version(verbose):
   """Interprets the package version from the directory name"""
@@ -198,7 +198,7 @@ if __name__ == '__main__':
 
     if options.version:
       # the directory in which this program is, is versioned
-      print options.version
+      print(options.version)
       sys.exit(0)
 
     if branch is not None:
@@ -207,15 +207,15 @@ if __name__ == '__main__':
   if options.count is None:
     options.count = git_count(branch, options.verbose)
 
-  if not options.version: 
-    print 'unknown'
+  if not options.version:
+    print('unknown')
   elif options.letter:
     final = options.version + options.letter + str(options.count)
     StrictVersion(final) #double-checks all is good
-    print final
+    print(final)
   else:
     final = options.version
     StrictVersion(final) #double-checks all is good
-    print final
+    print(final)
 
   sys.exit(0)
