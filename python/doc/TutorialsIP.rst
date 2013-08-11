@@ -294,8 +294,10 @@ Gabor jets can be extracted either with or without phases. The structure of the 
 
   >>> jet_image_without_phases = gabor_wavelet_transform.empty_jet_image ( cropped_image, include_phases = False )
   >>> jet_image_with_phases = gabor_wavelet_transform.empty_jet_image ( cropped_image, include_phases = True )
-  >>> print(jet_image_without_phases.shape, jet_image_with_phases.shape)
-  (128, 128, 40) (128, 128, 2, 40)
+  >>> print(jet_image_without_phases.shape)
+  (128, 128, 40)
+  >>> print(jet_image_with_phases.shape)
+  (128, 128, 2, 40)
 
 Now, we can fill the Gabor jets:
 
