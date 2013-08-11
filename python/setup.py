@@ -318,13 +318,14 @@ setup(
     license='GPLv3',
 
     classifiers=[
-      'Classifier: Development Status :: 5 - Production/Stable',
-      'Classifier: Environment :: Console (Text Based)',
-      'Classifier: Intended Audience :: Science/Research',
-      'Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-      'Classifier: Programming Language :: C++',
-      'Classifier: Programming Language :: Python',
-      'Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence',
+      'Development Status :: 5 - Production/Stable',
+      'Environment :: Console (Text Based)',
+      'Intended Audience :: Science/Research',
+      'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+      'Programming Language :: C++',
+      'Programming Language :: Python',
+      'Programming Language :: Python :: 3',
+      'Topic :: Scientific/Engineering :: Artificial Intelligence',
       ],
 
     packages=find_packages(),
