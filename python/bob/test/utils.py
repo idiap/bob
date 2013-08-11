@@ -122,7 +122,7 @@ def codec_available(codec):
     def wrapper(*args, **kwargs):
       from ..io import supported_video_codecs
       d = supported_video_codecs()
-      if d.has_key(codec) and d[codec]['encode'] and d[codec]['decode']:
+      if codec in d and d[codec]['encode'] and d[codec]['decode']:
         return test(*args, **kwargs)
       else:
         raise SkipTest('A functional codec for "%s" is not installed with FFmpeg' % codec)
@@ -163,7 +163,7 @@ def extension_available(extension):
     @functools.wraps(test)
     def wrapper(*args, **kwargs):
       from ..io import extensions
-      if extensions().has_key(extension):
+      if extension in extensions():
         return test(*args, **kwargs)
       else:
         raise SkipTest('Extension to handle "%s" files was not available at compile time' % extension)

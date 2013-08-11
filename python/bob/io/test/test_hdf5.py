@@ -159,7 +159,10 @@ def test_type_support():
     read_write_check(outfile, 'int32_data', data, numpy.int32)
     read_write_check(outfile, 'uint32_data', data, numpy.uint32)
 
-    data = [long(random.uniform(0,1000000000)) for z in range(N)]
+    if sys.version_info[0] < 3:
+      data = [long(random.uniform(0,1000000000)) for z in range(N)]
+    else:
+      data = [int(random.uniform(0,1000000000)) for z in range(N)]
     read_write_check(outfile, 'long_data', data)
     read_write_check(outfile, 'int64_data', data, numpy.int64)
     read_write_check(outfile, 'uint64_data', data, numpy.uint64)

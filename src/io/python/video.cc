@@ -78,6 +78,7 @@ struct iterator_wrapper {
   static void wrap () {
     class_<bob::io::VideoReader::const_iterator>("VideoReaderIterator", no_init)
       .def("next", next)
+      .def("__next__", next)
       .def("__iter__", pass_through)
       ;
   }

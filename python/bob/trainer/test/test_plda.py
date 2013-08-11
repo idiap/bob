@@ -4,16 +4,16 @@
 # Fri Oct 14 18:07:56 2011 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -27,7 +27,7 @@ import numpy, numpy.linalg
 class PythonPLDATrainer():
   """A simplified (and slower) version of the PLDATrainer"""
 
-  def __init__(self, convergence_threshold=0.001, max_iterations=10, 
+  def __init__(self, convergence_threshold=0.001, max_iterations=10,
       compute_likelihood=False, use_sum_second_order=True):
     # Our state
     self.m_convergence_threshold = convergence_threshold
@@ -84,7 +84,7 @@ class PythonPLDATrainer():
         c +=1
     mu /= c
     machine.mu = mu
- 
+
   def __init_f__(self, machine, data):
     n_ids = len(data)
     S = numpy.zeros(shape=(machine.dim_d, n_ids), dtype=numpy.float64)
@@ -132,7 +132,7 @@ class PythonPLDATrainer():
     machine.g = U_slice / sigma_slice_sqrt
 
   def __init_sigma__(self, machine, data, factor = 1.):
-    """As a variance of the data""" 
+    """As a variance of the data"""
     cache1 = numpy.zeros(shape=(machine.dim_d,), dtype=numpy.float64)
     cache2 = numpy.zeros(shape=(machine.dim_d,), dtype=numpy.float64)
     n_samples = 0
@@ -167,16 +167,16 @@ class PythonPLDATrainer():
 
   def __compute_sufficient_statistics_given_observations__(self, machine, observations):
     """
-    We compute the expected values of the latent variables given the observations 
+    We compute the expected values of the latent variables given the observations
     and parameters of the model.
-    
+
     First order or the expected value of the latent variables.:
       F = (I+A^{T}\Sigma'^{-1}A)^{-1} * A^{T}\Sigma^{-1} (\tilde{x}_{s}-\mu').
     Second order stats:
       S = (I+A^{T}\Sigma'^{-1}A)^{-1} + (F*F^{T}).
     """
 
-    # Get the number of observations 
+    # Get the number of observations
     J_i                       = observations.shape[0]            # An integer > 0
     dim_d                     = observations.shape[1]            # A scalar
     # Useful values
@@ -236,7 +236,7 @@ class PythonPLDATrainer():
       ### Get the observations for this label and the number of observations for this label.
       observations_for_h_i      = data[i]
       J_i                       = observations_for_h_i.shape[0]                           # An integer > 0
-    
+
       ### Gather the statistics for this identity and then separate them for each observation.
       [z_first_order, z_second_order] = self.__compute_sufficient_statistics_given_observations__(machine, observations_for_h_i)
       self.m_z_first_order[i]  = z_first_order
@@ -311,10 +311,10 @@ class PythonPLDATrainer():
 
   def train(self, machine, data):
     self.initialize(machine, data)
-    average_output_previous = -sys.maxint
-    average_output = -sys.maxint
+    average_output_previous = -sys.maxsize
+    average_output = -sys.maxsize
     self.e_step(machine, data)
-    
+
     i = 0
     while True:
       average_output_previous = average_output
@@ -327,7 +327,7 @@ class PythonPLDATrainer():
 
 class PLDATrainerTest(unittest.TestCase):
   """Performs various PLDA trainer tests."""
-  
+
   def test01_plda_EM_vs_Python(self):
 
     # Data used for performing the tests
@@ -364,12 +364,12 @@ class PLDATrainerTest(unittest.TestCase):
       0.4364, -0.1699, -2.2015]).reshape(D,ng)
 
     # F <-> PCA on G
-    F_init=numpy.array([-0.054222647972093, -0.000000000783146, 
-      0.596449127693018,  0.000000006265167, 
-      0.298224563846509,  0.000000003132583, 
-      0.447336845769764,  0.000000009397750, 
-      -0.108445295944185, -0.000000001566292, 
-      -0.501559493741856, -0.000000006265167, 
+    F_init=numpy.array([-0.054222647972093, -0.000000000783146,
+      0.596449127693018,  0.000000006265167,
+      0.298224563846509,  0.000000003132583,
+      0.447336845769764,  0.000000009397750,
+      -0.108445295944185, -0.000000001566292,
+      -0.501559493741856, -0.000000006265167,
       -0.298224563846509, -0.000000003132583]).reshape(D,nf)
     sigma_init = 0.01 * numpy.ones(D, 'float64')
 
@@ -427,12 +427,12 @@ class PLDATrainerTest(unittest.TestCase):
       0.4364, -0.1699, -2.2015]).reshape(dim_d,dim_g)
 
     # F <-> PCA on G
-    F_init=numpy.array([-0.054222647972093, -0.000000000783146, 
-      0.596449127693018,  0.000000006265167, 
-      0.298224563846509,  0.000000003132583, 
-      0.447336845769764,  0.000000009397750, 
-      -0.108445295944185, -0.000000001566292, 
-      -0.501559493741856, -0.000000006265167, 
+    F_init=numpy.array([-0.054222647972093, -0.000000000783146,
+      0.596449127693018,  0.000000006265167,
+      0.298224563846509,  0.000000003132583,
+      0.447336845769764,  0.000000009397750,
+      -0.108445295944185, -0.000000001566292,
+      -0.501559493741856, -0.000000006265167,
       -0.298224563846509, -0.000000003132583]).reshape(dim_d,dim_f)
     sigma_init = 0.01 * numpy.ones(dim_d, 'float64')
 
@@ -449,7 +449,7 @@ class PLDATrainerTest(unittest.TestCase):
         3.494168818797438,  0.000000045643026,  1.102110715965762,  1.481232954001794, -0.970661225144399,
         3.494168818797438,  0.000000045643026, -1.212854031699468, -1.435946529317718,  0.717884143973377
       ]).reshape(3, dim_f+dim_g)
-  
+
     z_second_order_sum_1 = numpy.array(
       [64.203518285366087,  0.000000747228248,  0.002703277337642,  0.078542842475345,  0.020894328259862,
         0.000000747228248,  6.999999999999980, -0.000000003955962,  0.000000002017232, -0.000000003741593,
@@ -493,7 +493,7 @@ class PLDATrainerTest(unittest.TestCase):
           2.695117129662246,  0.000000035005543,  0.690321563509753,  0.944473716646212, -0.850835940962492,
           2.695117129662246,  0.000000035005543, -0.930970138998433, -0.949736472690315,  0.594216348861889
       ]).reshape(3, dim_f+dim_g)
- 
+
     z_second_order_sum_2 = numpy.array(
         [41.602421167226410,  0.000000449434708, -1.513391506933811, -0.477818674270533,  0.059260102368316,
           0.000000449434708,  7.000000000000005, -0.000000023255959, -0.000000005157439, -0.000000003230262,
@@ -506,7 +506,7 @@ class PLDATrainerTest(unittest.TestCase):
       [1.120493935052524, 1.777598857891599, 0.197579528599150,
         0.407657093211478, 0.166216300651473, 1.044336960403809,
         0.287856936559308])
- 
+
     F_2 = numpy.array(
       [-0.111956311978966,  0.000000000781025,
         0.702502767389263,  0.000000007683917,
@@ -526,7 +526,7 @@ class PLDATrainerTest(unittest.TestCase):
         0.562108137758111, -0.785296641855087, -5.318335345720314]).reshape(dim_d,dim_g)
 
     # Runs the PLDA trainer EM-steps (2 steps)
-    
+
     # Defines base trainer and machine
     t = bob.trainer.PLDATrainer()
     t0 = bob.trainer.PLDATrainer(t)
@@ -543,7 +543,7 @@ class PLDATrainerTest(unittest.TestCase):
     m_py.sigma = sigma_init
     m_py.g = G_init
     m_py.f = F_init
- 
+
     # E-step 1
     t.e_step(m,l)
     t_py.e_step(m_py,l)
@@ -605,7 +605,7 @@ class PLDATrainerTest(unittest.TestCase):
     m_py.sigma = sigma_init
     m_py.g = G_init
     m_py.f = F_init
- 
+
     # E-step 1
     t.e_step(m,l)
     t_py.e_step(m_py,l)
@@ -665,12 +665,12 @@ class PLDATrainerTest(unittest.TestCase):
       -0.5936, -0.8571, -0.2046,
       0.4364, -0.1699, -2.2015]).reshape(dim_d,dim_g)
     # F <-> PCA on G
-    F_init=numpy.array([-0.054222647972093, -0.000000000783146, 
-      0.596449127693018,  0.000000006265167, 
-      0.298224563846509,  0.000000003132583, 
-      0.447336845769764,  0.000000009397750, 
-      -0.108445295944185, -0.000000001566292, 
-      -0.501559493741856, -0.000000006265167, 
+    F_init=numpy.array([-0.054222647972093, -0.000000000783146,
+      0.596449127693018,  0.000000006265167,
+      0.298224563846509,  0.000000003132583,
+      0.447336845769764,  0.000000009397750,
+      -0.108445295944185, -0.000000001566292,
+      -0.501559493741856, -0.000000006265167,
       -0.298224563846509, -0.000000003132583]).reshape(dim_d,dim_f)
     sigma_init = 0.01 * numpy.ones((dim_d,), 'float64')
     mean_zero = numpy.zeros((dim_d,), 'float64')
@@ -702,7 +702,7 @@ class PLDATrainerTest(unittest.TestCase):
     ll = m.compute_log_likelihood(x3)
     self.assertTrue(abs(ll - ll_ref) < 1e-10)
 
-    # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2] 
+    # reference obtained by computing the likelihood of [x1,x2,x3], [x1,x2]
     # and [x3] separately
     llr_ref = -4.43695386675
     llr = m.forward(x3)
@@ -713,7 +713,7 @@ class PLDATrainerTest(unittest.TestCase):
     self.assertTrue(abs(llr - llr_separate) < 1e-10)
 
   def test04_plda_comparisons(self):
-    
+
     t1 = bob.trainer.PLDATrainer()
     t2 = bob.trainer.PLDATrainer()
     t2.rng = t1.rng

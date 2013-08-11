@@ -57,8 +57,8 @@ def print_numbers(frame, counter, format, fontsize):
   dim = min(width, height)
   font = ImageFont.truetype(DEFAULT_FONT, fontsize)
   (text_width, text_height) = font.getsize(text)
-  x_pos = (width - text_width) / 2
-  y_pos = (height - text_height) / 2
+  x_pos = int((width - text_width) / 2)
+  y_pos = int((height - text_height) / 2)
   # this is buggy in Pillow-2.0.0, so we do it manually
   #img = Image.fromarray(frame.transpose(1,2,0))
   img = Image.fromstring('RGB', (frame.shape[1], frame.shape[2]), frame.transpose(1,2,0).tostring())
@@ -111,7 +111,7 @@ def color_distortion(shape, framerate, format, codec, filename):
   orig = []
   text_format = "%%0%dd" % len(str(length-1))
   fontsize = estimate_fontsize(height, width, text_format)
-  fontsize /= 4
+  fontsize = int(fontsize/4)
   for i in range(0, length):
     newframe = generate_colors(height, width, i%width)
     newframe = print_numbers(newframe, i, text_format, fontsize)
@@ -177,7 +177,7 @@ def quality_degradation(shape, framerate, format, codec, filename):
   from . import VideoReader, VideoWriter
   text_format = "%%0%dd" % len(str(length-1))
   fontsize = estimate_fontsize(height, width, text_format)
-  fontsize /= 4
+  fontsize = int(fontsize/4)
   outv = VideoWriter(filename, height, width, framerate, codec=codec,
       format=format, check=False)
   orig = []
@@ -189,3 +189,13 @@ def quality_degradation(shape, framerate, format, codec, filename):
   outv.close()
   orig = numpy.array(orig, dtype='uint8')
   return orig, framerate, VideoReader(filename, check=False)
+
+def is_string(s):
+  """Returns ``True`` if the given object is a string
+
+  This method can be used with Python-2.x or 3.x and returns a string
+  respecting each environment's constraints.
+  """
+
+  return (sys.version_info[0] < 3 and isinstance(s, (str, unicode))) or \
+    isinstance(s, (bytes, str))

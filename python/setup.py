@@ -347,10 +347,6 @@ setup(
     entry_points={
       'console_scripts': CONSOLE_SCRIPTS,
       'bob.db': DATABASES,
-      'nose.plugins.0.10': [
-        'insulate = bob.test.insulate:Insulate',
-        'insulateslave = bob.test.insulate:InsulateSlave',
-        ]
       },
 
     )

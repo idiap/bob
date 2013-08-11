@@ -4,16 +4,16 @@
 # Tue Jul 19 11:50:08 2011 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -79,7 +79,7 @@ def create_machine(data, training_steps):
 
   # All data, as 2 x 2D arrays containing data and targets
   AllData, AllTargets = generate_testdata(datalist, targets)
-  
+
   # A helper to select and shuffle the data
   S = bob.trainer.DataShuffler(datalist, targets)
 
@@ -87,7 +87,7 @@ def create_machine(data, training_steps):
   retval = [bob.machine.MLP(mlp)]
 
   for k in range(training_steps):
-    
+
     input, target = S(BATCH)
 
     # We use "train_" which is unchecked and faster. Use train() if you want
@@ -102,7 +102,7 @@ def create_machine(data, training_steps):
 
 def process_data(machine, data):
   """Iterates over classes and passes data through the trained machine"""
-  
+
   output = {}
   for cl in data.keys():
     output[cl]=machine.forward(data[cl])
@@ -194,8 +194,8 @@ def makemovie(machines, data, filename=None):
     processed = process_data(machines[0], data)
     plot(processed)
     refimage = fig2bzarray(mpl.gcf())
-    orows = 2*(refimage.shape[1]/2)
-    ocols = 2*(refimage.shape[2]/2)
+    orows = int(2*(refimage.shape[1]/2))
+    ocols = int(2*(refimage.shape[2]/2))
     output = bob.io.VideoWriter(filename, orows, ocols, 5) #5 Hz
     print("Saving %d frames to %s" % (len(machines), filename))
 
@@ -211,7 +211,7 @@ def makemovie(machines, data, filename=None):
       output.append(image[:,:orows,:ocols])
       sys.stdout.write('.')
       sys.stdout.flush()
-    
+
   if filename:
     sys.stdout.write('\n')
     sys.stdout.flush()
@@ -219,7 +219,7 @@ def makemovie(machines, data, filename=None):
 def main(user_input=None):
 
   import argparse
-  
+
   parser = argparse.ArgumentParser(description=__doc__,
       formatter_class=argparse.RawDescriptionHelpFormatter)
 

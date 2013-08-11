@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Andre Anjos <andre.anjos@idiap.ch>
-# Thu 23 Jun 20:22:28 2011 CEST 
+# Thu 23 Jun 20:22:28 2011 CEST
 # vim: set fileencoding=utf-8 :
 
 """
@@ -8,7 +8,7 @@ The Iris flower data set or Fisher's Iris data set is a multivariate data
 set introduced by Sir Ronald Aylmer Fisher (1936) as an example of
 discriminant analysis. It is sometimes called Anderson's Iris data set
 because Edgar Anderson collected the data to quantify the geographic
-variation of Iris flowers in the Gaspe Peninsula.  
+variation of Iris flowers in the Gaspe Peninsula.
 
 For more information: http://en.wikipedia.org/wiki/Iris_flower_data_set
 
@@ -19,15 +19,15 @@ References:
   Mathematical Statistics" (John Wiley, NY, 1950).
 
   2. Duda,R.O., & Hart,P.E. (1973) Pattern Classification and Scene Analysis.
-  (Q327.D83) John Wiley & Sons. ISBN 0-471-22361-1. See page 218. 
+  (Q327.D83) John Wiley & Sons. ISBN 0-471-22361-1. See page 218.
 
   3. Dasarathy, B.V. (1980) "Nosing Around the Neighborhood: A New System
   Structure and Classification Rule for Recognition in Partially Exposed
   Environments". IEEE Transactions on Pattern Analysis and Machine
-  Intelligence, Vol. PAMI-2, No. 1, 67-71. 
+  Intelligence, Vol. PAMI-2, No. 1, 67-71.
 
   4. Gates, G.W. (1972) "The Reduced Nearest Neighbor Rule". IEEE
-  Transactions on Information Theory, May 1972, 431-433. 
+  Transactions on Information Theory, May 1972, 431-433.
 """
 
 import os
@@ -51,7 +51,7 @@ stat_names = ['Minimum', 'Maximum', 'Mean', 'Std.Dev.', 'Correlation']
 
 def data():
   """Loads from (text) file and returns Fisher's Iris Dataset.
-  
+
   This set is small and simple enough to require an SQL backend. We keep the
   single file it has in text and load it on-the-fly every time this method is
   called.
@@ -67,13 +67,19 @@ def data():
   data = Interface().files()[0]
 
   retval = {}
-  with open(data, 'rb') as csvfile:
+
+  # The CSV file reader API changed between Python2 and Python3
+  open_dict = dict(mode='rb') #python2.x
+  if sys.version_info[0] >= 3: #python3.x
+    open_dict = dict(mode='rt', encoding='ascii', newline='')
+
+  with open(data, **open_dict) as csvfile:
     for row in csv.reader(csvfile):
       name = row[4][5:].lower()
       retval.setdefault(name, []).append([float(k) for k in row[:4]])
 
   # Convert to a float64 2D numpy.ndarray
-  for key, value in retval.iteritems():
+  for key, value in retval.items():
     retval[key] = numpy.array(value, dtype='float64')
 
   return retval

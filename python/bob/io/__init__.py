@@ -70,12 +70,13 @@ def load(inputs):
 
   from collections import Iterable
   import numpy
-  if isinstance(inputs, (str, unicode)):
+  from .utils import is_string
+  if is_string(inputs):
     return File(inputs, 'r').read()
   elif isinstance(inputs, Iterable):
     retval = []
     for obj in inputs:
-      if isinstance(obj, (str, unicode)):
+      if is_string(obj):
         retval.append(load(obj))
       elif isinstance(obj, File):
         retval.append(obj.read())
@@ -102,7 +103,8 @@ def merge(filenames):
   """
 
   from collections import Iterable
-  if isinstance(filenames, (str, unicode)):
+  from .utils import is_string
+  if is_string(filenames):
     return [File(filenames, 'r')]
   elif isinstance(filenames, Iterable):
     return [File(k, 'r') for k in filenames]
