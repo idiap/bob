@@ -261,7 +261,7 @@ You can either get the LBP feature for a single point by specifying the position
 
   >>> lbp_local = lbp_extractor ( cropped_image, 69, 62 )
   >>> # print the binary representation of the LBP
-  >>> print bin ( lbp_local )
+  >>> print(bin ( lbp_local ))
   0b11110000
 
 or you can extract the LBP features for all pixels in the image. In this case you need to get the required shape of the output image:
@@ -276,7 +276,7 @@ or you can extract the LBP features for all pixels in the image. In this case yo
   >>> lbp_extractor ( cropped_image,  lbp_output_image )
   >>> # print the binary representation of the pixel at the same location as above;
   >>> # note that the index is shifted by 1 since the lbp image is smaller than the original
-  >>> print bin ( lbp_output_image [ 68, 60 ] )
+  >>> print(bin ( lbp_output_image [ 68, 60 ] ))
   0b11110000
 
 
@@ -294,7 +294,7 @@ Gabor jets can be extracted either with or without phases. The structure of the 
 
   >>> jet_image_without_phases = gabor_wavelet_transform.empty_jet_image ( cropped_image, include_phases = False )
   >>> jet_image_with_phases = gabor_wavelet_transform.empty_jet_image ( cropped_image, include_phases = True )
-  >>> print jet_image_without_phases.shape, jet_image_with_phases.shape
+  >>> print(jet_image_without_phases.shape, jet_image_with_phases.shape)
   (128, 128, 40) (128, 128, 2, 40)
 
 Now, we can fill the Gabor jets:
@@ -303,7 +303,7 @@ Now, we can fill the Gabor jets:
   :options: +NORMALIZE_WHITESPACE
 
   >>> gabor_wavelet_transform.compute_jets ( cropped_image, jet_image_with_phases )
-  >>> print jet_image_with_phases [ 32, 32 ].shape
+  >>> print(jet_image_with_phases [ 32, 32 ].shape)
   (2, 40)
 
 .. Place here your external references

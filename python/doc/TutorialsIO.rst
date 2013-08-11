@@ -1,18 +1,18 @@
 .. vim: set fileencoding=utf-8 :
 .. Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
 .. Wed Mar 14 12:31:35 2012 +0100
-.. 
+..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -41,7 +41,7 @@ and |project| loaded into the `Python`_ environment.
    current_directory = os.path.realpath(os.curdir)
    temp_dir = tempfile.mkdtemp(prefix='bob_doctest_')
    os.chdir(temp_dir)
-  
+
 HDF5 standard utilities
 =======================
 
@@ -102,11 +102,11 @@ you will verify that the file now contains:
 .. note::
 
    In |project|, when you open a HDF5 file, you can choose one of the following options:
-  
+
    **'r'** Open the file in reading mode; writing operations will fail (this is the default).
 
    **'a'** Open the file in reading and writing mode with appending.
- 
+
    **'w'** Open the file in reading and writing mode, but truncate it.
 
    **'x'** Read/write/append with exclusive access.
@@ -187,7 +187,7 @@ The result of running ``h5dump`` on the file ``testfile3.hdf5`` should be:
   ...
 
 You don't need to limit yourself to single variables, you can also save lists
-of scalars and arrays using the function :py:meth:`bob.io.HDF5.append` instead 
+of scalars and arrays using the function :py:meth:`bob.io.HDF5.append` instead
 of :py:meth:`bob.io.HDF5.set`.
 
 Reading operations
@@ -244,20 +244,20 @@ This is what the ``h5dump`` of the file would look like:
      }
   }
   }
-  
+
 Notice that the expansion limits for the first dimension have been correctly
 set by |project| so you can insert an *unlimited* number of 1D float vectors.
 Of course, you can also read the whole contents of the arrayset in a single
 shot:
 
 .. doctest::
-  
+
   >>> f = bob.io.HDF5File('testfile2.hdf5')
   >>> print(f.read('arrayset'))
   [[  0.   1.   2.   3.   4.   5.   6.   7.   8.   9.]
    [  0.   2.   4.   6.   8.  10.  12.  14.  16.  18.]
    [  0.   3.   6.   9.  12.  15.  18.  21.  24.  27.]]
-  
+
 As you can see, the only difference between :py:meth:`bob.io.HDF5File.read` and
 :py:meth:`bob.io.HDF5File.lread` is on how |project| considers the available
 data (as a single array with N dimensions or as a set of arrays with N-1
@@ -342,7 +342,7 @@ through the :py:class:`bob.io.Array` container:
   the read and write operations. Have a look at the manual section for
   :py:mod:`bob.io` for more details and other shortcuts available.
 
-Reading and writing images 
+Reading and writing images
 ==========================
 
 |project| provides support to load and save data from many different file types
@@ -419,7 +419,7 @@ randomly.
   >>> inv.shape
   (30, 3, 50, 50)
   >>> type(inv)
-  <type 'numpy.ndarray'>
+  <... 'numpy.ndarray'>
 
 Videos in |project| are represented as sequences of colored images, i.e. 4D
 arrays of type ``uint8``. All the extensions and formats for videos
@@ -464,7 +464,7 @@ For instance, to read a wave file, just use the
    >>> filename = '/home/user/sample.wav'
    >>> samplerate, data = scipy.io.wavfile.read(filename)
    >>> print(type(data))
-   <type 'numpy.ndarray'>
+   <... 'numpy.ndarray'>
    >>> print(data.shape)
    (132474, 2)
 

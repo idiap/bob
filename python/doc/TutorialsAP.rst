@@ -1,23 +1,23 @@
 .. vim: set fileencoding=utf-8 :
 .. Elie Khoury <Elie.Khoury@idiap.ch>
 .. Mon Jan 21 20:57:30 2013 +0100
-.. 
+..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 .. testsetup:: aptest
-  
+
   import bob
   import numpy
   import math
@@ -28,15 +28,15 @@
     return resource_filename('bob.%s.test' % m, os.path.join('data', f))
 
   wave_path = F('ap', 'sample.wav')
-  
-  
-  import scipy.io.wavfile 
+
+
+  import scipy.io.wavfile
   import sys
   sys.stdout =  open(os.devnull, 'w')
   rate, signal = scipy.io.wavfile.read(str(wave_path))
   sys.stdout = sys.__stdout__
 
-  
+
 
 *****************************
  Audio processing
@@ -60,7 +60,7 @@ The usual native formats can be read with **scipy.io.wavfile** module. Other wav
 
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> import scipy.io.wavfile #doctest: +SKIP
   >>> rate, signal = scipy.io.wavfile.read(str(wave_path)) #doctest: +SKIP
   >>> print(rate)
@@ -74,8 +74,8 @@ User can directly compute the duration of signal (in seconds):
 
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
-  
-  >>> print(len(signal)/rate)
+
+  >>> print(int(len(signal)/rate))
   2
 
 
@@ -83,10 +83,10 @@ LFCC and MFCC Extraction
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 The LFCC and MFCC coefficients can be extracted from a audio signal by using :py:func:`bob.ap.Ceps`. To do so, several parameters can be precised by the user. Typically, these are precised in a configuration file. The following values are the default ones:
- 
+
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> win_length_ms = 20 # The window length of the cepstral analysis in milliseconds
   >>> win_shift_ms = 10 # The window shift of the cepstral analysis in milliseconds
   >>> n_filters = 24 # The number of filter bands
@@ -102,7 +102,7 @@ Once the parameters are precised, :py:func:`bob.ap.Ceps` can be called as follow
 
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> c = bob.ap.Ceps(rate, win_length_ms, win_shift_ms, n_filters, n_ceps, f_min, f_max, delta_win, pre_emphasis_coef, mel_scale, dct_norm)
   >>> signal = numpy.cast['float'](signal) # vector should be in **float**
   >>> mfcc = c(signal)
@@ -112,18 +112,18 @@ Once the parameters are precised, :py:func:`bob.ap.Ceps` can be called as follow
   19
 
 LFCCs can be computed instead of MFCCs by setting **mel_scale** to **False**
-   
+
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> c.mel_scale = False
   >>> lfcc = c(signal)
-  
+
 User can also choose to extract the energy. This is typically used for Voice Activity Detection. Please check spkRecLib or FaceRecLib for more details about VAD.
 
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> c.with_energy = True
   >>> lfcc_e = c(signal)
   >>> print(len(lfcc_e))
@@ -135,7 +135,7 @@ It is also possible to compute first and second derivatives for those features:
 
 .. doctest:: aptest
   :options: +NORMALIZE_WHITESPACE
-  
+
   >>> c.with_delta = True
   >>> c.with_delta_delta = True
   >>> lfcc_e_d_dd = c(signal)
@@ -143,4 +143,4 @@ It is also possible to compute first and second derivatives for those features:
   199
   >>> print(len(lfcc_e_d_dd[0]))
   60
-  
+

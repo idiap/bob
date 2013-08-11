@@ -76,10 +76,10 @@ the given Iris type.
 
   >>> data = bob.db.iris.data()
   >>> type(data['setosa'])
-  <type 'numpy.ndarray'>
+  <... 'numpy.ndarray'>
   >>> data['setosa'].shape
   (50, 4)
-  >>> data.keys()
+  >>> list(data.keys())
   ['setosa', 'versicolor', 'virginica']
 
   >>> #the features in each array, if you are curious!
