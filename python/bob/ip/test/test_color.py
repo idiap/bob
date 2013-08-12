@@ -157,9 +157,9 @@ class ColorTest(unittest.TestCase):
     # uint16_t | (3) 0.005% | (4) 0.006% | (1) 0.006%
 
     mx = 4
-    for r in range(0,5) + range(120,130) + range(253,256):
-      for g in range(0,6) + range(125,135) + range(252,256):
-        for b in range(0,7) + range(127,137) + range(252,256):
+    for r in list(range(0,5)) + list(range(120,130)) + list(range(253,256)):
+      for g in list(range(0,6)) + list(range(125,135)) + list(range(252,256)):
+        for b in list(range(0,7)) + list(range(127,137)) + list(range(252,256)):
           ht, st, vt = bob.ip.rgb_to_hsv(r, g, b, dtype='uint8')
           r2, g2, b2 = bob.ip.hsv_to_rgb(ht, st, vt, dtype='uint8')
           #mx2 = max(abs(r2-r), abs(g2-g), abs(b2-b))
@@ -171,9 +171,9 @@ class ColorTest(unittest.TestCase):
     #print("uint8_t RGB/HSV/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.))
 
     mx = 5
-    for r in range(0,5) + range(120,130) + range(253,256):
-      for g in range(0,6) + range(125,135) + range(252,256):
-        for b in range(0,7) + range(127,137) + range(252,256):
+    for r in list(range(0,5)) + list(range(120,130)) + list(range(253,256)):
+      for g in list(range(0,6)) + list(range(125,135)) + list(range(252,256)):
+        for b in list(range(0,7)) + list(range(127,137)) + list(range(252,256)):
           ht, st, lt = bob.ip.rgb_to_hsl(r, g, b, dtype='uint8')
           r2, g2, b2 = bob.ip.hsl_to_rgb(ht, st, lt, dtype='uint8')
           #mx2 = max(abs(r2-r), abs(g2-g), abs(b2-b))
@@ -185,9 +185,9 @@ class ColorTest(unittest.TestCase):
     #print("uint8_t RGB/HSL/RGB error: %d (%.2f%%)" % (mx, 100*mx/255.))
 
     mx = 2
-    for r in range(0,5) + range(120,130) + range(253,256):
-      for g in range(0,6) + range(125,135) + range(252,256):
-        for b in range(0,7) + range(127,137) + range(252,256):
+    for r in list(range(0,5)) + list(range(120,130)) + list(range(253,256)):
+      for g in list(range(0,6)) + list(range(125,135)) + list(range(252,256)):
+        for b in list(range(0,7)) + list(range(127,137)) + list(range(252,256)):
           yt, ut, vt = bob.ip.rgb_to_yuv(r, g, b, dtype='uint8')
           r2, g2, b2 = bob.ip.yuv_to_rgb(yt, ut, vt, dtype='uint8')
           #mx2 = max(abs(r2-r), abs(g2-g), abs(b2-b))
@@ -200,9 +200,9 @@ class ColorTest(unittest.TestCase):
 
     # Just test a subrange or the test will take too long
     mx = 3
-    for r in range(0,5) + range(30000,30005) + range(65530,65536):
-      for g in range(0,6) + range(30002,3007) + range(65525,65532):
-        for b in range(0,7) + range(3003,3008) + range(65524,65531):
+    for r in list(range(0,5)) + list(range(30000,30005)) + list(range(65530,65536)):
+      for g in list(range(0,6)) + list(range(30002,3007)) + list(range(65525,65532)):
+        for b in list(range(0,7)) + list(range(3003,3008)) + list(range(65524,65531)):
           ht, st, vt = bob.ip.rgb_to_hsv(r, g, b, dtype='uint16')
           r2, g2, b2 = bob.ip.hsv_to_rgb(ht, st, vt, dtype='uint16')
           #mx2 = max(abs(r2-r), abs(g2-g), abs(b2-b))
@@ -213,9 +213,9 @@ class ColorTest(unittest.TestCase):
     #print("16-bit unsigned integer RGB/HSV/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.))
 
     mx = 4
-    for r in range(0,5) + range(30000,30005) + range(65530,65536):
-      for g in range(0,6) + range(30002,3007) + range(65525,65532):
-        for b in range(0,7) + range(3003,3008) + range(65524,65531):
+    for r in list(range(0,5)) + list(range(30000,30005)) + list(range(65530,65536)):
+      for g in list(range(0,6)) + list(range(30002,3007)) + list(range(65525,65532)):
+        for b in list(range(0,7)) + list(range(3003,3008)) + list(range(65524,65531)):
           ht, st, lt = bob.ip.rgb_to_hsl(r, g, b, dtype='uint16')
           r2, g2, b2 = bob.ip.hsl_to_rgb(ht, st, lt, dtype='uint16')
           #mx2 = max(abs(r2-r), abs(g2-g), abs(b2-b))
@@ -226,9 +226,9 @@ class ColorTest(unittest.TestCase):
     #print("16-bit unsigned integer RGB/HSL/RGB error: %d (%.4f%%)" % (mx, 100*mx/65535.))
 
     mx = 4
-    for r in range(0,10) + range(120,130) + range(250,256):
-      for g in range(5,12) + range(125,135) + range(240,252):
-        for b in range(7,15) + range(127,137) + range(235,251):
+    for r in list(range(0,10)) + list(range(120,130)) + list(range(250,256)):
+      for g in list(range(5,12)) + list(range(125,135)) + list(range(240,252)):
+        for b in list(range(7,15)) + list(range(127,137)) + list(range(235,251)):
           yt, ut, vt = bob.ip.rgb_to_yuv(r, g, b, dtype='uint16')
           r2, g2, b2 = bob.ip.yuv_to_rgb(yt, ut, vt, dtype='uint16')
           #mx2 = max(abs(r2-r), abs(g2-g), abs(b2-b))

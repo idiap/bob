@@ -4,16 +4,16 @@
 # Sun Sep 16 16:44:00 2012 +0200
 #
 # Copyright (C) 2011-2012 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -63,7 +63,7 @@ class GaussianScaleSpaceTest(unittest.TestCase):
     self.assertEqual(op.sigma_n, 0.6)
     self.assertEqual(op.sigma0, 2.)
     self.assertEqual(op.kernel_radius_factor, 3.)
-  
+
   def test02_processing(self):
     # Processing tests
     A = bob.io.load(F(os.path.join("sift", "vlimg_ref.pgm")))
@@ -83,7 +83,7 @@ class GaussianScaleSpaceTest(unittest.TestCase):
       for s in range(-1,Ns+2):
         # Get Gaussian for this scale
         g_pyr = op.get_gaussian(s+1)
-        
+
         # Filtering step
         if s!=-1 or (o==0 and s==-1):
           # Compute scale and radius
@@ -99,7 +99,7 @@ class GaussianScaleSpaceTest(unittest.TestCase):
           self.assertTrue( abs(sigma - g_pyr.sigma_x) < eps)
           self.assertTrue( abs(radius - g_pyr.radius_y) < eps)
           self.assertTrue( abs(radius - g_pyr.radius_x) < eps)
-          
+
           g = bob.ip.Gaussian(radius, radius, sigma, sigma)
           B = g(Aa)
         # Downsampling step
@@ -108,7 +108,7 @@ class GaussianScaleSpaceTest(unittest.TestCase):
           Aa = pyr[o-1][Ns,:,:]
           # Downsample using a trick to make sure that if the length is l=2p+1,
           # the new one is p and not p+1.
-          B = Aa[:2*(Aa.shape[0]/2):2,:2*(Aa.shape[1]/2):2]
+          B = Aa[:2*(int(Aa.shape[0]/2)):2,:2*(int(Aa.shape[1]/2)):2]
 
         # Compare image of the pyramids (Python implementation vs. C++)
         Bpyr = pyr[o][s+1,:,:]

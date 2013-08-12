@@ -33,7 +33,7 @@ class HistogramMeasureTest(unittest.TestCase):
     """Computes the chi-square distance between two histograms (or histogram sequences)"""
     d = 0
     for i in range(h1.shape[0]):
-      if h1[i] != h2[i]: d += (h1[i] - h2[i])**2 / (h1[i] + h2[i])
+      if h1[i] != h2[i]: d += int(((h1[i] - h2[i])**2) / (h1[i] + h2[i]))
     return d
 
 
