@@ -4,16 +4,16 @@
 # Mon Jul 25 20:50:52 2011 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -107,23 +107,23 @@ def process_video_data(args):
         sys.stdout.write("%d %d %d %d %d\n" % det[:5])
 
   else: #user wants to record a video with the output
-   
+
     if args.verbose:
       sys.stdout.write("Saving %d frames with detections to %s" % \
           (len(data), args.output))
 
     color = (255, 0, 0) #red
-    orows = 2*(input.height/2)
-    ocolumns = 2*(input.width/2)
+    orows = int(2*(input.height/2))
+    ocolumns = int(2*(input.width/2))
     ov = bob.io.VideoWriter(args.output, orows, ocolumns, input.frame_rate)
     for frame,bbox in zip(input,data):
       if bbox and sum(bbox) != 0:
         bbox = [r(v) for v in bbox[:4]]
         # 3-pixels width box
         bob.ip.draw_box(frame, bbox[0], bbox[1], bbox[2], bbox[3], color)
-        bob.ip.draw_box(frame, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2, 
+        bob.ip.draw_box(frame, bbox[0]-1, bbox[1]-1, bbox[2]+2, bbox[3]+2,
             color)
-        bob.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2, 
+        bob.ip.draw_box(frame, bbox[0]+1, bbox[1]+1, bbox[2]-2, bbox[3]-2,
             color)
       ov.append(frame[:,:orows,:ocolumns])
       if args.verbose:
@@ -150,7 +150,7 @@ def process_image_data(args):
     print("Total detection time was %.3f seconds" % total)
 
   if not args.output:
-    
+
     if not data: data = (0, 0, 0, 0, -sys.float_info.max)
     else: data = (r(data[0]), r(data[1]), r(data[2]), r(data[3]), data[4])
     if args.dump_scores:
@@ -197,10 +197,10 @@ def main(user_input=None):
       default=False, action='store_true',
       help="enable verbose output")
   parser.add_argument("-S", "--start-frame", dest='start_frame',
-      type=int, default=0, 
+      type=int, default=0,
       help="starts detection on the given frame (inclusive), in case you are treating videos (defaults to %(default)s")
   parser.add_argument("-E", "--end-frame", dest='end_frame',
-      type=int, default=0, 
+      type=int, default=0,
       help="ends detection on the given frame (exclusive), in case you are treating videos (give '0' to go through all frames; defaults to %(default)s")
   parser.add_argument("--self-test", metavar='INT', type=int, default=False,
       dest='selftest', help=argparse.SUPPRESS)
@@ -216,7 +216,7 @@ def main(user_input=None):
     os.unlink(filename)
     args.output = filename
     args.start_frame = 0
-    args.end_frame = 3 
+    args.end_frame = 3
 
   elif args.selftest == 2:
     (fd, filename) = tempfile.mkstemp('.jpg', 'bobtest_')
@@ -228,7 +228,7 @@ def main(user_input=None):
     args.verbose = True
     args.dump_scores = True
 
-  start = time.clock() 
+  start = time.clock()
   args.processor = bob.visioner.MaxDetector(model_file=args.model,
       scanning_levels=args.scan_levels)
   total = time.clock() - start
