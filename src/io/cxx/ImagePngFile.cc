@@ -109,10 +109,10 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info)
   info.dtype = (bit_depth <= 8 ? bob::core::array::t_uint8 : bob::core::array::t_uint16);
   if(color_type == PNG_COLOR_TYPE_GRAY)
     info.nd = 2;
-  else if (color_type == PNG_COLOR_TYPE_RGB)
+  else if (color_type == PNG_COLOR_TYPE_RGB || PNG_COLOR_TYPE_PALETTE)
     info.nd = 3;
   else {// Unsupported color type
-    throw std::runtime_error("png codec does not support images with color spaces different than GRAY or RGB");
+    throw std::runtime_error("PNG: codec does not support images with color spaces different than GRAY, RGB or Indexed colors (Palette)");
   }
   if(info.nd == 2)
   {
@@ -260,10 +260,11 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   // Expand grayscale images to the full 8 bits from 1, 2, or 4 bits/pixel
   if(color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
     png_set_expand_gray_1_2_4_to_8(png_ptr);
-
+  else if(color_type == PNG_COLOR_TYPE_PALETTE)
+    png_set_palette_to_rgb(png_ptr);
   // We currently only support grayscale and rgb images
-  if(color_type != PNG_COLOR_TYPE_GRAY && color_type != PNG_COLOR_TYPE_RGB) {
-    throw std::runtime_error("png codec does not support images with color spaces different than GRAY or RGB");
+  if(color_type != PNG_COLOR_TYPE_GRAY && color_type != PNG_COLOR_TYPE_RGB && color_type != PNG_COLOR_TYPE_PALETTE) {
+    throw std::runtime_error("PNG: codec does not support images with color spaces different than GRAY, RGB or Indexed colors (Palette)");
   }
 
   // 7. Read content
@@ -423,7 +424,7 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
       if(info.shape[0] != 3)
       {
         png_destroy_write_struct(&png_ptr, &info_ptr);
-        throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
+        throw std::runtime_error("PNG: color image does not have 3 planes on 1st. dimension");
       }
       im_save_color<uint8_t>(array, png_ptr);
     }
@@ -441,7 +442,7 @@ static void im_save(const std::string& filename, const bob::core::array::interfa
       if(info.shape[0] != 3)
       {
       png_destroy_write_struct(&png_ptr, &info_ptr);
-        throw std::runtime_error("color image does not have 3 planes on 1st. dimension");
+        throw std::runtime_error("PNG: color image does not have 3 planes on 1st. dimension");
       }
       im_save_color<uint16_t>(array, png_ptr);
     }
