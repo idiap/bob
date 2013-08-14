@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Andre Anjos <andre.anjos@idiap.ch>
-# Wed Jun 22 17:50:08 2011 +0200
+# Laurent El Shafey <laurent.el-shafey@idiap.ch>
+# Wed Aug 14 12:27:57 CEST 2013
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
 #
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Runs some video tests
+"""Runs some image tests
 """
 
 import os
@@ -31,8 +31,7 @@ PNG_INDEXED_COLOR = testutils.datafile('img_indexed_color.png', __name__)
 
 def test_png_indexed_color():
 
-  # This shows you can use the array interface to read an entire video
-  # sequence in a single shot
+  # Read an indexed color PNG image, and compared with hardcoded values
   from .. import load
   img = load(PNG_INDEXED_COLOR)
   assert img.shape == (3,22,32)
