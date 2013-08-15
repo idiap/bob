@@ -4,16 +4,16 @@
 # Mon Mar 21 20:09:18 2011 +0100
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -260,7 +260,7 @@ man_pages = [
 ]
 
 
-# We want to remove all private (i.e. _. or __.__) members 
+# We want to remove all private (i.e. _. or __.__) members
 # that are not in the list of accepted functions
 accepted_private_functions = ['__call__']
 
@@ -275,10 +275,10 @@ def member_function_test(app, what, name, obj, skip, options):
       # test if the method is documented
       if not hasattr(obj, '__doc__') or not obj.__doc__:
         return True
-  
+
   # Skips selected members in auto-generated documentation. Unfortunately, old
   # versions of Boost.Python will not generate a __self__ member for static
-  # methods and that screws-up Sphinx processing. 
+  # methods and that screws-up Sphinx processing.
   if sphinx.__version__ < "1.0":
     # We have to remove objects that do not have a __self__ attribute set
     import types
@@ -288,7 +288,7 @@ def member_function_test(app, what, name, obj, skip, options):
         return True
 
     return False
-  
+
 # Default processing flags for sphinx
 autoclass_content = 'both'
 autodoc_member_order = 'bysource'
@@ -355,7 +355,6 @@ intersphinx_mapping = {
   scipy_manual: None,
   sqlalc_manual: None,
   'http://matplotlib.sourceforge.net/': None,
-  'http://opencv.itseez.com/': None,
   }
 
 def setup(app):
