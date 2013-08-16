@@ -7,8 +7,6 @@
 # also defined, but not for general use are
 #  Blitz_LIBRARY, where to find the Blitz library.
 
-include(FindPkgConfig)
-
 execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} blitz --silence-errors --modversion OUTPUT_VARIABLE PKG_CONFIG_blitz_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 if(PKG_CONFIG_blitz_VERSION)

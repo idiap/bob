@@ -272,6 +272,12 @@ endmacro()
 # End of macros
 # ----------------------------------------------------------------------------
 
+# Double-checks pkg-config is reachable
+include(FindPkgConfig)
+if(NOT PKG_CONFIG_FOUND)
+  message(FATAL_ERROR "error: could not find binary for `pkg-config' - you cannot build Bob without it.")
+endif()
+
 # Project files
 set(ENABLED_PACKAGES "")
 add_subdirectory(src)
