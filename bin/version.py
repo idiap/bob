@@ -44,6 +44,10 @@ def git_remote_version_branches(verbose):
 
     if p.returncode != 0: raise RuntimeError
 
+    # Python3 support
+    if isinstance(stdout, bytes) and not isinstance(stdout, str):
+      stdout = stdout.decode('utf8')
+
     cand = [k[-1].split('/')[-1] for k in [j.split() for j in stdout.split('\n')] if k]
     return [k for k in cand if BRANCH_RE.match(k)]
 
@@ -61,6 +65,10 @@ def git_version_branches(verbose):
 
     if p.returncode != 0: raise RuntimeError
 
+    # Python3 support
+    if isinstance(stdout, bytes) and not isinstance(stdout, str):
+      stdout = stdout.decode('utf8')
+
     cand = list(set([j.strip('* ').split('/')[-1] for j in stdout.split('\n')]))
     return [k for k in cand if k and BRANCH_RE.match(k)]
 
@@ -76,6 +84,10 @@ def git_current_branch(verbose):
     stdout, stderr = p.communicate()
 
     if p.returncode != 0: raise RuntimeError
+
+    # Python3 support
+    if isinstance(stdout, bytes) and not isinstance(stdout, str):
+      stdout = stdout.decode('utf8')
 
     for k in stdout.split('\n'):
       if not k: continue
@@ -98,6 +110,10 @@ def git_next_minor_version(branch, verbose):
     stdout, stderr = p.communicate()
 
     if p.returncode != 0: raise RuntimeError
+
+    # Python3 support
+    if isinstance(stdout, bytes) and not isinstance(stdout, str):
+      stdout = stdout.decode('utf8')
 
     candidates = [k.strip() for k in stdout.split('\n')]
     candidates = sorted([StrictVersion(k[1:]) for k in candidates if k and TAG_RE.match(k)])
@@ -162,6 +178,10 @@ def git_count(branch, verbose):
     stdout, stderr = p.communicate()
 
     if p.returncode != 0: raise RuntimeError
+
+    # Python3 support
+    if isinstance(stdout, bytes) and not isinstance(stdout, str):
+      stdout = stdout.decode('utf8')
 
     return stdout.count('\n')
 
