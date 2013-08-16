@@ -6,16 +6,16 @@
  * @brief Extensive Blitz Array tests
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -57,7 +57,7 @@ size_t maxRAMInMegabytes () {
   int mib[] = { CTL_HW, HW_MEMSIZE };
   if (sysctl(mib, 2, &memsize, &len, 0, 0) != 0) return 1024; //returns 1G
   return memsize / (1024 * 1024);
-#elif defined(_WIN32) 
+#elif defined(_WIN32)
   MEMORYSTATUSEX statex;
   statex.dwLength = sizeof(statex);
   GlobalMemoryStatusEx(&statex);
@@ -83,14 +83,13 @@ void checkBlitzAllocation( const unsigned int n_megabytes ) {
   blitz::Array<int8_t,2> X;
 
 // If we can't allocate more than 2GB adresses, throw an exception
-#if !((defined(__LP64__) || defined(__APPLE__)) \
-  && defined(HAVE_BLITZ_SPECIAL_TYPES))
+#if !(defined(__LP64__) || defined(__APPLE__))
   static const int64_t TWO_GB = ((int64_t)2*1024)*((int64_t)1024*1024);
   if( n_e < TWO_GB ) {
     // Resize the blitz::Array and check that no exception is thrown
     BOOST_REQUIRE_NO_THROW( X.resize(n_elems_first,n_elems_second) );
 
-    // Check X.numElements equals n_elems_first * n_elems_second 
+    // Check X.numElements equals n_elems_first * n_elems_second
     // careful: use a 64 bit type to store the result)
     BOOST_CHECK_EQUAL(n_e, (int64_t)X.numElements() );
   }
@@ -98,7 +97,7 @@ void checkBlitzAllocation( const unsigned int n_megabytes ) {
   // Resize the blitz::Array and check that no exception is thrown
   BOOST_REQUIRE_NO_THROW( X.resize(n_elems_first,n_elems_second) );
 
-  // Check X.numElements equals n_elems_first * n_elems_second 
+  // Check X.numElements equals n_elems_first * n_elems_second
   // careful: use a 64 bit type to store the result)
   BOOST_CHECK_EQUAL(n_e, (int64_t)X.numElements() );
 #endif
@@ -133,7 +132,7 @@ void checkBlitzEqual( const blitz::Array<T,2> a, const blitz::Array<T,2> b ) {
   BOOST_REQUIRE_EQUAL( a.extent(1), b.extent(1) );
   for(int i=0; i<a.extent(0); ++i)
     for(int j=0; j<a.extent(1); ++j)
-      BOOST_CHECK_EQUAL( a(i+a.lbound(0),j+a.lbound(1)), 
+      BOOST_CHECK_EQUAL( a(i+a.lbound(0),j+a.lbound(1)),
         b(i+b.lbound(0),j+b.lbound(1)) );
 }
 
@@ -145,7 +144,7 @@ void checkBlitzEqual( const blitz::Array<T,3> a, const blitz::Array<T,3> b ) {
   for(int i=0; i<a.extent(0); ++i)
     for(int j=0; j<a.extent(1); ++j)
       for(int k=0; k<a.extent(2); ++k)
-        BOOST_CHECK_EQUAL( a(i+a.lbound(0),j+a.lbound(1),k+a.lbound(2)), 
+        BOOST_CHECK_EQUAL( a(i+a.lbound(0),j+a.lbound(1),k+a.lbound(2)),
           b(i+b.lbound(0),j+b.lbound(1),k+b.lbound(2)) );
 }
 
@@ -159,8 +158,8 @@ void checkBlitzEqual( const blitz::Array<T,4> a, const blitz::Array<T,4> b ) {
     for(int j=0; j<a.extent(1); ++j)
       for(int k=0; k<a.extent(2); ++k)
         for(int l=0; l<a.extent(3); ++l)
-          BOOST_CHECK_EQUAL( 
-            a(i+a.lbound(0),j+a.lbound(1),k+a.lbound(2),l+a.lbound(3)), 
+          BOOST_CHECK_EQUAL(
+            a(i+a.lbound(0),j+a.lbound(1),k+a.lbound(2),l+a.lbound(3)),
             b(i+b.lbound(0),j+b.lbound(1),k+b.lbound(2),l+b.lbound(3)) );
 }
 
@@ -205,7 +204,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_simple_1D )
   for(int i=0; i<4; ++i)
     X(i) = i+1;
 
-  blitz::Array<double,1> Y(4), ref(4); 
+  blitz::Array<double,1> Y(4), ref(4);
   Y = bob::core::array::cast<double>(X);
 
   for(int i=0; i<4; ++i)
@@ -220,7 +219,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_1D )
   for(int i=0; i<4; ++i)
     X(i) = i+1;
 
-  blitz::Array<std::complex<double>,1> Y(4), ref(4); 
+  blitz::Array<std::complex<double>,1> Y(4), ref(4);
   Y = bob::core::array::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
@@ -236,7 +235,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_2D )
     for(int j=0; j<4; ++j)
       X(i,j) = i+j+1;
 
-  blitz::Array<std::complex<double>,2> Y(4,4), ref(4,4); 
+  blitz::Array<std::complex<double>,2> Y(4,4), ref(4,4);
   Y = bob::core::array::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
@@ -254,7 +253,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_3D )
       for(int k=0; k<4; ++k)
         X(i,j,k) = i+j+k+1;
 
-  blitz::Array<std::complex<double>,3> Y(4,4,4), ref(4,4,4); 
+  blitz::Array<std::complex<double>,3> Y(4,4,4), ref(4,4,4);
   Y = bob::core::array::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
@@ -274,7 +273,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_tocomplex_4D )
         for(int l=0; l<4; ++l)
           X(i,j,k,l) = i+j+k+l+1;
 
-  blitz::Array<std::complex<double>,4> Y(4,4,4,4), ref(4,4,4,4); 
+  blitz::Array<std::complex<double>,4> Y(4,4,4,4), ref(4,4,4,4);
   Y = bob::core::array::cast<std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
@@ -293,7 +292,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_1D )
   for(int i=0; i<4; ++i)
     X(i) = std::complex<double>(i+1,i);
 
-  blitz::Array<int32_t,1> Y(4), ref(4); 
+  blitz::Array<int32_t,1> Y(4), ref(4);
   Y = bob::core::array::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)
@@ -308,7 +307,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromtocomplex_1D )
   for(int i=0; i<4; ++i)
     X(i) = std::complex<double>(i+1,i);
 
-  blitz::Array<std::complex<float>,1> Y(4), ref(4); 
+  blitz::Array<std::complex<float>,1> Y(4), ref(4);
   Y = bob::core::array::cast<std::complex<float>,std::complex<double> >(X);
 
   for(int i=0; i<4; ++i)
@@ -316,7 +315,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromtocomplex_1D )
 
   checkBlitzEqual( Y, ref);
 
-  blitz::Array<std::complex<double>,1> Z(4); 
+  blitz::Array<std::complex<double>,1> Z(4);
   Z = bob::core::array::cast<std::complex<double>,std::complex<double> >(X);
 
   checkBlitzEqual( Z, X);
@@ -329,7 +328,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_2D )
     for(int j=0; j<4; ++j)
       X(i,j) = std::complex<double>(i+j+1,i*j);
 
-  blitz::Array<int32_t,2> Y(4,4), ref(4,4); 
+  blitz::Array<int32_t,2> Y(4,4), ref(4,4);
   Y = bob::core::array::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)
@@ -347,7 +346,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_3D )
       for(int k=0; k<4; ++k)
         X(i,j,k) = std::complex<double>(i+j+k+1,i*j*k);
 
-  blitz::Array<int32_t,3> Y(4,4,4), ref(4,4,4); 
+  blitz::Array<int32_t,3> Y(4,4,4), ref(4,4,4);
   Y = bob::core::array::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)
@@ -367,7 +366,7 @@ BOOST_AUTO_TEST_CASE( test_blitz_array_cast_fromcomplex_4D )
         for(int l=0; l<4; ++l)
           X(i,j,k,l) = std::complex<double>(i+j+k+l+1,i*j*k*l);
 
-  blitz::Array<int32_t,4> Y(4,4,4,4), ref(4,4,4,4); 
+  blitz::Array<int32_t,4> Y(4,4,4,4), ref(4,4,4,4);
   Y = bob::core::array::cast<int32_t >(X);
 
   for(int i=0; i<4; ++i)

@@ -6,16 +6,16 @@
  * @brief Implementation of the SVM training methods
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,7 +24,6 @@
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
 #include <bob/trainer/SVMTrainer.h>
-#include <bob/core/blitz_compat.h>
 #include <bob/core/logging.h>
 
 #ifdef BOB_DEBUG
@@ -171,7 +170,7 @@ static boost::shared_ptr<svm_problem> data2problem
 
   //allocates all the nodes, set first entry, a la libsvm
   svm_node* all_nodes = new svm_node[nodes];
-  
+
   //iterates over each class data and fills the svm_node's
   int max_index = 0; //data width
   size_t sample = 0; //sample counter
@@ -241,11 +240,11 @@ boost::shared_ptr<bob::machine::SupportVector> bob::trainer::SVMTrainer::train
 
   //converts the input arraysets into something libsvm can digest
   double save_gamma = m_param.gamma; ///< the next method may update it!
-  boost::shared_ptr<svm_problem> problem = 
-    data2problem(data, input_subtraction, input_division, 
+  boost::shared_ptr<svm_problem> problem =
+    data2problem(data, input_subtraction, input_division,
         const_cast<svm_parameter&>(m_param) ///< temporary cast
         );
-  
+
   //checks parametrization to make sure all is alright.
   const char* error_msg = svm_check_parameter(problem.get(), &m_param);
 
@@ -271,7 +270,7 @@ boost::shared_ptr<bob::machine::SupportVector> bob::trainer::SVMTrainer::train
 
   //save newly created machine to file, reload from there to get rid of memory
   //dependencies due to the poorly implemented memory model in libsvm
-  boost::shared_ptr<svm_model> new_model = 
+  boost::shared_ptr<svm_model> new_model =
     bob::machine::svm_unpickle(bob::machine::svm_pickle(model));
 
   boost::shared_ptr<bob::machine::SupportVector> retval =

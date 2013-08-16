@@ -22,9 +22,6 @@
 #include <bob/math/lu.h>
 #include <bob/core/assert.h>
 #include <bob/core/array_copy.h>
-#if !defined (HAVE_BLITZ_TINYVEC2_H)
-#include <blitz/tinyvec-et.h>
-#endif
 #include <algorithm>
 #include <boost/shared_array.hpp>
 

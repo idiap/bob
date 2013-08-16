@@ -23,14 +23,7 @@
 #include <boost/python.hpp>
 #include <boost/format.hpp>
 
-#include <bob/core/blitz_compat.h>
-
-#include <bob/config.h>
-#if defined(HAVE_BLITZ_TINYVEC2_H)
 #include <blitz/tinyvec2.h>
-#else
-#include <blitz/tinyvec.h>
-#endif
 
 /**
  * Objects of this type create a binding between blitz::TinyVector<T,N> and
@@ -243,7 +236,6 @@ void bind_core_tinyvector () {
   tinyvec_from_sequence<double,9>();
   tinyvec_from_sequence<double,10>();
   tinyvec_from_sequence<double,11>();
-# if defined(HAVE_BLITZ_SPECIAL_TYPES)
   if (typeid(int) != typeid(blitz::diffType)) {
     tinyvec_from_sequence<blitz::diffType,1>();
     tinyvec_from_sequence<blitz::diffType,2>();
@@ -257,7 +249,6 @@ void bind_core_tinyvector () {
     tinyvec_from_sequence<blitz::diffType,10>();
     tinyvec_from_sequence<blitz::diffType,11>();
   }
-# endif //defined(HAVE_BLITZ_SPECIAL_TYPES)
 
   /**
    * The following struct constructors will make C++ return values of type
@@ -296,7 +287,6 @@ void bind_core_tinyvector () {
   register_tinyvec_to_tuple<double,9>();
   register_tinyvec_to_tuple<double,10>();
   register_tinyvec_to_tuple<double,11>();
-# if defined(HAVE_BLITZ_SPECIAL_TYPES)
   if (typeid(int) != typeid(blitz::diffType)) {
     register_tinyvec_to_tuple<blitz::diffType,1>();
     register_tinyvec_to_tuple<blitz::diffType,2>();
@@ -310,6 +300,5 @@ void bind_core_tinyvector () {
     register_tinyvec_to_tuple<blitz::diffType,10>();
     register_tinyvec_to_tuple<blitz::diffType,11>();
   }
-# endif //defined(HAVE_BLITZ_SPECIAL_TYPES)
 
 }

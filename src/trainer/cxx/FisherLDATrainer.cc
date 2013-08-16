@@ -25,7 +25,6 @@
 
 #include <boost/format.hpp>
 
-#include <bob/core/blitz_compat.h>
 #include <bob/math/pinv.h>
 #include <bob/math/eig.h>
 #include <bob/math/linear.h>

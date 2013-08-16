@@ -24,9 +24,6 @@
 #include <bob/core/assert.h>
 #include <bob/core/check.h>
 #include <bob/core/array_copy.h>
-#if !defined (HAVE_BLITZ_TINYVEC2_H)
-#include <blitz/tinyvec-et.h>
-#endif
 #include <boost/shared_array.hpp>
 
 // Declaration of the external LAPACK function

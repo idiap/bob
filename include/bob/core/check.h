@@ -4,16 +4,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,11 +28,6 @@
 #include <vector>
 #include <map>
 
-#include <bob/config.h>
-#if !defined (HAVE_BLITZ_TINYVEC2_H)
-#include <blitz/tinyvec-et.h>
-#endif
-
 namespace bob { namespace core {
 /**
  * @ingroup CORE
@@ -40,14 +35,14 @@ namespace bob { namespace core {
  */
 
 /**
- * @brief Compare two floating point values using two different comparison 
+ * @brief Compare two floating point values using two different comparison
  * criteria: a relative one (for large values) and an absolute one (for small
  * values).
  * |left - right| <= (a_epsilon + r_epsilon * min(left,right))
  */
-template<typename T> 
-bool isClose(const T& left, const T& right, const T& r_epsilon=1e-5, 
-  const T& a_epsilon=1e-8) 
+template<typename T>
+bool isClose(const T& left, const T& right, const T& r_epsilon=1e-5,
+  const T& a_epsilon=1e-8)
 {
   T diff = std::fabs(left - right);
   T min = std::min(std::fabs(left), std::fabs(right));
@@ -55,15 +50,15 @@ bool isClose(const T& left, const T& right, const T& r_epsilon=1e-5,
 }
 
 /**
- * @brief Compare two complex values using two different comparison 
+ * @brief Compare two complex values using two different comparison
  * criteria: a relative one (for large values) and an absolute one (for small
  * values).
  * |left_ - right_| <= (a_epsilon + r_epsilon * min(left_,right_))
  *   where left_, right_ are real or imaginary parts of the arguments
  */
-template<typename T> 
-bool isClose(const std::complex<T>& left, const std::complex<T>& right, 
-  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8) 
+template<typename T>
+bool isClose(const std::complex<T>& left, const std::complex<T>& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   // Check real parts first
   T diff = std::fabs(left.real() - right.real());
@@ -87,7 +82,7 @@ bool isClose(const std::vector<T>& left, const std::vector<T>& right,
     return false;
 
   typename std::vector<T>::const_iterator itl, itr;
-  for (itl = left.begin(), itr = right.begin(); 
+  for (itl = left.begin(), itr = right.begin();
        itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
       return false;
@@ -107,7 +102,7 @@ bool isClose(const std::vector<std::complex<T> >& left,
     return false;
 
   typename std::vector<std::complex<T> >::const_iterator itl, itr;
-  for (itl = left.begin(), itr = right.begin(); 
+  for (itl = left.begin(), itr = right.begin();
        itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
       return false;
@@ -116,10 +111,10 @@ bool isClose(const std::vector<std::complex<T> >& left,
 }
 
 /**
- * @brief Checks that two maps of floating point values are close. 
+ * @brief Checks that two maps of floating point values are close.
  */
 template <typename K, typename T>
-bool isClose(const std::map<K,T>& left, 
+bool isClose(const std::map<K,T>& left,
   const std::map<K,T>& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
@@ -139,10 +134,10 @@ bool isClose(const std::map<K,T>& left,
 
 
 /**
- * @brief Checks that two maps of complex floating point values are close. 
+ * @brief Checks that two maps of complex floating point values are close.
  */
 template <typename K, typename T>
-bool isClose(const std::map<K, std::complex<T> >& left, 
+bool isClose(const std::map<K, std::complex<T> >& left,
   const std::map<K, std::complex<T> >& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
@@ -173,7 +168,7 @@ namespace array {
  */
 
 /**
- * @brief Checks if a blitz array has zero base indices, for each of its 
+ * @brief Checks if a blitz array has zero base indices, for each of its
  * dimensions. This is the case with default C-style order blitz arrays.
  */
 template <typename T, int D>
@@ -203,7 +198,7 @@ bool isOneBase( const blitz::Array<T,D>& a)
  * blitz array.
  */
 template <typename T, typename U, int D>
-bool hasSameBase( const blitz::Array<T,D>& a, 
+bool hasSameBase( const blitz::Array<T,D>& a,
   const blitz::Array<U,D>& b)
 {
   for( int i=0; i<D; ++i)
@@ -213,47 +208,47 @@ bool hasSameBase( const blitz::Array<T,D>& a,
 }
 
 /**
- * @brief Checks if a blitz array is a C-style array stored in a 
+ * @brief Checks if a blitz array is a C-style array stored in a
  * contiguous memory area. By C-style array, it is meant that it is a row-
  * major order multidimensional array, i.e. strides are decreasing in size
  * as rank grows, and that the data is stored in ascending order in each
  * dimension.
  */
 template <typename T, int D>
-bool isCContiguous( const blitz::Array<T,D>& a) 
+bool isCContiguous( const blitz::Array<T,D>& a)
 {
   if( !a.isStorageContiguous() )
     return false;
-  for( int i=0; i<a.rank(); ++i) 
+  for( int i=0; i<a.rank(); ++i)
     if( !(a.isRankStoredAscending(i) && a.ordering(i)==a.rank()-1-i) )
       return false;
   return true;
 }
 
 /**
- * @brief Checks if a blitz array is a Fortran-style array stored in a 
- * contiguous memory area. By Fortran-style array, it is meant that it is 
- * a column-major order multidimensional array, i.e. strides are 
- * increasing in size as rank grows, and that the data is stored in 
+ * @brief Checks if a blitz array is a Fortran-style array stored in a
+ * contiguous memory area. By Fortran-style array, it is meant that it is
+ * a column-major order multidimensional array, i.e. strides are
+ * increasing in size as rank grows, and that the data is stored in
  * ascending order in each dimension.
  */
 template <typename T, int D>
-bool isFortranContiguous( const blitz::Array<T,D>& a) 
+bool isFortranContiguous( const blitz::Array<T,D>& a)
 {
   if( !a.isStorageContiguous() )
     return false;
-  for( int i=0; i<a.rank(); ++i) 
+  for( int i=0; i<a.rank(); ++i)
     if( !(a.isRankStoredAscending(i) && a.ordering(i)==i) )
       return false;
   return true;
 }
 
 /**
- * @brief Checks if a blitz array is a C-style array stored in a 
- * contiguous memory area, with zero base indices. 
+ * @brief Checks if a blitz array is a C-style array stored in a
+ * contiguous memory area, with zero base indices.
  */
 template <typename T, int D>
-bool isCZeroBaseContiguous( const blitz::Array<T,D>& a) 
+bool isCZeroBaseContiguous( const blitz::Array<T,D>& a)
 {
   if( !isZeroBase(a) )
     return false;
@@ -261,11 +256,11 @@ bool isCZeroBaseContiguous( const blitz::Array<T,D>& a)
 }
 
 /**
- * @brief Checks if a blitz array is a Fortran-style array stored in a 
- * contiguous memory area, with one base indices. 
+ * @brief Checks if a blitz array is a Fortran-style array stored in a
+ * contiguous memory area, with one base indices.
  */
 template <typename T, int D>
-bool isFortranOneBaseContiguous( const blitz::Array<T,D>& a) 
+bool isFortranOneBaseContiguous( const blitz::Array<T,D>& a)
 {
   if( !isOneBase(a) )
     return false;
@@ -277,7 +272,7 @@ bool isFortranOneBaseContiguous( const blitz::Array<T,D>& a)
  * given in the second argument.
  */
 template <typename T, int D>
-bool hasSameShape( const blitz::Array<T,D>& ar, 
+bool hasSameShape( const blitz::Array<T,D>& ar,
   const blitz::TinyVector<int, D>& shape)
 {
   const blitz::TinyVector<int, D>& ar_shape = ar.shape();
@@ -293,7 +288,7 @@ bool hasSameShape( const blitz::Array<T,D>& ar,
  * given in the first argument.
  */
 template <typename T, int D>
-bool hasSameShape( const blitz::TinyVector<int, D>& shape, 
+bool hasSameShape( const blitz::TinyVector<int, D>& shape,
   const blitz::Array<T,D>& ar)
 {
   const blitz::TinyVector<int, D>& ar_shape = ar.shape();
@@ -308,7 +303,7 @@ bool hasSameShape( const blitz::TinyVector<int, D>& shape,
  * @brief Checks that two blitz arrays have the same shape.
  */
 template <typename T, typename U, int D>
-bool hasSameShape( const blitz::Array<T,D>& a, 
+bool hasSameShape( const blitz::Array<T,D>& a,
   const blitz::Array<U,D>& b)
 {
   const blitz::TinyVector<int, D>& a_shape = a.shape();
@@ -323,13 +318,13 @@ bool hasSameShape( const blitz::Array<T,D>& a,
  * @brief Checks that two (floating point) 1D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
+template<typename T>
 bool isClose(const blitz::Array<T,1>& left, const blitz::Array<T,1>& right,
-  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8) 
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     if (!bob::core::isClose(left(i), right(i), r_epsilon, a_epsilon))
       return false;
@@ -341,13 +336,13 @@ bool isClose(const blitz::Array<T,1>& left, const blitz::Array<T,1>& right,
  * @brief Checks that two (floating point) 2D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
-bool isClose(const blitz::Array<T,2>& left, const blitz::Array<T,2>& right, 
-  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8) 
+template<typename T>
+bool isClose(const blitz::Array<T,2>& left, const blitz::Array<T,2>& right,
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     for (int j=0; j<left.extent(1); ++j)
       if (!bob::core::isClose(left(i,j), right(i,j), r_epsilon, a_epsilon))
@@ -360,13 +355,13 @@ bool isClose(const blitz::Array<T,2>& left, const blitz::Array<T,2>& right,
  * @brief Checks that two (floating point) 3D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
+template<typename T>
 bool isClose(const blitz::Array<T,3>& left, const blitz::Array<T,3>& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
-{ 
+{
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     for (int j=0; j<left.extent(1); ++j)
       for (int k=0; k<left.extent(2); ++k)
@@ -380,13 +375,13 @@ bool isClose(const blitz::Array<T,3>& left, const blitz::Array<T,3>& right,
  * @brief Checks that two (floating point) 4D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
+template<typename T>
 bool isClose(const blitz::Array<T,4>& left, const blitz::Array<T,4>& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     for (int j=0; j<left.extent(1); ++j)
       for (int k=0; k<left.extent(2); ++k)
@@ -401,14 +396,14 @@ bool isClose(const blitz::Array<T,4>& left, const blitz::Array<T,4>& right,
  * @brief Checks that two (complex floating point) 1D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
-bool isClose(const blitz::Array<std::complex<T>,1>& left, 
+template<typename T>
+bool isClose(const blitz::Array<std::complex<T>,1>& left,
   const blitz::Array<std::complex<T>,1>& right,
-  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8) 
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     if (!bob::core::isClose(left(i), right(i), r_epsilon, a_epsilon))
       return false;
@@ -420,14 +415,14 @@ bool isClose(const blitz::Array<std::complex<T>,1>& left,
  * @brief Checks that two (complex floating point) 2D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
-bool isClose(const blitz::Array<std::complex<T>,2>& left, 
+template<typename T>
+bool isClose(const blitz::Array<std::complex<T>,2>& left,
   const blitz::Array<std::complex<T>,2>& right,
-  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8) 
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     for (int j=0; j<left.extent(1); ++j)
       if (!bob::core::isClose(left(i,j), right(i,j), r_epsilon, a_epsilon))
@@ -440,14 +435,14 @@ bool isClose(const blitz::Array<std::complex<T>,2>& left,
  * @brief Checks that two (complex floating point) 3D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
-bool isClose(const blitz::Array<std::complex<T>,3>& left, 
+template<typename T>
+bool isClose(const blitz::Array<std::complex<T>,3>& left,
   const blitz::Array<std::complex<T>,3>& right,
-  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8) 
-{ 
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
+{
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     for (int j=0; j<left.extent(1); ++j)
       for (int k=0; k<left.extent(2); ++k)
@@ -461,14 +456,14 @@ bool isClose(const blitz::Array<std::complex<T>,3>& left,
  * @brief Checks that two (complex floating point) 4D blitz arrays are close.
  * This also checks that the shapes are the same.
  */
-template<typename T> 
-bool isClose(const blitz::Array<std::complex<T>,4>& left, 
+template<typename T>
+bool isClose(const blitz::Array<std::complex<T>,4>& left,
   const blitz::Array<std::complex<T>,4>& right,
-  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8) 
+  const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
   if (!hasSameShape(left, right))
     return false;
-  
+
   for (int i=0; i<left.extent(0); ++i)
     for (int j=0; j<left.extent(1); ++j)
       for (int k=0; k<left.extent(2); ++k)
@@ -480,7 +475,7 @@ bool isClose(const blitz::Array<std::complex<T>,4>& left,
 }
 
 /**
- * @brief Checks that two vectors of blitz arrays are close, also checking 
+ * @brief Checks that two vectors of blitz arrays are close, also checking
  * that the shapes of each pair of blitz arrays are the same.
  */
 template <typename T, int D>
@@ -492,7 +487,7 @@ bool isClose(const std::vector<blitz::Array<T,D> >& left,
     return false;
 
   typename std::vector<blitz::Array<T,D> >::const_iterator itl, itr;
-  for (itl = left.begin(), itr = right.begin(); 
+  for (itl = left.begin(), itr = right.begin();
        itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
       return false;
@@ -501,11 +496,11 @@ bool isClose(const std::vector<blitz::Array<T,D> >& left,
 }
 
 /**
- * @brief Checks that two maps of blitz arrays are close, also checking 
+ * @brief Checks that two maps of blitz arrays are close, also checking
  * that the shapes of each pair of blitz arrays are the same.
  */
 template <typename K, typename T, int D>
-bool isClose(const std::map<K, blitz::Array<T,D> >& left, 
+bool isClose(const std::map<K, blitz::Array<T,D> >& left,
   const std::map<K, blitz::Array<T,D> >& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
@@ -524,8 +519,8 @@ bool isClose(const std::map<K, blitz::Array<T,D> >& left,
 }
 
 /**
- * @brief Checks that two vectors of (complex floating point) blitz arrays 
- * are close, also checking that the shapes of each pair of blitz arrays are 
+ * @brief Checks that two vectors of (complex floating point) blitz arrays
+ * are close, also checking that the shapes of each pair of blitz arrays are
  * the same.
  */
 template <typename T, int D>
@@ -537,7 +532,7 @@ bool isClose(const std::vector<blitz::Array<std::complex<T>,D> >& left,
     return false;
 
   typename std::vector<blitz::Array<std::complex<T>,D> >::const_iterator itl, itr;
-  for (itl = left.begin(), itr = right.begin(); 
+  for (itl = left.begin(), itr = right.begin();
        itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isClose(*itl, *itr, r_epsilon, a_epsilon))
       return false;
@@ -546,12 +541,12 @@ bool isClose(const std::vector<blitz::Array<std::complex<T>,D> >& left,
 }
 
 /**
- * @brief Checks that two maps of (complex floating point) blitz arrays 
- * are close, also checking that the shapes of each pair of blitz arrays are 
+ * @brief Checks that two maps of (complex floating point) blitz arrays
+ * are close, also checking that the shapes of each pair of blitz arrays are
  * the same.
  */
 template <typename K, typename T, int D>
-bool isClose(const std::map<K, blitz::Array<std::complex<T>,D> >& left, 
+bool isClose(const std::map<K, blitz::Array<std::complex<T>,D> >& left,
   const std::map<K, blitz::Array<std::complex<T>,D> >& right,
   const T& r_epsilon=1e-5, const T& a_epsilon=1e-8)
 {
@@ -576,7 +571,7 @@ bool isClose(const std::map<K, blitz::Array<std::complex<T>,D> >& left,
  */
 template <typename T, int D>
 bool isEqual(const blitz::Array<T,D>& left, const blitz::Array<T,D>& right)
-{ 
+{
   if (!hasSameShape(left, right))
     return false;
 
@@ -584,7 +579,7 @@ bool isEqual(const blitz::Array<T,D>& left, const blitz::Array<T,D>& right)
 }
 
 /**
- * @brief Checks that two vectors of blitz arrays are equal, also checking 
+ * @brief Checks that two vectors of blitz arrays are equal, also checking
  * that the shapes of each pair of blitz arrays are the same.
  */
 template <typename T, int D>
@@ -595,7 +590,7 @@ bool isEqual(const std::vector<blitz::Array<T,D> >& left,
     return false;
 
   typename std::vector<blitz::Array<T,D> >::const_iterator itl, itr;
-  for (itl = left.begin(), itr = right.begin(); 
+  for (itl = left.begin(), itr = right.begin();
        itl != left.end() && itr != right.end(); ++itl, ++itr)
     if (!isEqual(*itl, *itr))
       return false;
@@ -604,11 +599,11 @@ bool isEqual(const std::vector<blitz::Array<T,D> >& left,
 }
 
 /**
- * @brief Checks that two maps of blitz arrays are equal, also checking 
+ * @brief Checks that two maps of blitz arrays are equal, also checking
  * that the shapes of each pair of blitz arrays are the same.
  */
 template <typename K, typename T, int D>
-bool isEqual(const std::map<K, blitz::Array<T,D> >& left, 
+bool isEqual(const std::map<K, blitz::Array<T,D> >& left,
   const std::map<K, blitz::Array<T,D> >& right)
 {
   if (left.size() != right.size())

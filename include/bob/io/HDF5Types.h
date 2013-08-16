@@ -23,15 +23,10 @@
 #ifndef BOB_IO_HDF5TYPES_H
 #define BOB_IO_HDF5TYPES_H
 
-#include <bob/config.h>
-
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <blitz/array.h>
-#if !defined (HAVE_BLITZ_TINYVEC2_H)
-#include <blitz/tinyvec-et.h>
-#endif
 #include <hdf5.h>
 
 /**

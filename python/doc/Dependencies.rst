@@ -46,7 +46,7 @@ Required at runtime
 +======================+==============+=======================================+
 | Std. C/C++ Libraries | any          | Depends on the compiler               |
 +----------------------+--------------+---------------------------------------+
-| `Blitz++`_           | 0.9          | `Artistic-2.0`_ or LGPLv3+ or GPLv3+  |
+| `Blitz++`_           | 0.10         | `Artistic-2.0`_ or LGPLv3+ or GPLv3+  |
 +----------------------+--------------+---------------------------------------+
 | `Lapack`_            | any          | BSD-style                             |
 +----------------------+--------------+---------------------------------------+
@@ -299,17 +299,29 @@ A single command line that will install all required packages under Ubuntu:
 
 .. note::
 
-  The version of Blitz++ that ships with Ubuntu currently does not support
-  arrays with more than 2G elements. Further, VLFeat is not available on this
-  distribution.  To overcome these difficulties, we have made available an
-  Ubuntu PPA that contains VLFeat and a newer version of Blitz++. To install
-  them:
+  VLFeat is not available on any version of Ubuntu, you may want to install it
+  from our PPA
 
   .. code-block:: sh
 
     $ sudo apt-add-repository ppa:biometrics/bob
     $ sudo apt-get update
-    $ sudo apt-get install libblitz1-dev libvl-dev
+    $ sudo apt-get install libvl-dev
+
+.. note::
+
+  |project| requires at least Blitz++ version 0.10 to properly compile.
+  Unfortunately, version 0.9 ships with Ubuntu versions up to 12.10 (Quantal).
+  To overcome this limitation, we created a PPA that contains a newer version
+  of Blitz++ for all supported versions of Ubuntu **that don't ship** Blitz++,
+  version 0.10. To install our pre-compiled Blitz++ packages in those cases, do
+  the following:
+
+  .. code-block:: sh
+
+    $ sudo apt-add-repository ppa:biometrics/bob
+    $ sudo apt-get update
+    $ sudo apt-get install libblitz1-dev
 
 Mac OSX
 -------
