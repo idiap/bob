@@ -87,10 +87,13 @@ def version_command(subparsers):
 
   return parser
 
-class Interface(object):
-  """Base manager for Bob databases"""
+def with_metaclass(meta, *bases):
+  """Create a base class with a metaclass (works with Python2 and Python3)."""
 
-  __metaclass__ = abc.ABCMeta
+  return meta("NewBase", bases, {})
+
+class Interface(with_metaclass(abc.ABCMeta, object)):
+  """Base manager for Bob databases"""
 
   @abc.abstractmethod
   def name(self):
