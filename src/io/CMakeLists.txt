@@ -44,7 +44,6 @@ endif()
 
 # Matio
 if (WITH_MATIO)
-  include(FindPkgConfig)
   pkg_check_modules(matio matio)
   if(matio_FOUND)
     include(CheckCSourceCompiles)
