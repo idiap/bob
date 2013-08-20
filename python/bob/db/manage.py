@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Tue 28 Jun 2011 12:54:06 CEST 
+# Tue 28 Jun 2011 12:54:06 CEST
 
 """Contains a set of management utilities for a centralized driver script.
 """
-  
+
 import os
 import sys
 import time
 
 def files_all(args):
   """Executes all the files commands from individual databases"""
-  
+
   for name in [k.name() for k in args.modules]:
     parsed = args.parser.parse_args([name, 'files'])
     parsed.func(parsed)
 
 def create_all(args):
   """Executes all the default create commands from individual databases"""
- 
+
   errors = 0
   databases = 0
   total_start = time.time()
@@ -30,7 +30,7 @@ def create_all(args):
     print '### Running %d SQLite database creation commands...' % len(sqlite_dbs)
 
   for name in sqlite_dbs:
-    
+
     start_time = time.time()
     databases += 1
 
@@ -45,7 +45,7 @@ def create_all(args):
       parsed.func(parsed)
 
     except:
-      
+
       errors += 1
 
       if args.keep_going:
@@ -70,7 +70,7 @@ def create_all(args):
 
 def version_all(args):
   """Executes all the default version commands from individual databases"""
-  
+
   for name in [k.name() for k in args.modules]:
     parsed = args.parser.parse_args([name, 'version'])
     parsed.func(parsed)
@@ -111,7 +111,7 @@ def add_all_commands(parser, top_subparser, modules):
   create_parser.add_argument('-R', '--recreate',
       action='store_true', default=False,
       help="If set, I'll first erase the current database")
-  create_parser.add_argument('-v', '--verbose', action='count',
+  create_parser.add_argument('-v', '--verbose', action='count', default=0,
       help="Do SQL operations in a verbose way")
   create_parser.set_defaults(func=create_all)
   create_parser.set_defaults(parser=parser)
