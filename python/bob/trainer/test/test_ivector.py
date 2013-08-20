@@ -124,7 +124,7 @@ class IVectorTrainerPy():
         Fnorm_Ewij_Tt    = numpy.diag(numpy.dot(self.m_acc_Fnorm_Sigma_wij[c], X))
         #Fnorm_Ewij_Tt = numpy.diag(numpy.dot(self.m_acc_Fnorm_Sigma_wij[c], Told_c))
         sigma[start:end] = (self.m_acc_Snorm[start:end] - Fnorm_Ewij_Tt) / self.m_N[c]
-      
+
     machine.t = T
     if self.m_sigma_update:
       sigma[sigma < self.m_variance_floor] = self.m_variance_floor
@@ -135,10 +135,10 @@ class IVectorTrainerPy():
 
   def train(self, machine, data):
     self.initialize(machine, data)
-    average_output_previous   = -sys.maxint
-    average_output            = -sys.maxint
+    average_output_previous   = -sys.maxsize
+    average_output            = -sys.maxsize
     self.e_step(machine, data)
-    
+
     i = 0
     while True:
       average_output_previous = average_output
@@ -160,8 +160,8 @@ class IVectorTests(unittest.TestCase):
 
     # Defines GMMStats
     gs1 = bob.machine.GMMStats(2,3)
-    log_likelihood1 = -3. 
-    T1 = 1 
+    log_likelihood1 = -3.
+    T1 = 1
     n1 = numpy.array([0.4, 0.6], numpy.float64)
     sumpx1 = numpy.array([[1., 2., 3.], [2., 4., 3.]], numpy.float64)
     sumpxx1 = numpy.array([[10., 20., 30.], [40., 50., 60.]], numpy.float64)
@@ -172,8 +172,8 @@ class IVectorTests(unittest.TestCase):
     gs1.sum_pxx = sumpxx1
 
     gs2 = bob.machine.GMMStats(2,3)
-    log_likelihood2 = -4. 
-    T2 = 1 
+    log_likelihood2 = -4.
+    T2 = 1
     n2 = numpy.array([0.2, 0.8], numpy.float64)
     sumpx2 = numpy.array([[2., 1., 3.], [3., 4.1, 3.2]], numpy.float64)
     sumpxx2 = numpy.array([[12., 15., 25.], [39., 51., 62.]], numpy.float64)
@@ -188,10 +188,10 @@ class IVectorTests(unittest.TestCase):
 
     acc_Nij_Sigma_wij2_ref1  = {0: numpy.array([[ 0.03202305, -0.02947769], [-0.02947769,  0.0561132 ]]),
                                1: numpy.array([[ 0.07953279, -0.07829414], [-0.07829414,  0.13814242]])}
-    acc_Fnorm_Sigma_wij_ref1 = {0: numpy.array([[-0.29622691,  0.61411796], [ 0.09391764, -0.27955961], [-0.39014455,  0.89367757]]), 
+    acc_Fnorm_Sigma_wij_ref1 = {0: numpy.array([[-0.29622691,  0.61411796], [ 0.09391764, -0.27955961], [-0.39014455,  0.89367757]]),
                                1: numpy.array([[ 0.04695882, -0.13977981], [-0.05718673,  0.24159665], [-0.17098161,  0.47326585]])}
     acc_Snorm_ref1           = numpy.array([16.6, 22.4, 16.6, 61.4, 55., 97.4])
-    N_ref1                   = numpy.array([0.6, 1.4]) 
+    N_ref1                   = numpy.array([0.6, 1.4])
     t_ref1                   = numpy.array([[  1.59543739, 11.78239235], [ -3.20130371, -6.66379081], [  4.79674111, 18.44618316],
                                             [ -0.91765407, -1.5319461 ], [  2.26805901,  3.03434944], [  2.76600031,  4.9935962 ]])
 
@@ -205,7 +205,7 @@ class IVectorTests(unittest.TestCase):
                                             [ -0.54644055, -0.93594252], [  1.29308324,  1.67762053], [  1.67583072,  3.13894546]])
     acc_Nij_Sigma_wij2_ref = [acc_Nij_Sigma_wij2_ref1, acc_Nij_Sigma_wij2_ref2]
     acc_Fnorm_Sigma_wij_ref = [acc_Fnorm_Sigma_wij_ref1, acc_Fnorm_Sigma_wij_ref2]
-    acc_Snorm_ref = [acc_Snorm_ref1, acc_Snorm_ref2] 
+    acc_Snorm_ref = [acc_Snorm_ref1, acc_Snorm_ref2]
     N_ref = [N_ref1, N_ref2]
     t_ref = [t_ref1, t_ref2]
 
@@ -241,7 +241,7 @@ class IVectorTests(unittest.TestCase):
     # Initialization
     trainer = bob.trainer.IVectorTrainer()
     trainer.initialize(m, data)
-    m.t = t 
+    m.t = t
     m.sigma = sigma
     for it in range(2):
       # E-Step
@@ -267,8 +267,8 @@ class IVectorTests(unittest.TestCase):
 
     # Defines GMMStats
     gs1 = bob.machine.GMMStats(dim_c,dim_d)
-    log_likelihood1 = -3. 
-    T1 = 1 
+    log_likelihood1 = -3.
+    T1 = 1
     n1 = numpy.array([0.4, 0.6], numpy.float64)
     sumpx1 = numpy.array([[1., 2., 3.], [2., 4., 3.]], numpy.float64)
     sumpxx1 = numpy.array([[10., 20., 30.], [40., 50., 60.]], numpy.float64)
@@ -279,8 +279,8 @@ class IVectorTests(unittest.TestCase):
     gs1.sum_pxx = sumpxx1
 
     gs2 = bob.machine.GMMStats(dim_c,dim_d)
-    log_likelihood2 = -4. 
-    T2 = 1 
+    log_likelihood2 = -4.
+    T2 = 1
     n2 = numpy.array([0.2, 0.8], numpy.float64)
     sumpx2 = numpy.array([[2., 1., 3.], [3., 4.1, 3.2]], numpy.float64)
     sumpxx2 = numpy.array([[12., 15., 25.], [39., 51., 62.]], numpy.float64)
@@ -295,17 +295,17 @@ class IVectorTests(unittest.TestCase):
     # Reference values
     acc_Nij_Sigma_wij2_ref1  = {0: numpy.array([[ 0.03202305, -0.02947769], [-0.02947769,  0.0561132 ]]),
                                 1: numpy.array([[ 0.07953279, -0.07829414], [-0.07829414,  0.13814242]])}
-    acc_Fnorm_Sigma_wij_ref1 = {0: numpy.array([[-0.29622691,  0.61411796], [ 0.09391764, -0.27955961], [-0.39014455,  0.89367757]]), 
+    acc_Fnorm_Sigma_wij_ref1 = {0: numpy.array([[-0.29622691,  0.61411796], [ 0.09391764, -0.27955961], [-0.39014455,  0.89367757]]),
                                 1: numpy.array([[ 0.04695882, -0.13977981], [-0.05718673,  0.24159665], [-0.17098161,  0.47326585]])}
     acc_Snorm_ref1           = numpy.array([16.6, 22.4, 16.6, 61.4, 55., 97.4])
-    N_ref1                   = numpy.array([0.6, 1.4]) 
+    N_ref1                   = numpy.array([0.6, 1.4])
     t_ref1                   = numpy.array([[  1.59543739, 11.78239235], [ -3.20130371, -6.66379081], [  4.79674111, 18.44618316],
                                             [ -0.91765407, -1.5319461 ], [  2.26805901,  3.03434944], [  2.76600031,  4.9935962 ]])
     sigma_ref1               = numpy.array([ 16.39472121, 34.72955353,  3.3108037, 43.73496916, 38.85472445, 68.22116903])
 
-    acc_Nij_Sigma_wij2_ref2  = {0: numpy.array([[ 0.50807426, -0.11907756], [-0.11907756,  0.12336544]]), 
+    acc_Nij_Sigma_wij2_ref2  = {0: numpy.array([[ 0.50807426, -0.11907756], [-0.11907756,  0.12336544]]),
                                 1: numpy.array([[ 1.18602399, -0.2835859 ], [-0.2835859 ,  0.39440498]])}
-    acc_Fnorm_Sigma_wij_ref2 = {0: numpy.array([[ 0.07221453,  1.1189786 ], [-0.08681275, -0.35396112], [ 0.15902728,  1.47293972]]), 
+    acc_Fnorm_Sigma_wij_ref2 = {0: numpy.array([[ 0.07221453,  1.1189786 ], [-0.08681275, -0.35396112], [ 0.15902728,  1.47293972]]),
                                 1: numpy.array([[-0.04340637, -0.17698056], [ 0.10662127,  0.21484933],[ 0.13116645,  0.64474271]])}
     acc_Snorm_ref2           = numpy.array([16.6, 22.4, 16.6, 61.4, 55., 97.4])
     N_ref2                   = numpy.array([0.6, 1.4])
@@ -315,7 +315,7 @@ class IVectorTests(unittest.TestCase):
 
     acc_Nij_Sigma_wij2_ref = [acc_Nij_Sigma_wij2_ref1, acc_Nij_Sigma_wij2_ref2]
     acc_Fnorm_Sigma_wij_ref = [acc_Fnorm_Sigma_wij_ref1, acc_Fnorm_Sigma_wij_ref2]
-    acc_Snorm_ref = [acc_Snorm_ref1, acc_Snorm_ref2] 
+    acc_Snorm_ref = [acc_Snorm_ref1, acc_Snorm_ref2]
     N_ref = [N_ref1, N_ref2]
     t_ref = [t_ref1, t_ref2]
     sigma_ref = [sigma_ref1, sigma_ref2]
@@ -351,12 +351,12 @@ class IVectorTests(unittest.TestCase):
     # C++ implementation
     # Machine
     m = bob.machine.IVectorMachine(ubm, 2)
-    m.variance_threshold = 1e-5 
+    m.variance_threshold = 1e-5
 
     # Initialization
     trainer = bob.trainer.IVectorTrainer(update_sigma=True)
     trainer.initialize(m, data)
-    m.t = t 
+    m.t = t
     m.sigma = sigma
     for it in range(2):
       # E-Step
