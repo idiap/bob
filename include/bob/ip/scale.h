@@ -41,16 +41,16 @@ namespace bob {
 
     namespace detail {
       /**
-        * @brief Function which rescales a 2D blitz::array/image of a given
-        *   type, using bilinear interpolation.
-        *   The first dimension is the height (y-axis), whereas the second
-        *   one is the width (x-axis).
-        * @warning No check is performed on the dst blitz::array/image.
-        * @param src The input blitz array
-        * @param src_mask The input blitz boolean mask array
-        * @param dst The output blitz array
-        * @param dst_mask The output blitz boolean mask array
-        */
+       * @brief Function which rescales a 2D blitz::array/image of a given
+       *   type, using bilinear interpolation.
+       *   The first dimension is the height (y-axis), whereas the second
+       *   one is the width (x-axis).
+       * @warning No check is performed on the dst blitz::array/image.
+       * @param src The input blitz array
+       * @param src_mask The input blitz boolean mask array
+       * @param dst The output blitz array
+       * @param dst_mask The output blitz boolean mask array
+       */
       template<typename T, bool mask>
       void scaleNoCheck2D_BI(const blitz::Array<T,2>& src,
         const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
@@ -97,14 +97,14 @@ namespace bob {
     }
 
     /**
-      * @brief Function which rescales a 2D blitz::array/image of a given type.
-      *   The first dimension is the height (y-axis), whereas the second
-      *   one is the width (x-axis).
-      * @param src The input blitz array
-      * @param dst The output blitz array. The new array is resized according
-      *   to the dimensions of this dst array.
-      * @param alg The algorithm used for rescaling.
-      */
+     * @brief Function which rescales a 2D blitz::array/image of a given type.
+     *   The first dimension is the height (y-axis), whereas the second
+     *   one is the width (x-axis).
+     * @param src The input blitz array
+     * @param dst The output blitz array. The new array is resized according
+     *   to the dimensions of this dst array.
+     * @param alg The algorithm used for rescaling.
+     */
     template<typename T>
     void scale(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst,
       const Rescale::Algorithm alg=Rescale::BilinearInterp)
@@ -157,16 +157,16 @@ namespace bob {
     }
 
     /**
-      * @brief Function which rescales a 2D blitz::array/image of a given type.
-      *   The first dimension is the height (y-axis), whereas the second
-      *   one is the width (x-axis).
-      * @param src The input blitz array
-      * @param src_mask The input blitz boolean mask array
-      * @param dst The output blitz array. The new array is resized according
-      *   to the dimensions of this dst array.
-      * @param dst_mask The output blitz boolean mask array
-      * @param alg The algorithm used for rescaling.
-      */
+     * @brief Function which rescales a 2D blitz::array/image of a given type.
+     *   The first dimension is the height (y-axis), whereas the second
+     *   one is the width (x-axis).
+     * @param src The input blitz array
+     * @param src_mask The input blitz boolean mask array
+     * @param dst The output blitz array. The new array is resized according
+     *   to the dimensions of this dst array.
+     * @param dst_mask The output blitz boolean mask array
+     * @param alg The algorithm used for rescaling.
+     */
     template<typename T>
     void scale(const blitz::Array<T,2>& src, const blitz::Array<bool,2>& src_mask,
       blitz::Array<double,2>& dst, blitz::Array<bool,2>& dst_mask,
@@ -223,6 +223,15 @@ namespace bob {
       }
     }
 
+    /**
+     * @brief Function which rescales a 3D blitz::array/image of a given type.
+     *   The first dimension is the number of color plane, the second is the 
+     * height (y-axis), whereas the third one is the width (x-axis).
+     * @param src The input blitz array
+     * @param dst The output blitz array. The new array is resized according
+     *   to the dimensions of this dst array.
+     * @param alg The algorithm used for rescaling.
+     */
     template <typename T>
     void scale(const blitz::Array<T,3>& src, blitz::Array<double,3>& dst,
       const Rescale::Algorithm alg=Rescale::BilinearInterp)
@@ -268,31 +277,47 @@ namespace bob {
       }
     }
 
+    /**
+     * @brief Function which returns the shape of an output 2D blitz::array/
+     *   image when rescaling an input image with the given scale factor.
+     *   The first dimension is the height (y-axis), whereas the second one 
+     *   is the width (x-axis).
+     * @param src The 2D input blitz array
+     * @param alg The algorithm used for rescaling.
+     * @return A blitz::TinyVector containing the shape of the rescaled image
+     */
     template <typename T>
-      blitz::Array<T,2>
-      scaleAs(const blitz::Array<T,2>& original, const double scale_factor)
-      {
-        blitz::TinyVector<int, 2> new_shape =
-          blitz::floor(original.shape() * scale_factor + 0.5);
-        return blitz::Array<T,2>(new_shape);
-      }
+    blitz::TinyVector<int,2>
+    getScaledShape(const blitz::Array<T,2>& original, const double scale_factor)
+    {
+      blitz::TinyVector<int,2> dst_shape =
+        blitz::floor(original.shape() * scale_factor + 0.5);
+      return dst_shape;
+    }
 
+    /**
+     * @brief Function which returns the shape of an output 3D blitz::array/
+     *   image when rescaling an input image with the given scale factor.
+     *   The first dimension is the number of color planes, the second one is
+     *   the height (y-axis), whereas the third one is the width (x-axis).
+     * @param src The 3D input blitz array
+     * @param alg The algorithm used for rescaling.
+     * @return A blitz::TinyVector containing the shape of the rescaled image
+     */
     template <typename T>
-      blitz::Array<T,3>
-      scaleAs(const blitz::Array<T,3>& original, const double scale_factor)
-      {
-        // With 3D Blitz arrays (e.g, color image) we do not want
-        // to scale the number of planes :)
-        blitz::TinyVector<int, 3> new_shape = original.shape();
-        new_shape(1) = floor(new_shape(1) * scale_factor + 0.5);
-        new_shape(2) = floor(new_shape(2) * scale_factor + 0.5);
-
-        return blitz::Array<T,3>(new_shape);
-      }
+    blitz::TinyVector<int,3>
+    getScaledShape(const blitz::Array<T,3>& original, const double scale_factor)
+    {
+      blitz::TinyVector<int,3> dst_shape = original.shape();
+      dst_shape(1) = floor(dst_shape(1) * scale_factor + 0.5);
+      dst_shape(2) = floor(dst_shape(2) * scale_factor + 0.5);
+      return dst_shape;
+    }
   }
+
   /**
    * @}
- */
+   */
 }
 
 #endif /* BOB_IP_SCALE_H */
