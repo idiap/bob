@@ -48,6 +48,7 @@ This module contains utilities for image processing.
    get_block_3d_output_shape
    get_block_4d_output_shape
    get_rotated_output_shape
+   get_scaled_output_shape
    get_shear_x_shape
    get_shear_y_shape
    gray_to_rgb
@@ -71,7 +72,6 @@ This module contains utilities for image processing.
    rgb_to_yuv
    rotate
    scale
-   scale_as
    shear_x
    shear_y
    shift

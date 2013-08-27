@@ -283,15 +283,15 @@ namespace bob {
      *   The first dimension is the height (y-axis), whereas the second one 
      *   is the width (x-axis).
      * @param src The 2D input blitz array
-     * @param alg The algorithm used for rescaling.
+     * @param scale_factor The scaling factor to apply
      * @return A blitz::TinyVector containing the shape of the rescaled image
      */
     template <typename T>
     blitz::TinyVector<int,2>
-    getScaledShape(const blitz::Array<T,2>& original, const double scale_factor)
+    getScaledShape(const blitz::Array<T,2>& src, const double scale_factor)
     {
       blitz::TinyVector<int,2> dst_shape =
-        blitz::floor(original.shape() * scale_factor + 0.5);
+        blitz::floor(src.shape() * scale_factor + 0.5);
       return dst_shape;
     }
 
@@ -301,14 +301,14 @@ namespace bob {
      *   The first dimension is the number of color planes, the second one is
      *   the height (y-axis), whereas the third one is the width (x-axis).
      * @param src The 3D input blitz array
-     * @param alg The algorithm used for rescaling.
+     * @param scale_factor The scaling factor to apply
      * @return A blitz::TinyVector containing the shape of the rescaled image
      */
     template <typename T>
     blitz::TinyVector<int,3>
-    getScaledShape(const blitz::Array<T,3>& original, const double scale_factor)
+    getScaledShape(const blitz::Array<T,3>& src, const double scale_factor)
     {
-      blitz::TinyVector<int,3> dst_shape = original.shape();
+      blitz::TinyVector<int,3> dst_shape = src.shape();
       dst_shape(1) = floor(dst_shape(1) * scale_factor + 0.5);
       dst_shape(2) = floor(dst_shape(2) * scale_factor + 0.5);
       return dst_shape;
