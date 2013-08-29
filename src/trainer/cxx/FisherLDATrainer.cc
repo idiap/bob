@@ -52,8 +52,11 @@ bob::trainer::FisherLDATrainer::~FisherLDATrainer()
 bob::trainer::FisherLDATrainer& bob::trainer::FisherLDATrainer::operator=
   (const bob::trainer::FisherLDATrainer& other)
 {
-  m_use_pinv = other.m_use_pinv;
-  m_strip_to_rank = other.m_strip_to_rank;
+  if (this != &other) // avoid auto assignment
+  {
+    m_use_pinv = other.m_use_pinv;
+    m_strip_to_rank = other.m_strip_to_rank;
+  }
   return *this;
 }
 
