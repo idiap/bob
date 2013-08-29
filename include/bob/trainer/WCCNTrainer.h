@@ -53,10 +53,8 @@ class WCCNTrainer: public Trainer<bob::machine::LinearMachine, std::vector<blitz
   public:
     /**
      * @brief Initializes a new WCCN trainer.
-     * @param use_pinv If set (to <code>true</code>), then use the
-     * pseudo-inverse to compute Sw^-1.
      */
-    WCCNTrainer(bool use_pinv = false);
+    WCCNTrainer();
 
     /**
      * @brief Copy constructor
@@ -88,23 +86,12 @@ class WCCNTrainer: public Trainer<bob::machine::LinearMachine, std::vector<blitz
       const double a_epsilon=1e-8) const;
 
     /**
-     * @brief Gets the pseudo-inverse flag
-     */
-    bool getUsePseudoInverse () const { return m_use_pinv; }
-
-    /**
-     * @brief Sets the pseudo-inverse flag
-     */
-    void setUsePseudoInverse (bool v) { m_use_pinv = v; }
-
-    /**
      * @brief Trains the LinearMachine to perform the WCCN
      */
     virtual void train(bob::machine::LinearMachine& machine, 
         const std::vector<blitz::Array<double, 2> >& data);
 
   private: //representation
-    bool m_use_pinv; ///< use the 'pinv' method for LDA
 };
 
 /**

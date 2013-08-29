@@ -435,15 +435,3 @@ def test_wccn_train():
   assert numpy.allclose(m2.input_subtract, mean_ref, eps, eps)
   assert numpy.allclose(m2.weights, weight_ref, eps, eps)
   assert numpy.allclose(s2, sample_wccn_ref, eps, eps)
-
-  # Runs WCCN (pseudo inverse)
-  t.use_pinv = True 
-  m3 = t.train(data)
-  s3 = m3.forward(sample)
-
-  # Makes sure results are good
-  eps = 1e-4
-  assert numpy.allclose(m3.input_subtract, mean_ref, eps, eps)
-  assert numpy.allclose(m3.weights, weight_ref, eps, eps)
-  assert numpy.allclose(s3, sample_wccn_ref, eps, eps)
-

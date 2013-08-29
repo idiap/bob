@@ -93,25 +93,12 @@ object py_train2(bob::trainer::WCCNTrainer& t, object data)
 
 void bind_trainer_wccn()
 {
-  class_<bob::trainer::WCCNTrainer, boost::shared_ptr<bob::trainer::WCCNTrainer> >("WCCNTrainer", CLASS_DOC, init<optional<const bool> >((arg("self"), arg("use_pinv")=false), 
-          "Initializes a new WCCN trainer\n" \
-          "\n" \
-          "Keyword parameters:\n" \
-          "\n" \
-          "use_pinv (bool) - defaults to ``False``\n" \
-          "   \n" \
-          "   If set to ``True``, use the pseudo-inverse to calculate :math:`S_w^{-1}`\n"
-          "   \n" \
-          "   .. note::\n" \
-          "     \n" \
-          "     Using the pseudo-inverse for the WCCN training is only recommended if you cannot make it work using the default method. It is slower and requires more machine memory to store partial values of the pseudo-inverse `S_w^{-1}`.\n")) 
+  class_<bob::trainer::WCCNTrainer, boost::shared_ptr<bob::trainer::WCCNTrainer> >("WCCNTrainer", CLASS_DOC, init<>((arg("self")), "Initializes a new WCCN trainer."))
     .def(init<const bob::trainer::WCCNTrainer&>((arg("self"), arg("other")), "Copy constructs a WCCNTrainer"))
     .def(self == self)
     .def(self != self)
     .def("is_similar_to", &bob::trainer::WCCNTrainer::is_similar_to, (arg("self"), arg("other"), arg("r_epsilon")=1e-5, arg("a_epsilon")=1e-8), "Compares this WCCNTrainer with the 'other' one to be approximately the same.")
     .def("train", &py_train1, (arg("self"), arg("machine"), arg("data")), "Trains the LinearMachine to perform the WCCN, given a training set.")
     .def("train", &py_train2, (arg("self"), arg("data")), "Allocates, trains and returns a LinearMachine to perform the WCCN, given a training set.")
-    .add_property("use_pinv", &bob::trainer::WCCNTrainer::getUsePseudoInverse, &bob::trainer::WCCNTrainer::setUsePseudoInverse,
-        "If ``True``, use the pseudo-inverse to calculate :math:`S_w^{-1}`")
   ;
 }
