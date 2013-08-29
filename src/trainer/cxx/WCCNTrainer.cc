@@ -21,16 +21,19 @@
 
 #include <bob/trainer/WCCNTrainer.h>
 #include <bob/math/inv.h>
+#include <bob/math/pinv.h>
 #include <bob/math/lu.h>
 #include <bob/math/stats.h>
 #include <boost/make_shared.hpp>
 
 
-bob::trainer::WCCNTrainer::WCCNTrainer()
+bob::trainer::WCCNTrainer::WCCNTrainer(const bool use_pinv):
+  m_use_pinv(use_pinv)
 {
 }
 
-bob::trainer::WCCNTrainer::WCCNTrainer(const bob::trainer::WCCNTrainer& other)
+bob::trainer::WCCNTrainer::WCCNTrainer(const bob::trainer::WCCNTrainer& other):
+  m_use_pinv(other.m_use_pinv)
 {
 }
 
@@ -39,13 +42,17 @@ bob::trainer::WCCNTrainer::~WCCNTrainer() {}
 bob::trainer::WCCNTrainer& bob::trainer::WCCNTrainer::operator=
 (const bob::trainer::WCCNTrainer& other)
 {
+  if (this != &other)
+  {
+    m_use_pinv = other.m_use_pinv;
+  }
   return *this;
 }
 
 bool bob::trainer::WCCNTrainer::operator==
   (const bob::trainer::WCCNTrainer& other) const
 {
-  return true;
+  return m_use_pinv == other.m_use_pinv;
 }
 
 bool bob::trainer::WCCNTrainer::operator!=
@@ -58,7 +65,7 @@ bool bob::trainer::WCCNTrainer::is_similar_to
   (const bob::trainer::WCCNTrainer& other, const double r_epsilon,
    const double a_epsilon) const
 {
-  return true;
+  return m_use_pinv == other.m_use_pinv;
 }
 
 
@@ -108,7 +115,10 @@ void bob::trainer::WCCNTrainer::train(bob::machine::LinearMachine& machine,
 
   // 2. Computes the inverse of (1/N * Sw), Sw is the within-class covariance matrix
   buf1 /= n_classes;
-  bob::math::inv(buf1, buf2); // buf2 = (1/N * Sw)^{-1}
+  if (m_use_pinv)
+    bob::math::pinv_(buf1, buf2); // buf2 = (1/N * Sw)^{-1} (using pseudo inverse)
+  else
+    bob::math::inv(buf1, buf2); // buf2 = (1/N * Sw)^{-1}
 
   // 3. Computes the Cholesky decomposition of the inverse covariance matrix 
   bob::math::chol(buf2, buf1); //  buf1 = cholesky(buf2)
