@@ -30,5 +30,7 @@ target_link_libraries(${PROJECT_NAME} ${shared})
 bob_add_test(${PROJECT_NAME} convolution test/conv.cc)
 bob_add_test(${PROJECT_NAME} fft_fct test/fft_fct.cc)
 
+bob_add_benchmark(${PROJECT_NAME} fft_fct benchmark/fft_fct.cc)
+
 # Pkg-Config generator
 bob_pkgconfig(${PROJECT_NAME} "${bob_deps}")

@@ -210,6 +210,23 @@ macro(bob_add_executable package name src)
   install(TARGETS ${ename} DESTINATION bin)
 endmacro()
 
+# Creates a standard Bob benchmark application.
+# A benchmark is a non-installable executable
+#
+# package: package the benchmark belongs to
+# name: application name
+# src: test source files
+#
+# Example: bob_add_benchmark(io array test/array.cc)
+macro(bob_add_benchmark package name src)
+  set(ename ${package}_${name})
+  include_directories(BEFORE 
+    "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
+  add_executable(${ename} ${src})
+  target_link_libraries(${ename} ${package})
+endmacro()
+
+
 # Creates and installs a pkg-config file for each subpackage
 #
 # package: package the test belongs to
