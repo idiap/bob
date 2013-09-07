@@ -264,7 +264,7 @@ class FATest(unittest.TestCase):
     x_ref = numpy.array([0.291042849767692, 0.310273618998444], 'float64')
     score_ref = -2.111577181208289
     score = m.forward(gs)
-    self.assertTrue( numpy.allclose(m.x, x_ref, eps) )
+    self.assertTrue( numpy.allclose(m.__x__, x_ref, eps) )
     self.assertTrue( abs(score_ref-score) < eps )
 
     # x and Ux
@@ -277,7 +277,7 @@ class FATest(unittest.TestCase):
     m.estimate_ux(gs, ux)
     ux_py = estimate_ux(m.dim_c, m.dim_d, ubm.mean_supervector, ubm.variance_supervector, U, n, sumpx)
     self.assertTrue( numpy.allclose(ux, ux_py, eps))
-    self.assertTrue( numpy.allclose(m.x, x, eps) )
+    self.assertTrue( numpy.allclose(m.__x__, x, eps) )
 
     score = m.forward_ux(gs, ux)
     self.assertTrue( abs(score_ref-score) < eps )
@@ -358,7 +358,7 @@ class FATest(unittest.TestCase):
     score_ref = -3.280498193082100
 
     score = m.forward(gs)
-    self.assertTrue( numpy.allclose(m.x, x_ref, eps) )
+    self.assertTrue( numpy.allclose(m.__x__, x_ref, eps) )
     self.assertTrue( abs(score_ref-score) < eps )
 
     # Check using alternate forward() method
@@ -377,7 +377,7 @@ class FATest(unittest.TestCase):
     m.estimate_ux(gs, ux)
     ux_py = estimate_ux(m.dim_c, m.dim_d, ubm.mean_supervector, ubm.variance_supervector, U, n, sumpx)
     self.assertTrue( numpy.allclose(ux, ux_py, eps))
-    self.assertTrue( numpy.allclose(m.x, x, eps) )
+    self.assertTrue( numpy.allclose(m.__x__, x, eps) )
 
     score = m.forward_ux(gs, ux)
     self.assertTrue( abs(score_ref-score) < eps )
