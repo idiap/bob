@@ -322,6 +322,8 @@ void bob::ip::GaussianScaleSpace::operator()(const blitz::Array<T,2>& src,
 {
   // Checks
   bob::core::array::assertZeroBase(src);
+  bob::core::array::assertSameDimensionLength(src.extent(0),m_height);
+  bob::core::array::assertSameDimensionLength(src.extent(1),m_width);
   for (size_t i=0; i<dst.size(); ++i)
     bob::core::array::assertZeroBase(dst[i]);
 
