@@ -35,7 +35,7 @@ class GMMMachineTest(unittest.TestCase):
   """Performs various GMM machine-related tests."""
 
   def test01_GMMStats(self):
-    """Test a GMMStats"""
+    # Test a GMMStats
 
     # Initializes a GMMStats
     gs = bob.machine.GMMStats(2,3)
@@ -98,7 +98,7 @@ class GMMMachineTest(unittest.TestCase):
     os.unlink(filename)
 
   def test02_GMMMachine(self):
-    """Test a GMMMachine basic features"""
+    # Test a GMMMachine basic features
 
     weights   = numpy.array([0.5, 0.5], 'float64')
     weights2   = numpy.array([0.6, 0.4], 'float64')
@@ -195,7 +195,7 @@ class GMMMachineTest(unittest.TestCase):
     self.assertFalse( gmm.is_similar_to(gmm6) )
 
   def test03_GMMMachine(self):
-    """Test a GMMMachine (statistics)"""
+    # Test a GMMMachine (statistics)
 
     arrayset = bob.io.load(F("faithful.torch3_f64.hdf5"))
     gmm = bob.machine.GMMMachine(2, 2)
@@ -217,7 +217,7 @@ class GMMMachineTest(unittest.TestCase):
     self.assertTrue( numpy.allclose(stats.sum_pxx, stats_ref.sum_pxx, atol=1e-10) )
 
   def test04_GMMMachine(self):
-    """Test a GMMMachine (log-likelihood computation)"""
+    # Test a GMMMachine (log-likelihood computation)
 
     data = bob.io.load(F('data.hdf5'))
     gmm = bob.machine.GMMMachine(2, 50)

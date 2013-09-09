@@ -4,16 +4,16 @@
 # Thu Jul 14 18:53:07 2011 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -24,6 +24,7 @@ import numpy
 
 from .. import MLPBaseTrainer, MLPRPropTrainer, CrossEntropyLoss, SquareError
 from ...machine import HyperbolicTangentActivation, LogisticActivation, IdentityActivation, MLP
+import unittest
 
 def sign(x):
   """A handy sign function"""
@@ -36,7 +37,7 @@ class PythonRProp(MLPBaseTrainer):
   """
 
   def __init__(self, batch_size, cost, machine, train_biases):
-    
+
     super(PythonRProp, self).__init__(batch_size, cost, machine, train_biases)
 
     # some constants for RProp
@@ -107,7 +108,7 @@ class PythonRProp(MLPBaseTrainer):
 def check_training(machine, cost, bias_training, batch_size):
 
   python_machine = MLP(machine)
-  
+
   X = numpy.random.rand(batch_size, machine.weights[0].shape[0])
   T = numpy.zeros((batch_size, machine.weights[-1].shape[1]))
 
@@ -150,97 +151,100 @@ def check_training(machine, cost, bias_training, batch_size):
   assert numpy.alltrue(machine.input_subtract == python_machine.input_subtract)
   assert numpy.alltrue(machine.input_divide == python_machine.input_divide)
 
-def test_2in_1out_nobias():
-  
-  machine = MLP((2, 1))
-  machine.randomize()
-  machine.hidden_activation = LogisticActivation()
-  machine.output_activation = LogisticActivation()
-  machine.biases = 0
 
-  BATCH_SIZE = 10
-  cost = CrossEntropyLoss(machine.output_activation)
+class RpropTest (unittest.TestCase):
 
-  for k in range(10):
-    check_training(machine, cost, False, BATCH_SIZE)
+  def test_2in_1out_nobias(self):
 
-def test_1in_2out_nobias():
+    machine = MLP((2, 1))
+    machine.randomize()
+    machine.hidden_activation = LogisticActivation()
+    machine.output_activation = LogisticActivation()
+    machine.biases = 0
 
-  machine = MLP((1, 2))
-  machine.randomize()
-  machine.hidden_activation = LogisticActivation()
-  machine.output_activation = LogisticActivation()
-  machine.biases = 0
+    BATCH_SIZE = 10
+    cost = CrossEntropyLoss(machine.output_activation)
 
-  BATCH_SIZE = 10
-  cost = CrossEntropyLoss(machine.output_activation)
+    for k in range(10):
+      check_training(machine, cost, False, BATCH_SIZE)
 
-  for k in range(10):
-    check_training(machine, cost, False, BATCH_SIZE)
+  def test_1in_2out_nobias(self):
 
-def test_2in_3_1out_nobias():
+    machine = MLP((1, 2))
+    machine.randomize()
+    machine.hidden_activation = LogisticActivation()
+    machine.output_activation = LogisticActivation()
+    machine.biases = 0
 
-  machine = MLP((2, 3, 1))
-  machine.randomize()
-  machine.hidden_activation = HyperbolicTangentActivation()
-  machine.output_activation = HyperbolicTangentActivation()
-  machine.biases = 0
+    BATCH_SIZE = 10
+    cost = CrossEntropyLoss(machine.output_activation)
 
-  BATCH_SIZE = 10
-  cost = SquareError(machine.output_activation)
+    for k in range(10):
+      check_training(machine, cost, False, BATCH_SIZE)
 
-  for k in range(10):
-    check_training(machine, cost, False, BATCH_SIZE)
+  def test_2in_3_1out_nobias(self):
 
-def test_100in_10_10_5out_nobias():
+    machine = MLP((2, 3, 1))
+    machine.randomize()
+    machine.hidden_activation = HyperbolicTangentActivation()
+    machine.output_activation = HyperbolicTangentActivation()
+    machine.biases = 0
 
-  machine = MLP((100, 10, 10, 5))
-  machine.randomize()
-  machine.hidden_activation = HyperbolicTangentActivation()
-  machine.output_activation = HyperbolicTangentActivation()
-  machine.biases = 0
+    BATCH_SIZE = 10
+    cost = SquareError(machine.output_activation)
 
-  BATCH_SIZE = 10
-  cost = SquareError(machine.output_activation)
+    for k in range(10):
+      check_training(machine, cost, False, BATCH_SIZE)
 
-  for k in range(10):
-    check_training(machine, cost, False, BATCH_SIZE)
+  def test_100in_10_10_5out_nobias(self):
 
-def test_2in_3_1out():
+    machine = MLP((100, 10, 10, 5))
+    machine.randomize()
+    machine.hidden_activation = HyperbolicTangentActivation()
+    machine.output_activation = HyperbolicTangentActivation()
+    machine.biases = 0
 
-  machine = MLP((2, 3, 1))
-  machine.randomize()
-  machine.hidden_activation = HyperbolicTangentActivation()
-  machine.output_activation = HyperbolicTangentActivation()
+    BATCH_SIZE = 10
+    cost = SquareError(machine.output_activation)
 
-  BATCH_SIZE = 10
-  cost = SquareError(machine.output_activation)
+    for k in range(10):
+      check_training(machine, cost, False, BATCH_SIZE)
 
-  for k in range(10):
-    check_training(machine, cost, True, BATCH_SIZE)
+  def test_2in_3_1out(self):
 
-def test_20in_10_5_3out():
+    machine = MLP((2, 3, 1))
+    machine.randomize()
+    machine.hidden_activation = HyperbolicTangentActivation()
+    machine.output_activation = HyperbolicTangentActivation()
 
-  machine = MLP((20, 10, 5, 3))
-  machine.randomize()
-  machine.hidden_activation = HyperbolicTangentActivation()
-  machine.output_activation = HyperbolicTangentActivation()
+    BATCH_SIZE = 10
+    cost = SquareError(machine.output_activation)
 
-  BATCH_SIZE = 10
-  cost = SquareError(machine.output_activation)
+    for k in range(10):
+      check_training(machine, cost, True, BATCH_SIZE)
 
-  for k in range(10):
-    check_training(machine, cost, True, BATCH_SIZE)
+  def test_20in_10_5_3out(self):
 
-def test_20in_10_5_3out_with_momentum():
+    machine = MLP((20, 10, 5, 3))
+    machine.randomize()
+    machine.hidden_activation = HyperbolicTangentActivation()
+    machine.output_activation = HyperbolicTangentActivation()
 
-  machine = MLP((20, 10, 5, 3))
-  machine.randomize()
-  machine.hidden_activation = HyperbolicTangentActivation()
-  machine.output_activation = HyperbolicTangentActivation()
+    BATCH_SIZE = 10
+    cost = SquareError(machine.output_activation)
 
-  BATCH_SIZE = 10
-  cost = SquareError(machine.output_activation)
+    for k in range(10):
+      check_training(machine, cost, True, BATCH_SIZE)
 
-  for k in range(10):
-    check_training(machine, cost, True, BATCH_SIZE)
+  def test_20in_10_5_3out_with_momentum(self):
+
+    machine = MLP((20, 10, 5, 3))
+    machine.randomize()
+    machine.hidden_activation = HyperbolicTangentActivation()
+    machine.output_activation = HyperbolicTangentActivation()
+
+    BATCH_SIZE = 10
+    cost = SquareError(machine.output_activation)
+
+    for k in range(10):
+      check_training(machine, cost, True, BATCH_SIZE)

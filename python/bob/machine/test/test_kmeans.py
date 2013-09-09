@@ -4,16 +4,16 @@
 # Thu Feb 16 17:57:10 2012 +0200
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -28,12 +28,12 @@ import tempfile
 
 def equals(x, y, epsilon):
   return (abs(x - y) < epsilon)
-  
+
 class KMeansMachineTest(unittest.TestCase):
   """Performs various KMeans machine-related tests."""
 
   def test01_KMeansMachine(self):
-    """Test a KMeansMachine"""
+    # Test a KMeansMachine
 
     means = numpy.array([[3, 70, 0], [4, 72, 0]], 'float64')
     mean  = numpy.array([3,70,1], 'float64')
@@ -66,7 +66,7 @@ class KMeansMachineTest(unittest.TestCase):
     km_loaded = bob.machine.KMeansMachine(bob.io.HDF5File(filename))
     self.assertTrue( km == km_loaded )
 
-    # Resize 
+    # Resize
     km.resize(4,5)
     self.assertTrue( km.dim_c == 4 )
     self.assertTrue( km.dim_d == 5 )

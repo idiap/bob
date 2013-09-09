@@ -8,11 +8,14 @@
 
 from ...test import utils
 
-@utils.ffmpeg_found()
-def test_video2frame():
+import unittest
 
-  movie = utils.datafile('test.mov', __name__)
+class Video2FrameTest (unittest.TestCase):
+  @utils.ffmpeg_found()
+  def test_video2frame(self):
 
-  from ..example.video2frame import main
-  cmdline = ['--self-test', movie]
-  assert main(cmdline) == 0
+    movie = utils.datafile('test.mov', __name__)
+
+    from ..example.video2frame import main
+    cmdline = ['--self-test', movie]
+    assert main(cmdline) == 0

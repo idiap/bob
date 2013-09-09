@@ -4,16 +4,16 @@
 # Tue Aug 27 12:40:18 CEST 2013
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 3 of the License.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -47,7 +47,7 @@ class ScaleTest(unittest.TestCase):
   """Performs various tests for the scale function."""
 
   def test01_scale_regular(self):
-    """Use scaling where both output and input are arguments"""
+    # Use scaling where both output and input are arguments
     dst_2by2 = numpy.zeros(shape=(2,2), dtype=numpy.float)
     bob.ip.scale(src, dst_2by2)
     numpy.allclose(dst_2by2, dst_ref_2by2, atol=eps)
@@ -57,7 +57,7 @@ class ScaleTest(unittest.TestCase):
     numpy.allclose(dst_8by8, dst_ref_8by8, atol=eps)
 
   def test02_scale_factor(self):
-    """Use scaling where the output size is provided as a scaling factor"""
+    # Use scaling where the output size is provided as a scaling factor
     dst_2by2 = numpy.zeros(shape=(2,2), dtype=numpy.float)
     dst_2by2 = bob.ip.scale(src, 0.5)
     numpy.allclose(dst_2by2, dst_ref_2by2, atol=eps)

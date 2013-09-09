@@ -29,6 +29,8 @@ import nose.tools
 from .. import load, write, File
 from ...test import utils as testutils
 
+import unittest
+
 def transcode(filename):
   """Runs a complete transcoding test, to and from the binary format."""
 
@@ -89,198 +91,201 @@ def arrayset_readwrite(extension, arrays, close=False):
   finally:
     if os.path.exists(tmpname): os.unlink(tmpname)
 
-def test_hdf5():
 
-  # array writing tests
-  a1 = numpy.random.normal(size=(2,3)).astype('float32')
-  a2 = numpy.random.normal(size=(2,3,4)).astype('float64')
-  a3 = numpy.random.normal(size=(2,3,4,5)).astype('complex128')
-  a4 = (10 * numpy.random.normal(size=(3,3))).astype('uint64')
+class IOTest(unittest.TestCase):
 
-  array_readwrite('.hdf5', a1) # extensions: .hdf5 or .h5
-  array_readwrite(".h5", a2)
-  array_readwrite('.h5', a3)
-  array_readwrite(".h5", a4)
+  def test_hdf5(self):
 
-  # arrayset writing tests
-  a1 = []
-  a2 = []
-  a3 = []
-  a4 = []
-  for k in range(10):
-    a1.append(numpy.random.normal(size=(2,3)).astype('float32'))
-    a2.append(numpy.random.normal(size=(2,3,4)).astype('float64'))
-    a3.append(numpy.random.normal(size=(2,3,4,5)).astype('complex128'))
-    a4.append((10*numpy.random.normal(size=(3,3))).astype('uint64'))
+    # array writing tests
+    a1 = numpy.random.normal(size=(2,3)).astype('float32')
+    a2 = numpy.random.normal(size=(2,3,4)).astype('float64')
+    a3 = numpy.random.normal(size=(2,3,4,5)).astype('complex128')
+    a4 = (10 * numpy.random.normal(size=(3,3))).astype('uint64')
 
-  arrayset_readwrite('.h5', a1)
-  arrayset_readwrite(".h5", a2)
-  arrayset_readwrite('.h5', a3)
-  arrayset_readwrite(".h5", a4)
+    array_readwrite('.hdf5', a1) # extensions: .hdf5 or .h5
+    array_readwrite(".h5", a2)
+    array_readwrite('.h5', a3)
+    array_readwrite(".h5", a4)
 
-  # complete transcoding tests
-  transcode(testutils.datafile('test1.hdf5', __name__))
-  transcode(testutils.datafile('matlab_1d.hdf5', __name__))
-  transcode(testutils.datafile('matlab_2d.hdf5', __name__))
+    # arrayset writing tests
+    a1 = []
+    a2 = []
+    a3 = []
+    a4 = []
+    for k in range(10):
+      a1.append(numpy.random.normal(size=(2,3)).astype('float32'))
+      a2.append(numpy.random.normal(size=(2,3,4)).astype('float64'))
+      a3.append(numpy.random.normal(size=(2,3,4,5)).astype('complex128'))
+      a4.append((10*numpy.random.normal(size=(3,3))).astype('uint64'))
 
-@testutils.extension_available('.bindata')
-def test_torch3_binary():
+    arrayset_readwrite('.h5', a1)
+    arrayset_readwrite(".h5", a2)
+    arrayset_readwrite('.h5', a3)
+    arrayset_readwrite(".h5", a4)
 
-  # array writing tests
-  a1 = numpy.random.normal(size=(3,4)).astype('float32') #good, supported
-  a2 = numpy.random.normal(size=(3,4)).astype('float64') #good, supported
-  a3 = numpy.random.normal(size=(3,4)).astype('complex128') #not supported
+    # complete transcoding tests
+    transcode(testutils.datafile('test1.hdf5', __name__))
+    transcode(testutils.datafile('matlab_1d.hdf5', __name__))
+    transcode(testutils.datafile('matlab_2d.hdf5', __name__))
 
-  array_readwrite('.bindata', a1)
-  array_readwrite(".bindata", a2)
-  nose.tools.assert_raises(RuntimeError, array_readwrite, ".bindata", a3)
+  @testutils.extension_available('.bindata')
+  def test_torch3_binary(self):
 
-  # arrayset writing tests
-  a1 = []
-  a2 = []
-  a3 = []
-  a4 = []
-  for k in range(10):
-    a1.append(numpy.random.normal(size=(24,)).astype('float32')) #supported
-    a2.append(numpy.random.normal(size=(24,)).astype('float64')) #supported
-    a3.append(numpy.random.normal(size=(24,)).astype('complex128')) #unsupp.
-    a4.append(numpy.random.normal(size=(3,3))) #not supported
+    # array writing tests
+    a1 = numpy.random.normal(size=(3,4)).astype('float32') #good, supported
+    a2 = numpy.random.normal(size=(3,4)).astype('float64') #good, supported
+    a3 = numpy.random.normal(size=(3,4)).astype('complex128') #not supported
 
-  arrayset_readwrite('.bindata', a1)
-  arrayset_readwrite(".bindata", a2)
+    array_readwrite('.bindata', a1)
+    array_readwrite(".bindata", a2)
+    nose.tools.assert_raises(RuntimeError, array_readwrite, ".bindata", a3)
 
-  # checks we raise if we don't suppport a type
-  nose.tools.assert_raises(RuntimeError, arrayset_readwrite, ".bindata", a3)
-  nose.tools.assert_raises(RuntimeError, arrayset_readwrite, ".bindata", a4)
+    # arrayset writing tests
+    a1 = []
+    a2 = []
+    a3 = []
+    a4 = []
+    for k in range(10):
+      a1.append(numpy.random.normal(size=(24,)).astype('float32')) #supported
+      a2.append(numpy.random.normal(size=(24,)).astype('float64')) #supported
+      a3.append(numpy.random.normal(size=(24,)).astype('complex128')) #unsupp.
+      a4.append(numpy.random.normal(size=(3,3))) #not supported
 
-  # complete transcoding test
-  transcode(testutils.datafile('torch3.bindata', __name__))
+    arrayset_readwrite('.bindata', a1)
+    arrayset_readwrite(".bindata", a2)
 
-@testutils.extension_available('.mat')
-def test_mat_file_io():
+    # checks we raise if we don't suppport a type
+    nose.tools.assert_raises(RuntimeError, arrayset_readwrite, ".bindata", a3)
+    nose.tools.assert_raises(RuntimeError, arrayset_readwrite, ".bindata", a4)
 
-  # array writing tests
-  a1 = numpy.random.normal(size=(2,3)).astype('float32')
-  a2 = numpy.random.normal(size=(2,3,4)).astype('float64')
-  a3 = numpy.random.normal(size=(2,3,4,5)).astype('complex128')
-  a4 = (10 * numpy.random.normal(size=(3,3))).astype('uint64')
+    # complete transcoding test
+    transcode(testutils.datafile('torch3.bindata', __name__))
 
-  array_readwrite('.mat', a1)
-  array_readwrite(".mat", a2)
-  array_readwrite('.mat', a3)
-  array_readwrite(".mat", a4)
+  @testutils.extension_available('.mat')
+  def test_mat_file_io(self):
 
-  # arrayset writing tests
-  a1 = []
-  a2 = []
-  a3 = []
-  a4 = []
-  for k in range(10):
-    a1.append(numpy.random.normal(size=(2,3)).astype('float32'))
-    a2.append(numpy.random.normal(size=(2,3,4)).astype('float64'))
-    a3.append(numpy.random.normal(size=(2,3,4,5)).astype('complex128'))
-    a4.append((10*numpy.random.normal(size=(3,3))).astype('uint64'))
+    # array writing tests
+    a1 = numpy.random.normal(size=(2,3)).astype('float32')
+    a2 = numpy.random.normal(size=(2,3,4)).astype('float64')
+    a3 = numpy.random.normal(size=(2,3,4,5)).astype('complex128')
+    a4 = (10 * numpy.random.normal(size=(3,3))).astype('uint64')
 
-  arrayset_readwrite('.mat', a1)
-  arrayset_readwrite(".mat", a2)
-  arrayset_readwrite('.mat', a3)
-  arrayset_readwrite(".mat", a4)
+    array_readwrite('.mat', a1)
+    array_readwrite(".mat", a2)
+    array_readwrite('.mat', a3)
+    array_readwrite(".mat", a4)
 
-  # complete transcoding tests
-  transcode(testutils.datafile('test_1d.mat', __name__)) #pseudo 1D - matlab does not support true 1D
-  transcode(testutils.datafile('test_2d.mat', __name__))
-  transcode(testutils.datafile('test_3d.mat', __name__))
-  transcode(testutils.datafile('test_4d.mat', __name__))
-  transcode(testutils.datafile('test_1d_cplx.mat', __name__)) #pseudo 1D - matlab does not support 1D
-  transcode(testutils.datafile('test_2d_cplx.mat', __name__))
-  transcode(testutils.datafile('test_3d_cplx.mat', __name__))
-  transcode(testutils.datafile('test_4d_cplx.mat', __name__))
-  transcode(testutils.datafile('test.mat', __name__)) #3D complex, large
+    # arrayset writing tests
+    a1 = []
+    a2 = []
+    a3 = []
+    a4 = []
+    for k in range(10):
+      a1.append(numpy.random.normal(size=(2,3)).astype('float32'))
+      a2.append(numpy.random.normal(size=(2,3,4)).astype('float64'))
+      a3.append(numpy.random.normal(size=(2,3,4,5)).astype('complex128'))
+      a4.append((10*numpy.random.normal(size=(3,3))).astype('uint64'))
 
-@nose.tools.nottest
-@testutils.extension_available('.mat')
-def test_mat_file_io_does_not_crash():
+    arrayset_readwrite('.mat', a1)
+    arrayset_readwrite(".mat", a2)
+    arrayset_readwrite('.mat', a3)
+    arrayset_readwrite(".mat", a4)
 
-  data = load(testutils.datafile('test_cell.mat', __name__))
+    # complete transcoding tests
+    transcode(testutils.datafile('test_1d.mat', __name__)) #pseudo 1D - matlab does not support true 1D
+    transcode(testutils.datafile('test_2d.mat', __name__))
+    transcode(testutils.datafile('test_3d.mat', __name__))
+    transcode(testutils.datafile('test_4d.mat', __name__))
+    transcode(testutils.datafile('test_1d_cplx.mat', __name__)) #pseudo 1D - matlab does not support 1D
+    transcode(testutils.datafile('test_2d_cplx.mat', __name__))
+    transcode(testutils.datafile('test_3d_cplx.mat', __name__))
+    transcode(testutils.datafile('test_4d_cplx.mat', __name__))
+    transcode(testutils.datafile('test.mat', __name__)) #3D complex, large
 
-@testutils.extension_available('.tensor')
-def test_tensorfile():
+  @nose.tools.nottest
+  @testutils.extension_available('.mat')
+  def test_mat_file_io_does_not_crash(self):
 
-  # array writing tests
-  a1 = numpy.random.normal(size=(3,4)).astype('float32')
-  a2 = numpy.random.normal(size=(3,4,5)).astype('float64')
-  a3 = (100*numpy.random.normal(size=(2,3,4,5))).astype('int32')
+    data = load(testutils.datafile('test_cell.mat', __name__))
 
-  array_readwrite('.tensor', a1)
-  array_readwrite(".tensor", a2)
-  array_readwrite(".tensor", a3)
+  @testutils.extension_available('.tensor')
+  def test_tensorfile(self):
 
-  # arrayset writing tests
-  a1 = []
-  a2 = []
-  a3 = []
-  for k in range(10):
-    a1.append(numpy.random.normal(size=(3,4)).astype('float32'))
-    a2.append(numpy.random.normal(size=(3,4,5)).astype('float64'))
-    a3.append((100*numpy.random.normal(size=(2,3,4,5))).astype('int32'))
+    # array writing tests
+    a1 = numpy.random.normal(size=(3,4)).astype('float32')
+    a2 = numpy.random.normal(size=(3,4,5)).astype('float64')
+    a3 = (100*numpy.random.normal(size=(2,3,4,5))).astype('int32')
 
-  arrayset_readwrite('.tensor', a1)
-  arrayset_readwrite(".tensor", a2)
-  arrayset_readwrite(".tensor", a3)
+    array_readwrite('.tensor', a1)
+    array_readwrite(".tensor", a2)
+    array_readwrite(".tensor", a3)
 
-  # complete transcoding test
-  transcode(testutils.datafile('torch.tensor', __name__))
+    # arrayset writing tests
+    a1 = []
+    a2 = []
+    a3 = []
+    for k in range(10):
+      a1.append(numpy.random.normal(size=(3,4)).astype('float32'))
+      a2.append(numpy.random.normal(size=(3,4,5)).astype('float64'))
+      a3.append((100*numpy.random.normal(size=(2,3,4,5))).astype('int32'))
 
-@testutils.extension_available('.pgm')
-@testutils.extension_available('.pbm')
-@testutils.extension_available('.ppm')
-def test_netpbm():
+    arrayset_readwrite('.tensor', a1)
+    arrayset_readwrite(".tensor", a2)
+    arrayset_readwrite(".tensor", a3)
 
-  def image_transcode(filename):
+    # complete transcoding test
+    transcode(testutils.datafile('torch.tensor', __name__))
 
-    tmpname = testutils.temporary_filename(suffix=os.path.splitext(filename)[1])
+  @testutils.extension_available('.pgm')
+  @testutils.extension_available('.pbm')
+  @testutils.extension_available('.ppm')
+  def test_netpbm(self):
 
-    try:
-      # complete transcoding test
-      image = load(filename)
+    def image_transcode(filename):
 
-      # save with the same extension
-      write(image, tmpname)
+      tmpname = testutils.temporary_filename(suffix=os.path.splitext(filename)[1])
 
-      # reload the image from the file
-      image2 = load(tmpname)
+      try:
+        # complete transcoding test
+        image = load(filename)
 
-      assert numpy.array_equal(image, image2)
+        # save with the same extension
+        write(image, tmpname)
 
-    finally:
-      if os.path.exists(tmpname): os.unlink(tmpname)
+        # reload the image from the file
+        image2 = load(tmpname)
 
-  image_transcode(testutils.datafile('test.pgm', __name__)) #indexed, works fine
-  image_transcode(testutils.datafile('test.pbm', __name__)) #indexed, works fine
-  image_transcode(testutils.datafile('test.ppm', __name__)) #indexed, works fine
-  #image_transcode(testutils.datafile('test.jpg', __name__)) #does not work because of re-compression
+        assert numpy.array_equal(image, image2)
 
-@testutils.extension_available('.csv')
-def test_csv():
+      finally:
+        if os.path.exists(tmpname): os.unlink(tmpname)
 
-  # array writing tests
-  a1 = numpy.random.normal(size=(5,5)).astype('float64')
-  a2 = numpy.random.normal(size=(5,10)).astype('float64')
-  a3 = numpy.random.normal(size=(5,100)).astype('float64')
+    image_transcode(testutils.datafile('test.pgm', __name__)) #indexed, works fine
+    image_transcode(testutils.datafile('test.pbm', __name__)) #indexed, works fine
+    image_transcode(testutils.datafile('test.ppm', __name__)) #indexed, works fine
+    #image_transcode(testutils.datafile('test.jpg', __name__)) #does not work because of re-compression
 
-  array_readwrite('.csv', a1, close=True)
-  array_readwrite(".csv", a2, close=True)
-  array_readwrite('.csv', a3, close=True)
+  @testutils.extension_available('.csv')
+  def test_csv(self):
 
-  # arrayset writing tests
-  a1 = []
-  a2 = []
-  a3 = []
-  for k in range(10):
-    a1.append(numpy.random.normal(size=(5,)).astype('float64'))
-    a2.append(numpy.random.normal(size=(50,)).astype('float64'))
-    a3.append(numpy.random.normal(size=(500,)).astype('float64'))
+    # array writing tests
+    a1 = numpy.random.normal(size=(5,5)).astype('float64')
+    a2 = numpy.random.normal(size=(5,10)).astype('float64')
+    a3 = numpy.random.normal(size=(5,100)).astype('float64')
 
-  arrayset_readwrite('.csv', a1, close=True)
-  arrayset_readwrite(".csv", a2, close=True)
-  arrayset_readwrite('.csv', a3, close=True)
+    array_readwrite('.csv', a1, close=True)
+    array_readwrite(".csv", a2, close=True)
+    array_readwrite('.csv', a3, close=True)
+
+    # arrayset writing tests
+    a1 = []
+    a2 = []
+    a3 = []
+    for k in range(10):
+      a1.append(numpy.random.normal(size=(5,)).astype('float64'))
+      a2.append(numpy.random.normal(size=(50,)).astype('float64'))
+      a3.append(numpy.random.normal(size=(500,)).astype('float64'))
+
+    arrayset_readwrite('.csv', a1, close=True)
+    arrayset_readwrite(".csv", a2, close=True)
+    arrayset_readwrite('.csv', a3, close=True)

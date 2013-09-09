@@ -26,40 +26,43 @@ import numpy
 from ...test import utils as testutils
 from .. import supported_videowriter_formats
 from ..utils import color_distortion, frameskip_detection, quality_degradation
+import unittest
 
 # These are some global parameters for the test.
 INPUT_VIDEO = testutils.datafile('test.mov', __name__)
 SUPPORTED = supported_videowriter_formats()
 
-@testutils.ffmpeg_found()
-def test_can_use_array_interface():
+class TestVideo (unittest.TestCase):
+  @testutils.ffmpeg_found()
+  def test_can_use_array_interface(self):
 
-  # This shows you can use the array interface to read an entire video
-  # sequence in a single shot
-  from .. import load, VideoReader
-  array = load(INPUT_VIDEO)
-  iv = VideoReader(INPUT_VIDEO)
+    # This shows you can use the array interface to read an entire video
+    # sequence in a single shot
+    from .. import load, VideoReader
+    array = load(INPUT_VIDEO)
+    iv = VideoReader(INPUT_VIDEO)
 
-  for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
-    assert numpy.array_equal(array[frame_id,:,:,:], frame)
+    for frame_id, frame in zip(range(array.shape[0]), iv.__iter__()):
+      assert numpy.array_equal(array[frame_id,:,:,:], frame)
 
-@testutils.ffmpeg_found()
-def test_can_iterate():
+  @testutils.ffmpeg_found()
+  def test_can_iterate(self):
 
-  # This test shows how you can read image frames from a VideoReader created
-  # on the spot
-  from .. import VideoReader
-  video = VideoReader(INPUT_VIDEO)
-  counter = 0
-  for frame in video:
-    assert isinstance(frame, numpy.ndarray)
-    assert len(frame.shape) == 3
-    assert frame.shape[0] == 3 #color-bands (RGB)
-    assert frame.shape[1] == 240 #height
-    assert frame.shape[2] == 320 #width
-    counter += 1
+    # This test shows how you can read image frames from a VideoReader created
+    # on the spot
+    from .. import VideoReader
+    video = VideoReader(INPUT_VIDEO)
+    counter = 0
+    for frame in video:
+      assert isinstance(frame, numpy.ndarray)
+      assert len(frame.shape) == 3
+      assert frame.shape[0] == 3 #color-bands (RGB)
+      assert frame.shape[1] == 240 #height
+      assert frame.shape[2] == 320 #width
+      counter += 1
 
-  assert counter == len(video) #we have gone through all frames
+    assert counter == len(video) #we have gone through all frames
+
 
 @testutils.ffmpeg_found()
 def check_format_codec(function, shape, framerate, format, codec, maxdist):

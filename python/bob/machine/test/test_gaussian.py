@@ -33,14 +33,14 @@ class GaussianMachineTest(unittest.TestCase):
   """Performs various Gaussian machine tests."""
 
   def test01_GaussianNormal(self):
-    """Test the likelihood computation of a simple normal Gaussian"""
+    # Test the likelihood computation of a simple normal Gaussian
     gaussian = bob.machine.Gaussian(2)
     # By default, initialized with zero mean and unit variance
     logLH = gaussian.log_likelihood(numpy.array([0.4, 0.2], 'float64'))
     self.assertTrue( equals(logLH, -1.93787706641, 1e-10))
 
   def test02_GaussianMachine(self):
-    """Test a GaussianMachine more thoroughly"""
+    # Test a GaussianMachine more thoroughly
 
     # Initializes a Gaussian with zero mean and unit variance
     g = bob.machine.Gaussian(3)
