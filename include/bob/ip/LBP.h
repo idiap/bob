@@ -50,6 +50,11 @@ namespace bob { namespace ip {
     ELBP_DIRECTION_CODED = 2//!< direction coded LBP: each three pixel values in a row define a two bit codes, which are then connected
   } ELBPType;
 
+  typedef enum{
+    LBP_BORDER_SHRINK,      //!< shrink the resulting image by 2* radius
+    LBP_BORDER_WRAP         //!< wrap around the image so that pixel[-1] == pixel[res - 1]
+  } LBPBorderHandling;
+
   /**
    * This class is an abstraction for all the Local Binary Patterns
    *   variants. For more information, please refer to the following
@@ -80,6 +85,7 @@ namespace bob { namespace ip {
        * @param uniform  compute LBP^u2 uniform LBP's (see paper listed above)
        * @param rotation_invariant  compute rotation invariant LBP's
        * @param eLBP_type  The extended type of LBP: regular, transitional or direction coded (see Cosmin's thesis)
+       * @param border_handling  How to handle the image in border cases
        */
       LBP(const int P,
           const double R_y,
@@ -89,7 +95,8 @@ namespace bob { namespace ip {
           const bool add_average_bit=false,
           const bool uniform=false,
           const bool rotation_invariant=false,
-          const bob::ip::ELBPType eLBP_type=ELBP_REGULAR);
+          const bob::ip::ELBPType eLBP_type=ELBP_REGULAR,
+          const bob::ip::LBPBorderHandling border_handling=LBP_BORDER_SHRINK);
 
       /**
        * Complete constructor with one radius. This will permit extraction of round and square LBP codes.
@@ -103,6 +110,7 @@ namespace bob { namespace ip {
        * @param uniform  compute LBP^u2 uniform LBP's (see paper listed above)
        * @param rotation_invariant  compute rotation invariant LBP's
        * @param eLBP_type  The extended type of LBP: REGULAR, TRANSITIONAL or DIRECTION_CODED (see Cosmins thesis)
+       * @param border_handling  How to handle the image in border cases
        */
       LBP(const int P,
           const double R=1.,
@@ -111,7 +119,8 @@ namespace bob { namespace ip {
           const bool add_average_bit=false,
           const bool uniform=false,
           const bool rotation_invariant=false,
-          const bob::ip::ELBPType eLBP_type=ELBP_REGULAR);
+          const bob::ip::ELBPType eLBP_type=ELBP_REGULAR,
+          const bob::ip::LBPBorderHandling border_handling=LBP_BORDER_SHRINK);
 
 
       /**
@@ -153,6 +162,7 @@ namespace bob { namespace ip {
       bool getUniform() const { return m_uniform; }
       bool getRotationInvariant() const { return m_rotation_invariant; }
       bob::ip::ELBPType get_eLBP() const { return m_eLBP_type; }
+      bob::ip::LBPBorderHandling getBorderHandling() const { return m_border_handling; }
       blitz::Array<double,2> getRelativePositions(){return m_positions;}
       blitz::Array<uint16_t,1> getLookUpTable(){return m_lut;}
 
@@ -167,8 +177,8 @@ namespace bob { namespace ip {
       void setAddAverageBit(const bool add_average_bit){ m_add_average_bit = add_average_bit; init(); }
       void setUniform(const bool uniform){ m_uniform = uniform; init(); }
       void setRotationInvariant(const bool rotation_invariant){ m_rotation_invariant = rotation_invariant; init(); }
-      void set_eLBP(bob::ip::ELBPType eLBP_type){ m_eLBP_type = eLBP_type; if (eLBP_type == ELBP_DIRECTION_CODED && m_P%2) { throw std::runtime_error("direction coded LBP types require an even number of neighbors.");}
-      }
+      void set_eLBP(bob::ip::ELBPType eLBP_type){ m_eLBP_type = eLBP_type; if (eLBP_type == ELBP_DIRECTION_CODED && m_P%2) { throw std::runtime_error("direction coded LBP types require an even number of neighbors.");}}
+      void setBorderHandling(bob::ip::LBPBorderHandling border_handling){ m_border_handling = border_handling; }
       void setLookUpTable(const blitz::Array<uint16_t,1>& new_lut){m_lut = new_lut;}
 
       /**
@@ -223,6 +233,7 @@ namespace bob { namespace ip {
       bool m_uniform;
       bool m_rotation_invariant;
       bob::ip::ELBPType m_eLBP_type;
+      bob::ip::LBPBorderHandling m_border_handling;
 
       // the look up table for the current type of LBP (uniform, rotation-invariant, ...)
       blitz::Array<uint16_t,1> m_lut;
@@ -238,9 +249,14 @@ namespace bob { namespace ip {
   template <typename T>
     const blitz::TinyVector<int,2> LBP::getLBPShape(const blitz::Array<T,2>& src) const
     {
-      // offset in the source image
-      const int r_y = (int)ceil(m_R_y), r_x = (int)ceil(m_R_x);
-      return blitz::TinyVector<int,2> (std::max(0, src.extent(0) - 2*r_y), std::max(0, src.extent(1) - 2*r_x));
+      if (m_border_handling == LBP_BORDER_WRAP){
+        // when wrapping borders, the resolution is not altered
+        return src.extent();
+      } else {
+        // offset in the source image
+        const int r_y = (int)ceil(m_R_y), r_x = (int)ceil(m_R_x);
+        return blitz::TinyVector<int,2> (std::max(0, src.extent(0) - 2*r_y), std::max(0, src.extent(1) - 2*r_x));
+      }
     }
 
 
@@ -252,7 +268,14 @@ namespace bob { namespace ip {
       bob::core::array::assertSameShape(dst, getLBPShape(src) );
 
       // offset in the source image
-      const int r_y = (int)ceil(m_R_y), r_x = (int)ceil(m_R_x);
+      int r_y, r_x;
+      if (m_border_handling == LBP_BORDER_WRAP){
+        r_y = 0;
+        r_x = 0;
+      } else {
+        r_y = (int)ceil(m_R_y);
+        r_x = (int)ceil(m_R_x);
+      }
       // iterate over target pixels
       for (int y = 0; y < dst.extent(0); ++y)
         for (int x = 0; x < dst.extent(1); ++x)
@@ -286,10 +309,12 @@ namespace bob { namespace ip {
     std::vector<double> pixels(m_P);
     if (m_circular)
       for (int p = 0; p < m_P; ++p)
-        pixels[p] = bob::sp::detail::bilinearInterpolationNoCheck(src, y + m_positions(p,0), x + m_positions(p,1));
+        pixels[p] = bob::sp::detail::bilinearInterpolationWrapNoCheck(src, y + m_positions(p,0), x + m_positions(p,1));
     else
       for (int p = 0; p < m_P; ++p){
-        pixels[p] = static_cast<double>(src(y + static_cast<int>(m_positions(p,0)), x + static_cast<int>(m_positions(p,1))));
+        const int cy = (y + static_cast<int>(m_positions(p,0)) + src.extent()[0]) % src.extent()[0];
+        const int cx = (x + static_cast<int>(m_positions(p,1)) + src.extent()[1]) % src.extent()[1];
+        pixels[p] = static_cast<double>(src(cy, cx));
       }
 
     double center = static_cast<double>(src(y, x));

@@ -429,6 +429,10 @@ class LBPTest(unittest.TestCase):
     sh = lbp.get_lbp_shape(image)
     self.assertEqual(sh, (1,1))
 
+    lbp = bob.ip.LBP(8, border_handling=bob.ip.LBPBorderHandling.WRAP)
+    sh = lbp.get_lbp_shape(image)
+    self.assertEqual(sh, (3,3))
+
   def test11_u2_16p1r(self):
     op = bob.ip.LBP(16, 1, True, False, False, True, False)
     values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]

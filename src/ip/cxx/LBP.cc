@@ -30,7 +30,7 @@
 
 bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool circular,
     const bool to_average, const bool add_average_bit, const bool uniform,
-    const bool rotation_invariant, const bob::ip::ELBPType eLBP_type):
+    const bool rotation_invariant, const bob::ip::ELBPType eLBP_type, const bob::ip::LBPBorderHandling border_handling):
   m_P(P),
   m_R_y(R_y),
   m_R_x(R_x),
@@ -40,6 +40,7 @@ bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool c
   m_uniform(uniform),
   m_rotation_invariant(rotation_invariant),
   m_eLBP_type(eLBP_type),
+  m_border_handling(border_handling),
   m_lut(0),
   m_positions(0,0)
 {
@@ -52,7 +53,7 @@ bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool c
 
 bob::ip::LBP::LBP(const int P, const double R, const bool circular,
     const bool to_average, const bool add_average_bit, const bool uniform,
-    const bool rotation_invariant, const bob::ip::ELBPType eLBP_type):
+    const bool rotation_invariant, const bob::ip::ELBPType eLBP_type, const bob::ip::LBPBorderHandling border_handling):
   m_P(P),
   m_R_y(R),
   m_R_x(R),
@@ -62,6 +63,7 @@ bob::ip::LBP::LBP(const int P, const double R, const bool circular,
   m_uniform(uniform),
   m_rotation_invariant(rotation_invariant),
   m_eLBP_type(eLBP_type),
+  m_border_handling(border_handling),
   m_lut(0),
   m_positions(0,0)
 {
@@ -105,6 +107,7 @@ bob::ip::LBP& bob::ip::LBP::operator=(const bob::ip::LBP& other) {
   m_uniform = other.m_uniform;
   m_rotation_invariant = other.m_rotation_invariant;
   m_eLBP_type = other.m_eLBP_type;
+  m_border_handling = other.m_border_handling;
   init();
   return *this;
 }

@@ -34,6 +34,7 @@
 
 struct T {
   blitz::Array<uint8_t,2> a1, a2;
+  blitz::Array<uint16_t, 2> w1, w2;
   uint16_t lbp_4_a1, lbp_4_a2, lbp_4_a1_u2, lbp_4_a2_u2, lbp_4_ri, lbp_4_ur,
            lbp_8_a1, lbp_8_a2, lbp_8_a1_u2, lbp_8_a2_u2, lbp_8_ri, lbp_8_ur,
            lbp_16_a1, lbp_16_a2, lbp_16_a1_u2, lbp_16_a2_u2, lbp_16_ri, lbp_16_ur,
@@ -41,7 +42,7 @@ struct T {
            lbp_4_d, lbp_8_d, lbp_16_d,
            lbp_4_a1_t, lbp_4_a2_t, lbp_8_a1_t, lbp_8_a2_t, lbp_16_a1_t, lbp_16_a2_t;
 
-  T(): a1(3,3), a2(3,3)
+  T(): a1(3,3), a2(3,3), w1(3,3), w2(3,3)
   {
     a1 = 0, 1, 2,
          3, 4, 5,
@@ -50,6 +51,14 @@ struct T {
     a2 = 8, 7, 6,
          5, 4, 3,
          2, 1, 0;
+
+    w1 =  255, 254, 238,
+          31, 30, 14,
+          17, 16, 0;
+
+    w2 =  0, 1, 57,
+          224, 225, 249,
+          238, 239, 255;
 
     // normal LBP4
     lbp_4_a1 = 6;
@@ -269,6 +278,28 @@ BOOST_AUTO_TEST_CASE( test_lbp_image )
   lbp(a2,result);
   BOOST_CHECK_EQUAL( lbp_8_a2, result(0,0) );
 }
+
+BOOST_AUTO_TEST_CASE( test_lbp_wrap )
+{
+  // LBP 8,1
+  bob::ip::LBP lbp(8, 1., false, false, false, false, false, bob::ip::ELBP_REGULAR, bob::ip::LBP_BORDER_WRAP);
+  blitz::TinyVector<int,2> resolution = lbp.getLBPShape(a1);
+  BOOST_CHECK_EQUAL(resolution[0], 3);
+  BOOST_CHECK_EQUAL(resolution[1], 3);
+  blitz::Array<uint16_t, 2> result(3,3);
+
+  lbp(a1,result);
+  checkBlitzEqual(result, w1);
+
+  bob::ip::LBP lbp2(8, 1., true, false, false, false, false, bob::ip::ELBP_REGULAR, bob::ip::LBP_BORDER_WRAP);
+  resolution = lbp2.getLBPShape(a2);
+  BOOST_CHECK_EQUAL(resolution[0], 3);
+  BOOST_CHECK_EQUAL(resolution[1], 3);
+
+  lbp2(a2,result);
+  checkBlitzEqual(result, w2);
+}
+
 
 
 BOOST_AUTO_TEST_CASE( test_lbp_other )

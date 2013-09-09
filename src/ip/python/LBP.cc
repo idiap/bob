@@ -131,9 +131,13 @@ void bind_ip_lbp() {
     .value("TRANSITIONAL", bob::ip::ELBP_TRANSITIONAL)
     .value("DIRECTION_CODED", bob::ip::ELBP_DIRECTION_CODED);
 
+  enum_<bob::ip::LBPBorderHandling>("LBPBorderHandling", "How to handle pixels near the border of the image.")
+    .value("SHRINK", bob::ip::LBP_BORDER_SHRINK)
+    .value("WRAP", bob::ip::LBP_BORDER_WRAP);
+
   class_<bob::ip::LBP, boost::shared_ptr<bob::ip::LBP> >("LBP", "A class for the LBP operators", no_init)
-    .def(init<int, double, double, bool, bool, bool, bool, bool, bob::ip::ELBPType >((arg("self"), arg("neighbors"), arg("radius_y"), arg("radius_x"), arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR), "Constructs a new LBP operator with different radii"))
-    .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType >((arg("self"), arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR), "Constructs a new LBP operator"))
+    .def(init<int, double, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius_y"), arg("radius_x"), arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator with different radii"))
+    .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator"))
 
     .add_property("radius", &bob::ip::LBP::getRadius, &bob::ip::LBP::setRadius)
     .add_property("radii", &bob::ip::LBP::getRadii, &bob::ip::LBP::setRadii)
@@ -144,6 +148,7 @@ void bind_ip_lbp() {
     .add_property("uniform", &bob::ip::LBP::getUniform, &bob::ip::LBP::setUniform)
     .add_property("rotation_invariant", &bob::ip::LBP::getRotationInvariant, &bob::ip::LBP::setRotationInvariant)
     .add_property("elbp_type", &bob::ip::LBP::get_eLBP, &bob::ip::LBP::set_eLBP, "The type of extended LBP: bob.ip.ELBPType.REGULAR (0), bob.ip.ELBPType.TRANSITIONAL (1), bob.ip.ELBPType.DIRECTION_CODED (2)")
+    .add_property("border_handling", &bob::ip::LBP::getBorderHandling, &bob::ip::LBP::setBorderHandling, "The way, how the image is treated at its borders: bob.ip.LBPBpoderHandling.SHRINK: shrinks image, bob.ip.LBPBpoderHandling.WRAP: uses pixels from other border.")
     .add_property("max_label", &bob::ip::LBP::getMaxLabel)
     .add_property("look_up_table", &bob::ip::LBP::getLookUpTable, &bob::ip::LBP::setLookUpTable)
     .add_property("relative_positions", &bob::ip::LBP::getRelativePositions)
