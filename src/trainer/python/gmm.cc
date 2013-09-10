@@ -22,6 +22,7 @@
 #include <bob/trainer/GMMTrainer.h>
 #include <bob/trainer/MAP_GMMTrainer.h>
 #include <bob/trainer/ML_GMMTrainer.h>
+#include <limits>
 
 using namespace boost::python;
 
@@ -82,7 +83,7 @@ void bind_trainer_gmm() {
       "The prior parameters are encoded in the form of a GMM (e.g. a universal background model). "
       "The EM algorithm thus performs GMM adaptation.\n"
       "See Section 3.4 of Reynolds et al., \"Speaker Verification Using Adapted Gaussian Mixture Models\", Digital Signal Processing, 2000. We use a \"single adaptation coefficient\", alpha_i, and thus a single relevance factor, r.",
-      init<optional<const double, const bool, const bool, const bool, const double> >((arg("self"), arg("relevance_factor"), arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
+      init<optional<const double, const bool, const bool, const bool, const double> >((arg("self"), arg("relevance_factor")=0, arg("update_means")=true, arg("update_variances")=false, arg("update_weights")=false, arg("responsibilities_threshold")=std::numeric_limits<double>::epsilon())))
     .def("set_prior_gmm", &bob::trainer::MAP_GMMTrainer::setPriorGMM, (arg("self"), arg("prior_gmm")), 
       "Set the GMM to use as a prior for MAP adaptation. "
       "Generally, this is a \"universal background model\" (UBM), "
@@ -96,6 +97,6 @@ void bind_trainer_gmm() {
   class_<bob::trainer::ML_GMMTrainer, boost::noncopyable, bases<bob::trainer::GMMTrainer> >("ML_GMMTrainer",
       "This class implements the maximum likelihood M-step of the expectation-maximisation algorithm for a GMM Machine.\n"
       "See Section 9.2.2 of Bishop, \"Pattern recognition and machine learning\", 2006",
-      init<optional<const bool, const bool, const bool, const double> >((arg("self"), arg("update_means"), arg("update_variances"), arg("update_weights"), arg("responsibilities_threshold"))))
+      init<optional<const bool, const bool, const bool, const double> >((arg("self"), arg("update_means")=true, arg("update_variances")=false, arg("update_weights")=false, arg("responsibilities_threshold")=std::numeric_limits<double>::epsilon())))
   ;
 }
