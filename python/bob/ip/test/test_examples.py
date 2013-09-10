@@ -8,12 +8,10 @@
 
 from ...test import utils
 from ...io import test as iotest
-import unittest
 
-class OpticalFlowTest (unittest.TestCase):
-  @utils.ffmpeg_found()
-  def test01_optflow_hs(self):
-    movie = utils.datafile('test.mov', iotest.__name__)
-    from ..example.optflow_hs import main
-    cmdline = ['--self-test', movie, '__ignored__']
-    assert main(cmdline) == 0
+@utils.ffmpeg_found()
+def test01_optflow_hs():
+  movie = utils.datafile('test.mov', iotest.__name__)
+  from ..example.optflow_hs import main
+  cmdline = ['--self-test', movie, '__ignored__']
+  assert main(cmdline) == 0
