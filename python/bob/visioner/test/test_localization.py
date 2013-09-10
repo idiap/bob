@@ -26,63 +26,60 @@ from ...test import utils
 from ... import io, ip
 from ...ip import test as iptest
 from ...io import test as iotest
-import unittest
 
 TEST_VIDEO = utils.datafile("test.mov", iotest.__name__)
 IMAGE = utils.datafile('test-faces.jpg', iptest.__name__, os.path.join('data', 'faceextract'))
 
-class LocalazationTest (unittest.TestCase):
+@utils.visioner_available
+def test_single():
 
-  @utils.visioner_available
-  def test_single(self):
+  from .. import Localizer
+  processor = Localizer()
+  processor.detector.scanning_levels = 10
+  locdata = processor(ip.rgb_to_gray(io.load(IMAGE)))
+  assert locdata is not None
 
-    from .. import Localizer
-    processor = Localizer()
-    processor.detector.scanning_levels = 10
-    locdata = processor(ip.rgb_to_gray(io.load(IMAGE)))
+@utils.visioner_available
+@utils.ffmpeg_found()
+def test_faster():
+
+  from .. import Localizer
+  video = io.VideoReader(TEST_VIDEO)
+  images = [ip.rgb_to_gray(k) for k in video[:20]]
+  processor = Localizer()
+  processor.detector.scanning_levels = 10
+
+  # find faces on the video
+  for image in images:
+    locdata = processor(image)
     assert locdata is not None
 
-  @utils.visioner_available
-  @utils.ffmpeg_found()
-  def test_faster(self):
+@utils.visioner_available
+@utils.ffmpeg_found()
+def test_fast():
 
-    from .. import Localizer
-    video = io.VideoReader(TEST_VIDEO)
-    images = [ip.rgb_to_gray(k) for k in video[:20]]
-    processor = Localizer()
-    processor.detector.scanning_levels = 10
+  from .. import Localizer
+  video = io.VideoReader(TEST_VIDEO)
+  images = [ip.rgb_to_gray(k) for k in video[:10]]
+  processor = Localizer()
+  processor.detector.scanning_levels = 5
 
-    # find faces on the video
-    for image in images:
-      locdata = processor(image)
-      assert locdata is not None
+  # find faces on the video
+  for image in images:
+    locdata = processor(image)
+    assert locdata is not None
 
-  @utils.visioner_available
-  @utils.ffmpeg_found()
-  def test_fast(self):
+@utils.visioner_available
+@utils.ffmpeg_found()
+@nose.tools.nottest
+def test_thorough():
 
-    from .. import Localizer
-    video = io.VideoReader(TEST_VIDEO)
-    images = [ip.rgb_to_gray(k) for k in video[:10]]
-    processor = Localizer()
-    processor.detector.scanning_levels = 5
+  from .. import Localizer
+  video = io.VideoReader(TEST_VIDEO)
+  images = [ip.rgb_to_gray(k) for k in video[:2]]
+  processor = Localizer()
 
-    # find faces on the video
-    for image in images:
-      locdata = processor(image)
-      assert locdata is not None
-
-  @utils.visioner_available
-  @utils.ffmpeg_found()
-  @nose.tools.nottest
-  def test_thorough(self):
-
-    from .. import Localizer
-    video = io.VideoReader(TEST_VIDEO)
-    images = [ip.rgb_to_gray(k) for k in video[:2]]
-    processor = Localizer()
-
-    # find faces on the video
-    for image in images:
-      locdata = processor(image)
-      assert locdata is not None
+  # find faces on the video
+  for image in images:
+    locdata = processor(image)
+    assert locdata is not None
