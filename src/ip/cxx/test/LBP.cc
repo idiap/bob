@@ -300,7 +300,45 @@ BOOST_AUTO_TEST_CASE( test_lbp_wrap )
   checkBlitzEqual(result, w2);
 }
 
+BOOST_AUTO_TEST_CASE( test_mb_lbp ){
+  // multi-block LBP 8,(3,2)
+  bob::ip::LBP lbp832(8, blitz::TinyVector<int,2>(3, 2));
+  blitz::Array<double,2> positions = lbp832.getRelativePositions();
 
+  BOOST_CHECK_EQUAL(positions.shape()[0], 8);
+  BOOST_CHECK_EQUAL(positions.shape()[1], 4);
+
+  // check some positions
+  BOOST_CHECK_EQUAL(positions(0,0), -4);
+  BOOST_CHECK_EQUAL(positions(0,1), -1);
+  BOOST_CHECK_EQUAL(positions(0,2), -3);
+  BOOST_CHECK_EQUAL(positions(0,3), -1);
+
+  BOOST_CHECK_EQUAL(positions(4,0), 2);
+  BOOST_CHECK_EQUAL(positions(4,1), 5);
+  BOOST_CHECK_EQUAL(positions(4,2), 1);
+  BOOST_CHECK_EQUAL(positions(4,3), 3);
+
+  // check that the multi-block LBP (8,1,1) and the LBP 8,1 generate identical results
+  bob::ip::LBP lbp811(8, blitz::TinyVector<int,2>(1, 1));
+  BOOST_CHECK_EQUAL( lbp_8_a1, lbp811(a1,1,1) );
+  BOOST_CHECK_EQUAL( lbp_8_a2, lbp811(a2,1,1) );
+
+  // compute integral image
+  blitz::Array<int,2> ii(4,4);
+  bob::ip::integral(a1, ii, true);
+  BOOST_CHECK_EQUAL( lbp_8_a1, lbp811(ii,1,1,true) );
+  bob::ip::integral(a2, ii, true);
+  BOOST_CHECK_EQUAL( lbp_8_a2, lbp811(ii,1,1,true) );
+
+  // check that the required dimensions fit
+  blitz::TinyVector<int,2> resolution = lbp811.getLBPShape(a1);
+  BOOST_CHECK_EQUAL(resolution[0], 1);
+  BOOST_CHECK_EQUAL(resolution[1], 1);
+  resolution = lbp811.getLBPShape(ii, true);
+  BOOST_CHECK_EQUAL(resolution[0], 1);
+  BOOST_CHECK_EQUAL(resolution[1], 1);
+}
 
 BOOST_AUTO_TEST_CASE( test_lbp_other )
 {

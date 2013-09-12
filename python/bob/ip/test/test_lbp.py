@@ -22,10 +22,11 @@ LBP codes.
 """
 
 import os, sys
-import unittest
 import bob
 import math
 import numpy
+import nose.tools
+
 
 def generate_3x3_image(image, values):
   """Generates a 3x3 image from a 9-position value vector using the following
@@ -265,369 +266,403 @@ def bin(s, m=1):
   """Converts the number s into its binary representation (as a string)"""
   return str(m*s) if s<=1 else bin(s>>1, m) + str(m*(s&1))
 
-class LBPTest(unittest.TestCase):
-  """Performs various tests for the bob::ipLBP and friends types."""
 
-  def test01_vanilla_4p1r(self):
-    op = bob.ip.LBP(4,1)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc('011111111'), 0xf)
-    #please note that the bob implementation of LBPs is slightly different
-    #then that of the original LBP paper:
-    # s(x) >= 0 => LBP digit = 1
-    # s(x) <  0 => LBO digit = 0
-    self.assertEqual(proc('100000000'), 0x0)
-    self.assertEqual(proc('102000000'), 0x8)
-    self.assertEqual(proc('100020000'), 0x4)
-    self.assertEqual(proc('100000200'), 0x2)
-    self.assertEqual(proc('100000002'), 0x1)
-    self.assertEqual(proc('102020000'), 0xc)
-    self.assertEqual(proc('100020200'), 0x6)
-    self.assertEqual(proc('100000202'), 0x3)
-    self.assertEqual(proc('102000002'), 0x9)
-    self.assertEqual(proc('102020200'), 0xe)
-    self.assertEqual(proc('100020202'), 0x7)
-    self.assertEqual(proc('102000202'), 0xb)
-    self.assertEqual(proc('102020002'), 0xd)
-    self.assertEqual(proc('100020002'), 0x5)
-    self.assertEqual(proc('102000200'), 0xa)
-    self.assertEqual(proc('102020202'), 0xf)
-    self.assertEqual(op.max_label, 0x10) # this is set to 16!
+####################################
+# Here the real test functions start
 
-  def test02_rotinvariant_4p1r(self):
-    op = bob.ip.LBP(4,1,False,False,False,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    #bob's implementation start labelling the patterns from 0
-    self.assertEqual(proc('100000000'), 0x0) #0x0
-    self.assertEqual(proc('102000000'), 0x1) #0x1
-    self.assertEqual(proc('100020000'), 0x1) #0x1
-    self.assertEqual(proc('100000200'), 0x1) #0x1
-    self.assertEqual(proc('100000002'), 0x1) #0x1
-    self.assertEqual(proc('102020000'), 0x2) #0x3
-    self.assertEqual(proc('100020200'), 0x2) #0x3
-    self.assertEqual(proc('100000202'), 0x2) #0x3
-    self.assertEqual(proc('102000002'), 0x2) #0x3
-    self.assertEqual(proc('100020002'), 0x3) #0x5
-    self.assertEqual(proc('102000200'), 0x3) #0x5
-    self.assertEqual(proc('102020200'), 0x4) #0x7
-    self.assertEqual(proc('100020202'), 0x4) #0x7
-    self.assertEqual(proc('102000202'), 0x4) #0x7
-    self.assertEqual(proc('102020002'), 0x4) #0x7
-    self.assertEqual(proc('102020202'), 0x5) #0xf
-    self.assertEqual(op.max_label, 0x6) # this is set to 6!
+def test_vanilla_4p1r():
+  op = bob.ip.LBP(4,1)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc('011111111'), 0xf)
+  #please note that the bob implementation of LBPs is slightly different
+  #then that of the original LBP paper:
+  # s(x) >= 0 => LBP digit = 1
+  # s(x) <  0 => LBO digit = 0
+  nose.tools.eq_(proc('100000000'), 0x0)
+  nose.tools.eq_(proc('102000000'), 0x8)
+  nose.tools.eq_(proc('100020000'), 0x4)
+  nose.tools.eq_(proc('100000200'), 0x2)
+  nose.tools.eq_(proc('100000002'), 0x1)
+  nose.tools.eq_(proc('102020000'), 0xc)
+  nose.tools.eq_(proc('100020200'), 0x6)
+  nose.tools.eq_(proc('100000202'), 0x3)
+  nose.tools.eq_(proc('102000002'), 0x9)
+  nose.tools.eq_(proc('102020200'), 0xe)
+  nose.tools.eq_(proc('100020202'), 0x7)
+  nose.tools.eq_(proc('102000202'), 0xb)
+  nose.tools.eq_(proc('102020002'), 0xd)
+  nose.tools.eq_(proc('100020002'), 0x5)
+  nose.tools.eq_(proc('102000200'), 0xa)
+  nose.tools.eq_(proc('102020202'), 0xf)
+  nose.tools.eq_(op.max_label, 0x10) # this is set to 16!
 
-  def test03_u2_4p1r(self):
-    op = bob.ip.LBP(4,1,False,False,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc('100000000'), 0x1) #0x0
-    self.assertEqual(proc('102000000'), 0x2) #0x8
-    self.assertEqual(proc('100020000'), 0x3) #0x4
-    self.assertEqual(proc('100000200'), 0x4) #0x2
-    self.assertEqual(proc('100000002'), 0x5) #0x1
-    self.assertEqual(proc('102020000'), 0x6) #0xc
-    self.assertEqual(proc('100020200'), 0x7) #0x6
-    self.assertEqual(proc('100000202'), 0x8) #0x3
-    self.assertEqual(proc('102000002'), 0x9) #0x9 (by chance!)
-    self.assertEqual(proc('102020200'), 0xa) #0xe
-    self.assertEqual(proc('100020202'), 0xb) #0x7
-    self.assertEqual(proc('102000202'), 0xc) #0xb
-    self.assertEqual(proc('102020002'), 0xd) #0xd (by chance!)
-    self.assertEqual(proc('100020002'), 0x0) #non-uniform(2) => 0x0
-    self.assertEqual(proc('102000200'), 0x0) #non-uniform(2) => 0x0
-    self.assertEqual(proc('102020202'), 0xe) #0xf
-    self.assertEqual(op.max_label, 0xf) # this is set to 15!
+def test_rotinvariant_4p1r():
+  op = bob.ip.LBP(4,1,False,False,False,False,True)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  #bob's implementation start labelling the patterns from 0
+  nose.tools.eq_(proc('100000000'), 0x0) #0x0
+  nose.tools.eq_(proc('102000000'), 0x1) #0x1
+  nose.tools.eq_(proc('100020000'), 0x1) #0x1
+  nose.tools.eq_(proc('100000200'), 0x1) #0x1
+  nose.tools.eq_(proc('100000002'), 0x1) #0x1
+  nose.tools.eq_(proc('102020000'), 0x2) #0x3
+  nose.tools.eq_(proc('100020200'), 0x2) #0x3
+  nose.tools.eq_(proc('100000202'), 0x2) #0x3
+  nose.tools.eq_(proc('102000002'), 0x2) #0x3
+  nose.tools.eq_(proc('100020002'), 0x3) #0x5
+  nose.tools.eq_(proc('102000200'), 0x3) #0x5
+  nose.tools.eq_(proc('102020200'), 0x4) #0x7
+  nose.tools.eq_(proc('100020202'), 0x4) #0x7
+  nose.tools.eq_(proc('102000202'), 0x4) #0x7
+  nose.tools.eq_(proc('102020002'), 0x4) #0x7
+  nose.tools.eq_(proc('102020202'), 0x5) #0xf
+  nose.tools.eq_(op.max_label, 0x6) # this is set to 6!
 
-  def test04_rotinvariant_u2_4p1r(self):
-    op = bob.ip.LBP(4,1,False,False,False,True,True)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc('100000000'), 0x1) #0x0
-    self.assertEqual(proc('102000000'), 0x2) #0x8
-    self.assertEqual(proc('100020000'), 0x2) #0x4
-    self.assertEqual(proc('100000200'), 0x2) #0x2
-    self.assertEqual(proc('100000002'), 0x2) #0x1
-    self.assertEqual(proc('102020000'), 0x3) #0xc
-    self.assertEqual(proc('100020200'), 0x3) #0x6
-    self.assertEqual(proc('100000202'), 0x3) #0x3
-    self.assertEqual(proc('102000002'), 0x3) #0x9 #missing from bob
-    self.assertEqual(proc('102020200'), 0x4) #0xe
-    self.assertEqual(proc('100020202'), 0x4) #0x7
-    self.assertEqual(proc('102000202'), 0x4) #0xb #missing from bob
-    self.assertEqual(proc('102020002'), 0x4) #0xd #missing from bob
-    self.assertEqual(proc('100020002'), 0x0) #non-uniform(2) => 0x0
-    self.assertEqual(proc('102000200'), 0x0) #non-uniform(2) => 0x0
-    self.assertEqual(proc('102020202'), 0x5) #0xf
-    self.assertEqual(op.max_label, 0x6) # this is set to 6!
+def test_u2_4p1r():
+  op = bob.ip.LBP(4,1,False,False,False,True)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc('100000000'), 0x1) #0x0
+  nose.tools.eq_(proc('102000000'), 0x2) #0x8
+  nose.tools.eq_(proc('100020000'), 0x3) #0x4
+  nose.tools.eq_(proc('100000200'), 0x4) #0x2
+  nose.tools.eq_(proc('100000002'), 0x5) #0x1
+  nose.tools.eq_(proc('102020000'), 0x6) #0xc
+  nose.tools.eq_(proc('100020200'), 0x7) #0x6
+  nose.tools.eq_(proc('100000202'), 0x8) #0x3
+  nose.tools.eq_(proc('102000002'), 0x9) #0x9 (by chance!)
+  nose.tools.eq_(proc('102020200'), 0xa) #0xe
+  nose.tools.eq_(proc('100020202'), 0xb) #0x7
+  nose.tools.eq_(proc('102000202'), 0xc) #0xb
+  nose.tools.eq_(proc('102020002'), 0xd) #0xd (by chance!)
+  nose.tools.eq_(proc('100020002'), 0x0) #non-uniform(2) => 0x0
+  nose.tools.eq_(proc('102000200'), 0x0) #non-uniform(2) => 0x0
+  nose.tools.eq_(proc('102020202'), 0xe) #0xf
+  nose.tools.eq_(op.max_label, 0xf) # this is set to 15!
 
-  def test05_vanilla_4p1r_toaverage(self):
-    op = bob.ip.LBP(4,1,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc('100000000'), 0x0) #average is 0.2
-    self.assertEqual(proc('102000000'), 0x8) #average is 0.6
-    self.assertEqual(proc('100020000'), 0x4) #average is 0.6
-    self.assertEqual(proc('100000200'), 0x2) #average is 0.6
-    self.assertEqual(proc('100000002'), 0x1) #average is 0.6
-    self.assertEqual(proc('102020000'), 0xc) #average is 1.0
-    self.assertEqual(proc('100020200'), 0x6) #average is 1.0
-    self.assertEqual(proc('100000202'), 0x3) #average is 1.0
-    self.assertEqual(proc('102000002'), 0x9) #average is 1.0
-    self.assertEqual(proc('102020200'), 0xe) #average is 1.4
-    self.assertEqual(proc('100020202'), 0x7) #average is 1.4
-    self.assertEqual(proc('102000202'), 0xb) #average is 1.4
-    self.assertEqual(proc('102020002'), 0xd) #average is 1.4
-    self.assertEqual(proc('100020002'), 0x5) #average is 1.0
-    self.assertEqual(proc('102000200'), 0xa) #average is 1.0
-    self.assertEqual(proc('102020202'), 0xf) #average is 1.8
-    self.assertEqual(op.max_label, 0x10) # this is set to 16!
+def test_rotinvariant_u2_4p1r():
+  op = bob.ip.LBP(4,1,False,False,False,True,True)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc('100000000'), 0x1) #0x0
+  nose.tools.eq_(proc('102000000'), 0x2) #0x8
+  nose.tools.eq_(proc('100020000'), 0x2) #0x4
+  nose.tools.eq_(proc('100000200'), 0x2) #0x2
+  nose.tools.eq_(proc('100000002'), 0x2) #0x1
+  nose.tools.eq_(proc('102020000'), 0x3) #0xc
+  nose.tools.eq_(proc('100020200'), 0x3) #0x6
+  nose.tools.eq_(proc('100000202'), 0x3) #0x3
+  nose.tools.eq_(proc('102000002'), 0x3) #0x9 #missing from bob
+  nose.tools.eq_(proc('102020200'), 0x4) #0xe
+  nose.tools.eq_(proc('100020202'), 0x4) #0x7
+  nose.tools.eq_(proc('102000202'), 0x4) #0xb #missing from bob
+  nose.tools.eq_(proc('102020002'), 0x4) #0xd #missing from bob
+  nose.tools.eq_(proc('100020002'), 0x0) #non-uniform(2) => 0x0
+  nose.tools.eq_(proc('102000200'), 0x0) #non-uniform(2) => 0x0
+  nose.tools.eq_(proc('102020202'), 0x5) #0xf
+  nose.tools.eq_(op.max_label, 0x6) # this is set to 6!
 
-  def test06_vanilla_8p1r(self):
-    op = bob.ip.LBP(8,1)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    for i in range(256):
-      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
-      self.assertEqual(proc(v), i)
+def test_vanilla_4p1r_toaverage():
+  op = bob.ip.LBP(4,1,False,True)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc('100000000'), 0x0) #average is 0.2
+  nose.tools.eq_(proc('102000000'), 0x8) #average is 0.6
+  nose.tools.eq_(proc('100020000'), 0x4) #average is 0.6
+  nose.tools.eq_(proc('100000200'), 0x2) #average is 0.6
+  nose.tools.eq_(proc('100000002'), 0x1) #average is 0.6
+  nose.tools.eq_(proc('102020000'), 0xc) #average is 1.0
+  nose.tools.eq_(proc('100020200'), 0x6) #average is 1.0
+  nose.tools.eq_(proc('100000202'), 0x3) #average is 1.0
+  nose.tools.eq_(proc('102000002'), 0x9) #average is 1.0
+  nose.tools.eq_(proc('102020200'), 0xe) #average is 1.4
+  nose.tools.eq_(proc('100020202'), 0x7) #average is 1.4
+  nose.tools.eq_(proc('102000202'), 0xb) #average is 1.4
+  nose.tools.eq_(proc('102020002'), 0xd) #average is 1.4
+  nose.tools.eq_(proc('100020002'), 0x5) #average is 1.0
+  nose.tools.eq_(proc('102000200'), 0xa) #average is 1.0
+  nose.tools.eq_(proc('102020202'), 0xf) #average is 1.8
+  nose.tools.eq_(op.max_label, 0x10) # this is set to 16!
 
-
-  def test07_rotinvariant_8p1r(self):
-    op = bob.ip.LBP(8,1,False,False,False,False,True)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    table = calculate_lbp8r_rotinvariant_table()
-    for i in range(256):
-      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
-      self.assertEqual(proc(v), table[i])
-
-  def test08_u2_8p1r(self):
-    op = bob.ip.LBP(8,1,False,False,False,True,False)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    table = calculate_lbp8r_u2_table()
-    values = []
-    for i in range(256):
-      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
-      values.append(proc(v))
-      # just check that the zeros are good
-      if not table[i] and i: self.assertEqual(values[-1], 0)
-      if values[-1] and i:
-        self.assertEqual(bool(table[i]), True)
-    self.assertEqual(len(set(values)), len(set(table))+1)
-
-  def test09_riu2_8p1r(self):
-    op = bob.ip.LBP(8,1,False,False,False,True,True)
-    proc = Processor(op, generate_3x3_image, (1,1), 3)
-    table = calculate_lbp8r_riu2_table()
-    values = []
-    for i in range(256):
-      v = ('1%8s' % bin(i, 2)).replace(' ', '0')
-      values.append(proc(v))
-      # just check that the zeros are good
-      if not table[i] and i: self.assertEqual(values[-1], 0)
-      if values[-1] and i:
-        self.assertEqual(bool(table[i]), True)
-    self.assertEqual(len(set(values)), len(set(table))+1)
-
-  def test10_shape(self):
-    lbp = bob.ip.LBP(8)
-    image = numpy.ndarray((3,3), dtype='uint8')
-    sh = lbp.get_lbp_shape(image)
-    self.assertEqual(sh, (1,1))
-
-    lbp = bob.ip.LBP(8, border_handling=bob.ip.LBPBorderHandling.WRAP)
-    sh = lbp.get_lbp_shape(image)
-    self.assertEqual(sh, (3,3))
-
-  def test11_u2_16p1r(self):
-    op = bob.ip.LBP(16, 1, True, False, False, True, False)
-    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
-    res = numpy.array(((214, 1, 122), (0, 4, 32), (12, 242, 178)), dtype=int)
-
-    proc1 = Processor(op, generate_5x5_image, (1,1), 5); self.assertEqual(proc1(values), res[0,0])
-    proc2 = Processor(op, generate_5x5_image, (2,1), 5); self.assertEqual(proc2(values), res[0,1])
-    proc3 = Processor(op, generate_5x5_image, (3,1), 5); self.assertEqual(proc3(values), res[0,2])
-    proc4 = Processor(op, generate_5x5_image, (1,2), 5); self.assertEqual(proc4(values), res[1,0])
-    proc5 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc5(values), res[1,1])
-    proc6 = Processor(op, generate_5x5_image, (3,2), 5); self.assertEqual(proc6(values), res[1,2])
-    proc7 = Processor(op, generate_5x5_image, (1,3), 5); self.assertEqual(proc7(values), res[2,0])
-    proc8 = Processor(op, generate_5x5_image, (2,3), 5); self.assertEqual(proc8(values), res[2,1])
-    proc9 = Processor(op, generate_5x5_image, (3,3), 5); self.assertEqual(proc9(values), res[2,2])
-
-  def test12_u2_16p2r(self):
-    op = bob.ip.LBP(16, 2, True, False, False, True, False)
-    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
-    res = numpy.ndarray((1,1), dtype=int)
-    res[0,0]=1;
-    proc1 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc1(values), res[0,0])
-
-  def test13_riu2_16p1r(self):
-    op = bob.ip.LBP(16, 1, True, False, False, True, True)
-    values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
-    res = numpy.ndarray((3,3), dtype=int)
-    res[0,0]=15; res[0,1]=1; res[0,2]=9;
-    res[1,0]=0; res[1,1]=2; res[1,2]=3;
-    res[2,0]=2; res[2,1]=17; res[2,2]=13;
-    proc1 = Processor(op, generate_5x5_image, (1,1), 5); self.assertEqual(proc1(values), res[0,0])
-    proc2 = Processor(op, generate_5x5_image, (2,1), 5); self.assertEqual(proc2(values), res[0,1])
-    proc3 = Processor(op, generate_5x5_image, (3,1), 5); self.assertEqual(proc3(values), res[0,2])
-    proc4 = Processor(op, generate_5x5_image, (1,2), 5); self.assertEqual(proc4(values), res[1,0])
-    proc5 = Processor(op, generate_5x5_image, (2,2), 5); self.assertEqual(proc5(values), res[1,1])
-    proc6 = Processor(op, generate_5x5_image, (3,2), 5); self.assertEqual(proc6(values), res[1,2])
-    proc7 = Processor(op, generate_5x5_image, (1,3), 5); self.assertEqual(proc7(values), res[2,0])
-    proc8 = Processor(op, generate_5x5_image, (2,3), 5); self.assertEqual(proc8(values), res[2,1])
-    proc9 = Processor(op, generate_5x5_image, (3,3), 5); self.assertEqual(proc9(values), res[2,2])
-
-  def test14_eLBP_8p1r(self):
-    op = bob.ip.LBP(8, 1, False, False, False, False, False, bob.ip.ELBPType.REGULAR) # eLBP_type = 0,
-    proc1 = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc1('012345678'), 0xff) #0x0
-    op = bob.ip.LBP(8, 1, False, True, False, False, False, bob.ip.ELBPType.REGULAR) # eLBP_type = 0, to_average=True for modified LBP (MCT)
-    proc2 = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc2('012345678'), 0x1f) #0x0
-    op = bob.ip.LBP(8, 1, False, False, False, False, False, bob.ip.ELBPType.TRANSITIONAL) # eLBP_type=1, transitional LBP
-    proc3 = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc3('014725836'), 0x25) #0x0
-    op = bob.ip.LBP(8, 1, False, False, False, False, False, bob.ip.ELBPType.DIRECTION_CODED) # eLBP_type=2, direction coded LBP
-    proc4 = Processor(op, generate_3x3_image, (1,1), 3)
-    self.assertEqual(proc4('014725836'), 0x5d) #0x0
+def test_vanilla_8p1r():
+  op = bob.ip.LBP(8,1)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  for i in range(256):
+    v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+    nose.tools.eq_(proc(v), i)
 
 
+def test_rotinvariant_8p1r():
+  op = bob.ip.LBP(8,1,False,False,False,False,True)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  table = calculate_lbp8r_rotinvariant_table()
+  for i in range(256):
+    v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+    nose.tools.eq_(proc(v), table[i])
 
-  def test15_vanilla_4p1r_rectangle(self):
-    #please note that the bob implementation of LBPs is slightly different
-    #then that of the original LBP paper:
-    # s(x) >= 0 => LBP digit = 1
-    # s(x) <  0 => LBO digit = 0
+def test_u2_8p1r():
+  op = bob.ip.LBP(8,1,False,False,False,True,False)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  table = calculate_lbp8r_u2_table()
+  values = []
+  for i in range(256):
+    v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+    values.append(proc(v))
+    # just check that the zeros are good
+    if not table[i] and i: nose.tools.eq_(values[-1], 0)
+    if values[-1] and i:
+      nose.tools.eq_(bool(table[i]), True)
+  nose.tools.eq_(len(set(values)), len(set(table))+1)
 
-    op = bob.ip.LBP(4)
-    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+def test_riu2_8p1r():
+  op = bob.ip.LBP(8,1,False,False,False,True,True)
+  proc = Processor(op, generate_3x3_image, (1,1), 3)
+  table = calculate_lbp8r_riu2_table()
+  values = []
+  for i in range(256):
+    v = ('1%8s' % bin(i, 2)).replace(' ', '0')
+    values.append(proc(v))
+    # just check that the zeros are good
+    if not table[i] and i: nose.tools.eq_(values[-1], 0)
+    if values[-1] and i:
+      nose.tools.eq_(bool(table[i]), True)
+  nose.tools.eq_(len(set(values)), len(set(table))+1)
 
-    op.radius  = 1
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 0);
+def test_shape():
+  lbp = bob.ip.LBP(8)
+  image = numpy.ndarray((3,3), dtype='uint8')
+  sh = lbp.get_lbp_shape(image)
+  nose.tools.eq_(sh, (1,1))
 
-    op.radius  = 2
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 9);
+  lbp = bob.ip.LBP(8, border_handling=bob.ip.LBPBorderHandling.WRAP)
+  sh = lbp.get_lbp_shape(image)
+  nose.tools.eq_(sh, (3,3))
 
+def test_u2_16p1r():
+  op = bob.ip.LBP(16, 1, True, False, False, True, False)
+  values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
+  res = numpy.array(((214, 1, 122), (0, 4, 32), (12, 242, 178)), dtype=int)
 
-    op.radii  = (2,1)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 8);
+  proc1 = Processor(op, generate_5x5_image, (1,1), 5); nose.tools.eq_(proc1(values), res[0,0])
+  proc2 = Processor(op, generate_5x5_image, (2,1), 5); nose.tools.eq_(proc2(values), res[0,1])
+  proc3 = Processor(op, generate_5x5_image, (3,1), 5); nose.tools.eq_(proc3(values), res[0,2])
+  proc4 = Processor(op, generate_5x5_image, (1,2), 5); nose.tools.eq_(proc4(values), res[1,0])
+  proc5 = Processor(op, generate_5x5_image, (2,2), 5); nose.tools.eq_(proc5(values), res[1,1])
+  proc6 = Processor(op, generate_5x5_image, (3,2), 5); nose.tools.eq_(proc6(values), res[1,2])
+  proc7 = Processor(op, generate_5x5_image, (1,3), 5); nose.tools.eq_(proc7(values), res[2,0])
+  proc8 = Processor(op, generate_5x5_image, (2,3), 5); nose.tools.eq_(proc8(values), res[2,1])
+  proc9 = Processor(op, generate_5x5_image, (3,3), 5); nose.tools.eq_(proc9(values), res[2,2])
 
+def test_u2_16p2r():
+  op = bob.ip.LBP(16, 2, True, False, False, True, False)
+  values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
+  res = numpy.ndarray((1,1), dtype=int)
+  res[0,0]=1;
+  proc1 = Processor(op, generate_5x5_image, (2,2), 5); nose.tools.eq_(proc1(values), res[0,0])
 
-    op.radii  = (1,2)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 1);
+def test_riu2_16p1r():
+  op = bob.ip.LBP(16, 1, True, False, False, True, True)
+  values = [207, 24, 40, 36, 167, 230, 71, 247, 107, 9, 32, 139, 244, 233, 216, 232, 244, 123, 202, 238, 161, 246, 204, 244, 173]
+  res = numpy.ndarray((3,3), dtype=int)
+  res[0,0]=15; res[0,1]=1; res[0,2]=9;
+  res[1,0]=0; res[1,1]=2; res[1,2]=3;
+  res[2,0]=2; res[2,1]=17; res[2,2]=13;
+  proc1 = Processor(op, generate_5x5_image, (1,1), 5); nose.tools.eq_(proc1(values), res[0,0])
+  proc2 = Processor(op, generate_5x5_image, (2,1), 5); nose.tools.eq_(proc2(values), res[0,1])
+  proc3 = Processor(op, generate_5x5_image, (3,1), 5); nose.tools.eq_(proc3(values), res[0,2])
+  proc4 = Processor(op, generate_5x5_image, (1,2), 5); nose.tools.eq_(proc4(values), res[1,0])
+  proc5 = Processor(op, generate_5x5_image, (2,2), 5); nose.tools.eq_(proc5(values), res[1,1])
+  proc6 = Processor(op, generate_5x5_image, (3,2), 5); nose.tools.eq_(proc6(values), res[1,2])
+  proc7 = Processor(op, generate_5x5_image, (1,3), 5); nose.tools.eq_(proc7(values), res[2,0])
+  proc8 = Processor(op, generate_5x5_image, (2,3), 5); nose.tools.eq_(proc8(values), res[2,1])
+  proc9 = Processor(op, generate_5x5_image, (3,3), 5); nose.tools.eq_(proc9(values), res[2,2])
 
-
-  def test16_vanilla_8p1r_rectangle(self):
-    #please note that the bob implementation of LBPs is slightly different
-    #then that of the original LBP paper:
-    # s(x) >= 0 => LBP digit = 1
-    # s(x) <  0 => LBO digit = 0
-
-    op = bob.ip.LBP(8)
-    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
-
-    op.radius  = 1
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 34);
-
-    op.radius  = 2
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 67);
-
-
-    op.radii  = (2,1)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 66);
-
-
-    op.radii  = (1,2)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 35);
-
-
-  def test17_vanilla_8p1r_elipse(self):
-    #please note that the bob implementation of LBPs is slightly different
-    #then that of the original LBP paper:
-    # s(x) >= 0 => LBP digit = 1
-    # s(x) <  0 => LBO digit = 0
-
-    op = bob.ip.LBP(8)
-    op.circular = True
-    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
-
-    op.radius  = 1
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 0);
-
-    op.radius  = 2
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 67);
-
-
-    op.radii   = (2,1)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 64);
-
-
-    op.radii   = (1,2)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 3);
-
-
-  def test18_vanilla_16p1r_elipse(self):
-    #please note that the bob implementation of LBPs is slightly different
-    #then that of the original LBP paper:
-    # s(x) >= 0 => LBP digit = 1
-    # s(x) <  0 => LBO digit = 0
-
-    op = bob.ip.LBP(16, circular=True)
-    values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
-
-    op.radius  = 1
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 0);
-
-    op.radius  = 2
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 8206);
-
-
-    op.radii   = (2,1)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 8192);
-
-
-    op.radii   = (1,2)
-    proc = Processor(op, generate_5x5_image, (2,2), 5)
-    self.assertEqual(proc(values), 14);
+def test_eLBP_8p1r():
+  op = bob.ip.LBP(8, 1, False, False, False, False, False, bob.ip.ELBPType.REGULAR) # eLBP_type = 0,
+  proc1 = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc1('012345678'), 0xff) #0x0
+  op = bob.ip.LBP(8, 1, False, True, False, False, False, bob.ip.ELBPType.REGULAR) # eLBP_type = 0, to_average=True for modified LBP (MCT)
+  proc2 = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc2('012345678'), 0x1f) #0x0
+  op = bob.ip.LBP(8, 1, False, False, False, False, False, bob.ip.ELBPType.TRANSITIONAL) # eLBP_type=1, transitional LBP
+  proc3 = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc3('014725836'), 0x25) #0x0
+  op = bob.ip.LBP(8, 1, False, False, False, False, False, bob.ip.ELBPType.DIRECTION_CODED) # eLBP_type=2, direction coded LBP
+  proc4 = Processor(op, generate_3x3_image, (1,1), 3)
+  nose.tools.eq_(proc4('014725836'), 0x5d) #0x0
 
 
 
-  """
-  " All planes are p=4, r=1, non uniform pattern and non RI
-  """
-  def test19_vanilla_4p1r_4p1r_4p1r(self):
-    lbp4R_XY = bob.ip.LBP(4, radius=1.0, circular=False, uniform=False, rotation_invariant=False)
-    lbp4R_XT = bob.ip.LBP(4, radius=1.0, circular=False, uniform=False, rotation_invariant=False)
-    lbp4R_YT = bob.ip.LBP(4, radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+def test_vanilla_4p1r_rectangle():
+  #please note that the bob implementation of LBPs is slightly different
+  #then that of the original LBP paper:
+  # s(x) >= 0 => LBP digit = 1
+  # s(x) <  0 => LBO digit = 0
 
-    op = bob.ip.LBPTop(lbp4R_XY,lbp4R_XT,lbp4R_YT)
+  op = bob.ip.LBP(4)
+  values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
 
-    proc1 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=3,n_frames=3)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0,0)),0xf)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=1,operator_coordinates=(0,0,0)),0x7)
-    self.assertEqual(proc1(['000000000','111111111','222222222'],plane_index=2,operator_coordinates=(0,0,0)),0x7)
+  op.radius  = 1
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 0);
+
+  op.radius  = 2
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 9);
 
 
-    proc2 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=5,n_frames=5)
-    values_5x5 = []
-    values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
-    values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
-    values_5x5.append([2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2])
-    values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
-    values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+  op.radii  = (2,1)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 8);
 
-    self.assertEqual(proc2(values_5x5,plane_index=0,operator_coordinates=(0,0,0)),0xf)
-    self.assertEqual(proc2(values_5x5,plane_index=1,operator_coordinates=(0,0,0)),0x7)
-    self.assertEqual(proc2(values_5x5,plane_index=2,operator_coordinates=(0,0,0)),0x7)
+
+  op.radii  = (1,2)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 1);
+
+
+def test_vanilla_8p1r_rectangle():
+  #please note that the bob implementation of LBPs is slightly different
+  #then that of the original LBP paper:
+  # s(x) >= 0 => LBP digit = 1
+  # s(x) <  0 => LBO digit = 0
+
+  op = bob.ip.LBP(8)
+  values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+
+  op.radius  = 1
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 34);
+
+  op.radius  = 2
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 67);
+
+  op.radii  = (2,1)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 66);
+
+  op.radii  = (1,2)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 35);
+
+
+def test_vanilla_8p1r_elipse():
+  #please note that the bob implementation of LBPs is slightly different
+  #then that of the original LBP paper:
+  # s(x) >= 0 => LBP digit = 1
+  # s(x) <  0 => LBO digit = 0
+
+  op = bob.ip.LBP(8)
+  op.circular = True
+  values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+
+  op.radius  = 1
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 0);
+
+  op.radius  = 2
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 67);
+
+  op.radii   = (2,1)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 64);
+
+  op.radii   = (1,2)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 3);
+
+
+def test_vanilla_16p1r_elipse():
+  #please note that the bob implementation of LBPs is slightly different
+  #then that of the original LBP paper:
+  # s(x) >= 0 => LBP digit = 1
+  # s(x) <  0 => LBO digit = 0
+
+  op = bob.ip.LBP(16, circular=True)
+  values = [3,5,12,1,3, 4,5,2,10,13, 14,0,10,3,1, 20,12,0,1,2, 14,12,1,3,7]
+
+  op.radius  = 1
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 0);
+
+  op.radius  = 2
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 8206);
+
+  op.radii   = (2,1)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 8192);
+
+  op.radii   = (1,2)
+  proc = Processor(op, generate_5x5_image, (2,2), 5)
+  nose.tools.eq_(proc(values), 14);
+
+
+def test_mb_lbp():
+  # Tests multi-block LBP
+  op = bob.ip.LBP(8, (2,1))
+  nose.tools.eq_(op.block_size, (2,1))
+
+  values = numpy.array([[3,5,12], [1,3,4], [5,2,10], [13,14,0], [10,3,1], [20,12,0]], dtype=numpy.uint8)
+  nose.tools.eq_(op.get_lbp_shape(values), (1,1))
+  # get the multi-block code for this image
+  nose.tools.eq_(op(values)[0,0], 0xc9)
+
+  # generate integral image
+  ii = numpy.ndarray((7,4), dtype = numpy.uint16)
+  bob.ip.integral(values, ii, True)
+  nose.tools.eq_(op.get_lbp_shape(ii, True), (1,1))
+  # get the multi-block code for this image
+  nose.tools.eq_(op(ii, True)[0,0], 0xc9)
+
+  # test that all the other types of LBP still work
+  op = bob.ip.LBP(8, (2,1), uniform=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x00)
+
+  op = bob.ip.LBP(8, (2,1), rotation_invariant=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x12)
+
+  op = bob.ip.LBP(8, (2,1), uniform=True, rotation_invariant=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x0)
+
+  op = bob.ip.LBP(8, (2,1), to_average=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0xc9)
+
+  op = bob.ip.LBP(8, (2,1), to_average=True, add_average_bit=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x193)
+
+  op = bob.ip.LBP(8, (2,1), elbp_type=bob.ip.ELBPType.TRANSITIONAL)
+  nose.tools.eq_(op(ii, True)[0,0], 0x6d)
+
+  op = bob.ip.LBP(8, (2,1), elbp_type=bob.ip.ELBPType.DIRECTION_CODED)
+  nose.tools.eq_(op(ii, True)[0,0], 0x46)
+
+
+"""
+" All planes are p=4, r=1, non uniform pattern and non RI
+"""
+def test_vanilla_4p1r_4p1r_4p1r():
+  lbp4R_XY = bob.ip.LBP(4, radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+  lbp4R_XT = bob.ip.LBP(4, radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+  lbp4R_YT = bob.ip.LBP(4, radius=1.0, circular=False, uniform=False, rotation_invariant=False)
+
+  op = bob.ip.LBPTop(lbp4R_XY,lbp4R_XT,lbp4R_YT)
+
+  proc1 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=3,n_frames=3)
+  nose.tools.eq_(proc1(['000000000','111111111','222222222'],plane_index=0,operator_coordinates=(0,0,0)),0xf)
+  nose.tools.eq_(proc1(['000000000','111111111','222222222'],plane_index=1,operator_coordinates=(0,0,0)),0x7)
+  nose.tools.eq_(proc1(['000000000','111111111','222222222'],plane_index=2,operator_coordinates=(0,0,0)),0x7)
+
+
+  proc2 = ProcessorLBPTop(op, generate_NxMxM_image,img_size=5,n_frames=5)
+  values_5x5 = []
+  values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+  values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+  values_5x5.append([2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2])
+  values_5x5.append([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1])
+  values_5x5.append([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+
+  nose.tools.eq_(proc2(values_5x5,plane_index=0,operator_coordinates=(0,0,0)),0xf)
+  nose.tools.eq_(proc2(values_5x5,plane_index=1,operator_coordinates=(0,0,0)),0x7)
+  nose.tools.eq_(proc2(values_5x5,plane_index=2,operator_coordinates=(0,0,0)),0x7)
 
 

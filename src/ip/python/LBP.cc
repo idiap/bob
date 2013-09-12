@@ -32,58 +32,58 @@ using namespace boost::python;
 
 
 template <typename T>
-static void inner_call_inout (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bob::python::ndarray output) {
+static void inner_call_inout (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bob::python::ndarray output, bool is_integral_image) {
   blitz::Array<uint16_t,2> out_ = output.bz<uint16_t,2>();
-  lbp(input.bz<T,2>(), out_);
+  lbp(input.bz<T,2>(), out_, is_integral_image);
 }
 
-static void call_inout (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bob::python::ndarray output) {
+static void call_inout (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bob::python::ndarray output, bool is_integral_image) {
   switch(input.type().dtype) {
-    case bob::core::array::t_uint8: inner_call_inout<uint8_t>(lbp, input, output); break;
-    case bob::core::array::t_uint16: inner_call_inout<uint16_t>(lbp, input, output); break;
-    case bob::core::array::t_float64: inner_call_inout<double>(lbp, input, output); break;
+    case bob::core::array::t_uint8: inner_call_inout<uint8_t>(lbp, input, output, is_integral_image); break;
+    case bob::core::array::t_uint16: inner_call_inout<uint16_t>(lbp, input, output, is_integral_image); break;
+    case bob::core::array::t_float64: inner_call_inout<double>(lbp, input, output, is_integral_image); break;
     default: PYTHON_ERROR(TypeError, "LBP operator cannot process image of type '%s'", input.type().str().c_str()); break;
   }
 }
 
-static uint16_t call_pos (const bob::ip::LBP& lbp, bob::python::const_ndarray input, int y, int x) {
+static uint16_t call_pos (const bob::ip::LBP& lbp, bob::python::const_ndarray input, int y, int x, bool is_integral_image) {
   switch(input.type().dtype) {
-    case bob::core::array::t_uint8: return lbp(input.bz<uint8_t,2>(), y, x);
-    case bob::core::array::t_uint16: return lbp(input.bz<uint16_t,2>(), y, x);
-    case bob::core::array::t_float64: return lbp(input.bz<double,2>(), y, x);
+    case bob::core::array::t_uint8: return lbp(input.bz<uint8_t,2>(), y, x, is_integral_image);
+    case bob::core::array::t_uint16: return lbp(input.bz<uint16_t,2>(), y, x, is_integral_image);
+    case bob::core::array::t_float64: return lbp(input.bz<double,2>(), y, x, is_integral_image);
     default: PYTHON_ERROR(TypeError, "LBP operator cannot process image of type '%s'", input.type().str().c_str()); return 0;
   }
 }
 
 template <typename T>
-static object inner_call_alloc (const bob::ip::LBP& lbp, bob::python::const_ndarray input) {
+static object inner_call_alloc (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bool is_integral_image) {
   blitz::Array<T,2> i_ = input.bz<T,2>();
-  blitz::TinyVector<int,2> shape = lbp.getLBPShape(i_);
+  blitz::TinyVector<int,2> shape = lbp.getLBPShape(i_, is_integral_image);
   bob::python::ndarray out(bob::core::array::t_uint16, shape(0), shape(1));
   blitz::Array<uint16_t,2> out_ = out.bz<uint16_t,2>();
-  lbp(input.bz<T,2>(), out_);
+  lbp(input.bz<T,2>(), out_, is_integral_image);
   return out.self();
 }
 
-static object call_alloc (const bob::ip::LBP& lbp, bob::python::const_ndarray input) {
+static object call_alloc (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bool is_integral_image) {
   switch(input.type().dtype) {
-    case bob::core::array::t_uint8: return inner_call_alloc<uint8_t>(lbp, input);
-    case bob::core::array::t_uint16: return inner_call_alloc<uint16_t>(lbp, input);
-    case bob::core::array::t_float64: return inner_call_alloc<double>(lbp, input);
+    case bob::core::array::t_uint8: return inner_call_alloc<uint8_t>(lbp, input, is_integral_image);
+    case bob::core::array::t_uint16: return inner_call_alloc<uint16_t>(lbp, input, is_integral_image);
+    case bob::core::array::t_float64: return inner_call_alloc<double>(lbp, input, is_integral_image);
     default: PYTHON_ERROR(TypeError, "LBP operator cannot process image of type '%s'", input.type().str().c_str()); return boost::python::api::object();
   }
 }
 
 template <typename T>
-static object inner_get_shape (const bob::ip::LBP& lbp, bob::python::const_ndarray input) {
-  return object(lbp.getLBPShape(input.bz<T,2>()));
+static object inner_get_shape (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bool is_integral_image) {
+  return object(lbp.getLBPShape(input.bz<T,2>(), is_integral_image));
 }
 
-static object get_shape (const bob::ip::LBP& lbp, bob::python::const_ndarray input) {
+static object get_shape (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bool is_integral_image) {
   switch(input.type().dtype) {
-    case bob::core::array::t_uint8: return inner_get_shape<uint8_t>(lbp, input);
-    case bob::core::array::t_uint16: return inner_get_shape<uint16_t>(lbp, input);
-    case bob::core::array::t_float64: return inner_get_shape<double>(lbp, input);
+    case bob::core::array::t_uint8: return inner_get_shape<uint8_t>(lbp, input, is_integral_image);
+    case bob::core::array::t_uint16: return inner_get_shape<uint16_t>(lbp, input, is_integral_image);
+    case bob::core::array::t_float64: return inner_get_shape<double>(lbp, input, is_integral_image);
     default: PYTHON_ERROR(TypeError, "LBP operator cannot process image of type '%s'", input.type().str().c_str()); return boost::python::api::object();
   }
 }
@@ -138,9 +138,11 @@ void bind_ip_lbp() {
   class_<bob::ip::LBP, boost::shared_ptr<bob::ip::LBP> >("LBP", "A class for the LBP operators", no_init)
     .def(init<int, double, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius_y"), arg("radius_x"), arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator with different radii"))
     .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator"))
+    .def(init<int, blitz::TinyVector<int,2>, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("block_size"), arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new multi-block LBP operator"))
 
     .add_property("radius", &bob::ip::LBP::getRadius, &bob::ip::LBP::setRadius)
     .add_property("radii", &bob::ip::LBP::getRadii, &bob::ip::LBP::setRadii)
+    .add_property("block_size", &bob::ip::LBP::getBlockSize, &bob::ip::LBP::setBlockSize)
     .add_property("points", &bob::ip::LBP::getNNeighbours, &bob::ip::LBP::setNNeighbours)
     .add_property("circular", &bob::ip::LBP::getCircular, &bob::ip::LBP::setCircular)
     .add_property("to_average", &bob::ip::LBP::getToAverage, &bob::ip::LBP::setToAverage)
@@ -153,10 +155,10 @@ void bind_ip_lbp() {
     .add_property("look_up_table", &bob::ip::LBP::getLookUpTable, &bob::ip::LBP::setLookUpTable)
     .add_property("relative_positions", &bob::ip::LBP::getRelativePositions)
 
-    .def("get_lbp_shape", &get_shape, (arg("self"), arg("input")), "Get a tuple containing the expected size of the output when extracting LBP features.")
-    .def("__call__", &call_inout, (arg("self"), arg("input"), arg("output")), "Call an object of this type to extract LBP features for the whole image.")
-    .def("__call__", &call_pos, (arg("self"), arg("input"), arg("y"), arg("x")), "Call an object of this type to extract LBP features for a given position in the image.")
-    .def("__call__", &call_alloc, (arg("self"), arg("input")), "Call an object of this type to extract LBP features for the whole image.")
+    .def("get_lbp_shape", &get_shape, (arg("self"), arg("input"), arg("is_integral_image")=false), "Get a tuple containing the expected size of the output when extracting LBP features.")
+    .def("__call__", &call_inout, (arg("self"), arg("input"), arg("output"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for the whole image.")
+    .def("__call__", &call_pos, (arg("self"), arg("input"), arg("y"), arg("x"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for a given position in the image.")
+    .def("__call__", &call_alloc, (arg("self"), arg("input"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for the whole image.")
 
     ;
 

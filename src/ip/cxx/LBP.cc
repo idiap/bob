@@ -34,6 +34,8 @@ bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool c
   m_P(P),
   m_R_y(R_y),
   m_R_x(R_x),
+  m_mb_y(-1),
+  m_mb_x(-1),
   m_circular(circular),
   m_to_average(to_average),
   m_add_average_bit(add_average_bit),
@@ -57,7 +59,34 @@ bob::ip::LBP::LBP(const int P, const double R, const bool circular,
   m_P(P),
   m_R_y(R),
   m_R_x(R),
+  m_mb_y(-1),
+  m_mb_x(-1),
   m_circular(circular),
+  m_to_average(to_average),
+  m_add_average_bit(add_average_bit),
+  m_uniform(uniform),
+  m_rotation_invariant(rotation_invariant),
+  m_eLBP_type(eLBP_type),
+  m_border_handling(border_handling),
+  m_lut(0),
+  m_positions(0,0)
+{
+  // sanity check
+  if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
+    throw std::runtime_error("Direction coded LBP types require an even number of neighbors.");
+  }
+  init();
+}
+
+bob::ip::LBP::LBP(const int P, const blitz::TinyVector<int,2> block_size,
+    const bool to_average, const bool add_average_bit, const bool uniform,
+    const bool rotation_invariant, const bob::ip::ELBPType eLBP_type, const bob::ip::LBPBorderHandling border_handling):
+  m_P(P),
+  m_R_y(-1.),
+  m_R_x(-1.),
+  m_mb_y(block_size[0]),
+  m_mb_x(block_size[1]),
+  m_circular(false),
   m_to_average(to_average),
   m_add_average_bit(add_average_bit),
   m_uniform(uniform),
@@ -79,6 +108,8 @@ bob::ip::LBP::LBP(const bob::ip::LBP& other):
   m_P(other.m_P),
   m_R_y(other.m_R_y),
   m_R_x(other.m_R_x),
+  m_mb_y(other.m_mb_y),
+  m_mb_x(other.m_mb_x),
   m_circular(other.m_circular),
   m_to_average(other.m_to_average),
   m_add_average_bit(other.m_add_average_bit),
@@ -101,6 +132,8 @@ bob::ip::LBP& bob::ip::LBP::operator=(const bob::ip::LBP& other) {
   m_P = other.m_P;
   m_R_y = other.m_R_y;
   m_R_x = other.m_R_x;
+  m_mb_y = other.m_mb_y;
+  m_mb_x = other.m_mb_x;
   m_circular = other.m_circular;
   m_to_average = other.m_to_average;
   m_add_average_bit = other.m_add_average_bit;
@@ -128,47 +161,89 @@ void bob::ip::LBP::init()
   if (m_P == 16 && m_add_average_bit && m_to_average){
     throw std::runtime_error("LBP16 codes with average bit require 17 bits, but our representation is UINT16.");
   }
+  if (m_P == 16 && m_mb_y > 0 && m_mb_x > 0){
+    throw std::runtime_error("LBP16 codes are not supported for multi-block LBP's.");
+  }
   if (m_P > 16){
     throw std::runtime_error("LBP codes with more than 16 neighbors are not supported since our representation is UINT16.");
   }
+  if ((m_mb_y < 0 || m_mb_x < 0) && (m_R_y < 0 || m_R_x < 0)){
+    throw std::runtime_error("LPB codes with negative radius or negaitve multi-block dimensions are not supported.");
+  }
 
   // initialize the positions
-  m_positions.resize(m_P,2);
-  if (m_circular){
-    double PI = boost::math::constants::pi<double>();
-    // compute angle offset since LBP codes do not start at the x axis
-    double angle_offset = m_P == 4 ? - 0.5 * PI : - 0.75 * PI;
-    for (int p = 0; p < m_P; ++p){
-      double angle = angle_offset + 2. * PI * p / m_P;
-      m_positions(p,0) = m_R_y * sin(angle);
-      m_positions(p,1) = m_R_x * cos(angle);
-    }
-  }else{ // circular
-    blitz::TinyVector<int, 16> d_y, d_x;
-    int r_y = (int)round(m_R_y), r_x = (int)round(m_R_x);
+  if (m_mb_y > 0 && m_mb_x > 0){
+    // multi-block LBP requested; store the top-left and bottom-right entry for all our positions
+    m_positions.resize(m_P, 4);
+    // compute the top-left of the central pixel
+    blitz::TinyVector<int, 8> d_y, d_x;
+    int top_y = -m_mb_y/2, left_x = -m_mb_x/2;
     switch (m_P){
       case 4:{
         // 4 neighbors: (-y,0), (0,x), (y,0), (0,-x)
-        d_y = -r_y, 0, r_y, 0;
-        d_x = 0, r_x, 0, -r_x;
+        d_y = -m_mb_y, 0, m_mb_y, 0;
+        d_x = 0, m_mb_x, 0, -m_mb_x;
       }break;
       case 8:{
         // 8 neighbors: (-y,-x), (-y,0), (-y,x), (0,x), (y,x), (y,0), (y,-x), (0,-x)
-        d_y = -r_y, -r_y, -r_y, 0, r_y, r_y, r_y, 0;
-        d_x = -r_x, 0, r_x, r_x, r_x, 0, -r_x, -r_x;
+        d_y = -m_mb_y, -m_mb_y, -m_mb_y, 0, m_mb_y, m_mb_y, m_mb_y, 0;
+        d_x = -m_mb_x, 0, m_mb_x, m_mb_x, m_mb_x, 0, -m_mb_x, -m_mb_x;
         break;
       }
-      case 16:
-        // 16 neighbors: ...
-        throw std::runtime_error("Rectangular LBP16 codes are not yet implemented.");
       default:
         // any other number of neighbors is not supported
-        throw std::runtime_error("Rectangular LBP's with other than 4 and 8 neighbors are not supported.");
+        throw std::runtime_error("Multi-block LBP's with other than 4 and 8 neighbors are not supported.");
     }
     // fill the positions
     for (int p = 0; p < m_P; ++p){
-      m_positions(p,0) = d_y[p];
-      m_positions(p,1) = d_x[p];
+      // top of the region
+      m_positions(p,0) = d_y[p] + top_y;
+      // bottom of the region (not included)
+      m_positions(p,1) = d_y[p] + top_y + m_mb_y;
+      // left of the region
+      m_positions(p,2) = d_x[p] + left_x;
+      // right of the region (not included)
+      m_positions(p,3) = d_x[p] + left_x + m_mb_x;
+    }
+
+  }else{
+    m_positions.resize(m_P,2);
+    if (m_circular){
+      double PI = boost::math::constants::pi<double>();
+      // compute angle offset since LBP codes do not start at the x axis
+      double angle_offset = m_P == 4 ? - 0.5 * PI : - 0.75 * PI;
+      for (int p = 0; p < m_P; ++p){
+        double angle = angle_offset + 2. * PI * p / m_P;
+        m_positions(p,0) = m_R_y * sin(angle);
+        m_positions(p,1) = m_R_x * cos(angle);
+      }
+    }else{ // circular
+      blitz::TinyVector<int, 8> d_y, d_x;
+      int r_y = (int)round(m_R_y), r_x = (int)round(m_R_x);
+      switch (m_P){
+        case 4:{
+          // 4 neighbors: (-y,0), (0,x), (y,0), (0,-x)
+          d_y = -r_y, 0, r_y, 0;
+          d_x = 0, r_x, 0, -r_x;
+        }break;
+        case 8:{
+          // 8 neighbors: (-y,-x), (-y,0), (-y,x), (0,x), (y,x), (y,0), (y,-x), (0,-x)
+          d_y = -r_y, -r_y, -r_y, 0, r_y, r_y, r_y, 0;
+          d_x = -r_x, 0, r_x, r_x, r_x, 0, -r_x, -r_x;
+          break;
+        }
+        case 16:
+          // 16 neighbors: ...
+          throw std::runtime_error("Rectangular LBP16 codes are not yet implemented.");
+        default:
+          // any other number of neighbors is not supported
+          throw std::runtime_error("Rectangular LBP's with other than 4 and 8 neighbors are not supported.");
+      }
+      // fill the positions
+      for (int p = 0; p < m_P; ++p){
+        m_positions(p,0) = d_y[p];
+        m_positions(p,1) = d_x[p];
+      }
     }
   }
 
