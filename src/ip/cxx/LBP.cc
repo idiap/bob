@@ -116,6 +116,7 @@ bob::ip::LBP::LBP(const bob::ip::LBP& other):
   m_uniform(other.m_uniform),
   m_rotation_invariant(other.m_rotation_invariant),
   m_eLBP_type(other.m_eLBP_type),
+  m_border_handling(other.m_border_handling),
   m_lut(0),
   m_positions(0,0)
 {
