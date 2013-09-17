@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE( test_mb_lbp ){
   bob::ip::LBP lbp832(8, blitz::TinyVector<int,2>(3, 2));
   blitz::Array<double,2> positions = lbp832.getRelativePositions();
 
-  BOOST_CHECK_EQUAL(positions.shape()[0], 8);
+  BOOST_CHECK_EQUAL(positions.shape()[0], 9);
   BOOST_CHECK_EQUAL(positions.shape()[1], 4);
 
   // check some positions
@@ -338,6 +338,13 @@ BOOST_AUTO_TEST_CASE( test_mb_lbp ){
   resolution = lbp811.getLBPShape(ii, true);
   BOOST_CHECK_EQUAL(resolution[0], 1);
   BOOST_CHECK_EQUAL(resolution[1], 1);
+
+  // check that the image operator also extracts the same lbp codes
+  blitz::Array<uint16_t,2> result(1,1);
+  lbp811(a1,result);
+  BOOST_CHECK_EQUAL( lbp_8_a1, result(0,0) );
+  lbp811(ii,result, true);
+  BOOST_CHECK_EQUAL( lbp_8_a2, result(0,0) );
 }
 
 BOOST_AUTO_TEST_CASE( test_lbp_other )

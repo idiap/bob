@@ -172,10 +172,13 @@ void bob::ip::LBP::init()
     throw std::runtime_error("LPB codes with negative radius or negaitve multi-block dimensions are not supported.");
   }
 
+  // initialize temporal memory
+  _pixels.resize(m_P);
+
   // initialize the positions
   if (m_mb_y > 0 && m_mb_x > 0){
     // multi-block LBP requested; store the top-left and bottom-right entry for all our positions
-    m_positions.resize(m_P, 4);
+    m_positions.resize(m_P+1, 4);
     // compute the top-left of the central pixel
     blitz::TinyVector<int, 8> d_y, d_x;
     int top_y = -m_mb_y/2, left_x = -m_mb_x/2;
@@ -206,6 +209,16 @@ void bob::ip::LBP::init()
       // right of the region (not included)
       m_positions(p,3) = d_x[p] + left_x + m_mb_x;
     }
+    // fill the last position, which is the central pixel
+    // top of the region
+    m_positions(m_P,0) = top_y;
+    // bottom of the region (not included)
+    m_positions(m_P,1) = top_y + m_mb_y;
+    // left of the region
+    m_positions(m_P,2) = left_x;
+    // right of the region (not included)
+    m_positions(m_P,3) = left_x + m_mb_x;
+
 
   }else{
     m_positions.resize(m_P,2);
@@ -315,6 +328,24 @@ void bob::ip::LBP::init()
       m_lut = i;
     }
   }
+}
+
+blitz::TinyVector<int, 2> bob::ip::LBP::getOffset() const {
+  blitz::TinyVector<int, 2> offset;
+  if (m_border_handling == LBP_BORDER_WRAP){
+    // for wrapping boarders, all pixels are allowed
+    offset[0] = 0;
+    offset[1] = 0;
+  } else if (m_mb_y > 0 && m_mb_x > 0){
+    // for multi-block LBP features, the offset is defined as 1.5 times the block size
+    offset[0] = m_mb_y + m_mb_y/2;
+    offset[1] = m_mb_x + m_mb_x/2;
+  } else {
+    /// for normal LBP, the offset is equal to the radius
+    offset[0] = (int)ceil(m_R_y);
+    offset[1] = (int)ceil(m_R_x);
+  }
+  return offset;
 }
 
 int bob::ip::LBP::getMaxLabel() const {

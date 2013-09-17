@@ -165,6 +165,11 @@ namespace bob { namespace ip {
       int getMaxLabel() const;
 
       /**
+       * Returns the first offset in the image that is valid to be used in the operator ()(image, y, x)
+       */
+      blitz::TinyVector<int,2> getOffset() const;
+
+      /**
        * Accessors
        */
       double getRadius() const {
@@ -214,6 +219,17 @@ namespace bob { namespace ip {
         void operator()(const blitz::Array<T,2>& src, blitz::Array<uint16_t,2>& dst, bool is_integral_image = false) const;
 
       /**
+       * Extract LBP features from a 2D blitz::Array, and save
+       *   the resulting LBP codes in the dst 2D blitz::Array.
+       *   For multi-block LBP types, the given image might be an integral image.
+       *   Please set is_integral_image to true in this case.
+       *   This function does not perform any kind of checks.
+       */
+      template <typename T>
+        void extract_(const blitz::Array<T,2>& src, blitz::Array<uint16_t,2>& dst, bool is_integral_image = false) const;
+
+
+      /**
        * Extract the LBP code of a 2D blitz::Array at the given
        *   location, and return it.
        *   For multi-block LBP types, the given image might be an integral image.
@@ -222,6 +238,17 @@ namespace bob { namespace ip {
        */
       template <typename T>
         uint16_t operator()(const blitz::Array<T,2>& src, int y, int x, bool is_integral_image = false) const;
+
+      /**
+       * Extract the LBP code of a 2D blitz::Array at the given
+       *   location, and return it.
+       *   For multi-block LBP types, the given image might be an integral image.
+       *   Please set is_integral_image to true in this case.
+       *   This function does not perform any kind of checks.
+       */
+      template <typename T>
+        uint16_t extract_(const blitz::Array<T,2>& src, int y, int x, bool is_integral_image = false) const;
+
 
       /**
        * Get the required shape of the dst output blitz array,
@@ -283,6 +310,9 @@ namespace bob { namespace ip {
 
       // a pre-allocated copy of the integral image, just for speed purposes
       mutable blitz::Array<double, 2> _integral_image;
+
+      // a pre-allocated vector to store the pixels for extracting LBP codes
+      mutable std::vector<double> _pixels;
   };
 
   ///////////////////////////////////////////////////
@@ -320,8 +350,13 @@ namespace bob { namespace ip {
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(dst);
       bob::core::array::assertSameShape(dst, getLBPShape(src, is_integral_image) );
+      extract_<T>(src, dst, is_integral_image);
+    }
 
-      if (m_mb_y > 0 && m_mb_x > 0 &&! is_integral_image){
+  template <typename T>
+    inline void LBP::extract_(const blitz::Array<T,2>& src, blitz::Array<uint16_t,2>& dst, bool is_integral_image) const
+    {
+      if (!is_integral_image && m_mb_y > 0 && m_mb_x > 0){
         // apply integral image
         _integral_image.resize(src.extent(0)+1, src.extent(1)+1);
         bob::ip::integral(src, _integral_image, true);
@@ -335,23 +370,12 @@ namespace bob { namespace ip {
       inline void LBP::apply(const blitz::Array<T,2>& src, blitz::Array<uint16_t,2>& dst) const
     {
       // offset in the source image
-      int r_y, r_x;
-      if (m_border_handling == LBP_BORDER_WRAP){
-        r_y = 0;
-        r_x = 0;
-      } else if (m_mb_y > 0 && m_mb_x > 0){
-        // + 1 since the integral image is one element larger than the original image
-        r_y = m_mb_y + m_mb_y/2 + 1;
-        r_x = m_mb_x + m_mb_x/2 + 1;
-      } else {
-        r_y = (int)ceil(m_R_y);
-        r_x = (int)ceil(m_R_x);
-      }
+      const blitz::TinyVector<int,2> offset = getOffset();
 
       // iterate over target pixels
       for (int y = 0; y < dst.extent(0); ++y)
         for (int x = 0; x < dst.extent(1); ++x)
-          dst(y, x) = lbp_code(src, y + r_y, x + r_x);
+          dst(y, x) = lbp_code(src, y + offset[0], x + offset[1]);
     }
 
   template <typename T>
@@ -359,19 +383,26 @@ namespace bob { namespace ip {
     // perform some checks
     bob::core::array::assertZeroBase(src);
     // offset in the source image
-    const int r_y = (int)ceil(m_R_y), r_x = (int)ceil(m_R_x);
-    if (y < r_y || y >= src.extent(0)-r_y) {
-     boost::format m("argument `y' = %d is set outside the expected range [%d, %d]");
-     m % y % r_y % (src.extent(0)-r_y-1);
-     throw std::runtime_error(m.str());
-    }
-    if (x < r_x || x >= src.extent(1)-r_x) {
-     boost::format m("argument `x' = %d is set outside the expected range [%d, %d]");
-     m % x % r_x % (src.extent(1)-r_x-1);
-     throw std::runtime_error(m.str());
-    }
+    blitz::TinyVector<int, 2> min = getOffset();
+    blitz::TinyVector<int, 2> max = getLBPShape(src, is_integral_image) + min;
 
-    if (m_mb_y > 0 && m_mb_x > 0 && !is_integral_image){
+    if (y < min[0] || y >= max[0]) {
+     boost::format m("argument `y' = %d is set outside the expected range [%d, %d]");
+     m % y % min[0] % (max[0] - 1);
+     throw std::runtime_error(m.str());
+    }
+    if (x < min[1] || x >= max[1]) {
+     boost::format m("argument `x' = %d is set outside the expected range [%d, %d]");
+     m % x % min[1] % (max[1]-1);
+     throw std::runtime_error(m.str());
+    }
+    return extract_<T>(src, y, x, is_integral_image);
+  }
+
+
+  template <typename T>
+  inline uint16_t LBP::extract_(const blitz::Array<T,2>& src, int y, int x, bool is_integral_image) const{
+    if (!is_integral_image && m_mb_y > 0 && m_mb_x > 0){
       // apply integral image
       _integral_image.resize(src.extent(0)+1, src.extent(1)+1);
       // compute integral image; adds one line of zeros in the front
@@ -388,7 +419,6 @@ namespace bob { namespace ip {
   // implementation of the LBP code extraction
   template <typename T>
   inline uint16_t LBP::lbp_code(const blitz::Array<T,2>& src, int y, int x) const{
-    std::vector<double> pixels(m_P);
     double center;
     if (m_mb_y > 0 && m_mb_x > 0){
       // extract the pixels from the INTEGRAL image
@@ -398,25 +428,24 @@ namespace bob { namespace ip {
                   y1 = (y + static_cast<int>(m_positions(p,1)) + src.extent(0)) % src.extent(0),
                   x0 = (x + static_cast<int>(m_positions(p,2)) + src.extent(1)) % src.extent(1),
                   x1 = (x + static_cast<int>(m_positions(p,3)) + src.extent(1)) % src.extent(1);
-        pixels[p] = static_cast<double>(src(y0, x0)) + static_cast<double>(src(y1, x1)) - static_cast<double>(src(y0, x1)) - static_cast<double>(src(y1, x0));
+        _pixels[p] = static_cast<double>(src(y0, x0)) + static_cast<double>(src(y1, x1)) - static_cast<double>(src(y0, x1)) - static_cast<double>(src(y1, x0));
       }
-      const int y0 = (y + static_cast<int>(m_positions(3,0)) + src.extent(0)) % src.extent(0),
-                y1 = (y + static_cast<int>(m_positions(3,1)) + src.extent(0)) % src.extent(0),
-                x0 = (x + static_cast<int>(m_positions(1,2)) + src.extent(1)) % src.extent(1),
-                x1 = (x + static_cast<int>(m_positions(1,3)) + src.extent(1)) % src.extent(1);
+      const int y0 = (y + static_cast<int>(m_positions(m_P,0)) + src.extent(0)) % src.extent(0),
+                y1 = (y + static_cast<int>(m_positions(m_P,1)) + src.extent(0)) % src.extent(0),
+                x0 = (x + static_cast<int>(m_positions(m_P,2)) + src.extent(1)) % src.extent(1),
+                x1 = (x + static_cast<int>(m_positions(m_P,3)) + src.extent(1)) % src.extent(1);
       center = static_cast<double>(src(y0, x0)) + static_cast<double>(src(y1, x1)) - static_cast<double>(src(y0, x1)) - static_cast<double>(src(y1, x0));
-
     }else if (m_circular){
       // extract the pixels from the image by interpolating the image
       for (int p = 0; p < m_P; ++p)
-        pixels[p] = bob::sp::detail::bilinearInterpolationWrapNoCheck(src, y + m_positions(p,0), x + m_positions(p,1));
+        _pixels[p] = bob::sp::detail::bilinearInterpolationWrapNoCheck(src, y + m_positions(p,0), x + m_positions(p,1));
       center = static_cast<double>(src(y, x));
     }else{
       // extract the pixels from the image by wrapping around (also works for shrinking since these positions will never be used)
       for (int p = 0; p < m_P; ++p){
         const int cy = (y + static_cast<int>(m_positions(p,0)) + src.extent(0)) % src.extent(0);
         const int cx = (x + static_cast<int>(m_positions(p,1)) + src.extent(1)) % src.extent(1);
-        pixels[p] = static_cast<double>(src(cy, cx));
+        _pixels[p] = static_cast<double>(src(cy, cx));
       }
       center = static_cast<double>(src(y, x));
     }
@@ -424,7 +453,7 @@ namespace bob { namespace ip {
 
     double cmp_point = center;
     if (m_to_average)
-      cmp_point = std::accumulate(pixels.begin(), pixels.end(), center) / (m_P + 1); // /(P+1) since (averaged over P+1 points)
+      cmp_point = std::accumulate(_pixels.begin(), _pixels.end(), center) / (m_P + 1); // /(P+1) since (averaged over P+1 points)
 
     // the formulas are implemented from Cosmin's thesis
     uint16_t lbp_code = 0;
@@ -432,7 +461,7 @@ namespace bob { namespace ip {
       case ELBP_REGULAR:{
         for (int p = 0; p < m_P; ++p){
           lbp_code <<= 1;
-          if (pixels[p] > cmp_point || bob::core::isClose(pixels[p], cmp_point)) ++lbp_code;
+          if (_pixels[p] > cmp_point || bob::core::isClose(_pixels[p], cmp_point)) ++lbp_code;
         }
         if (m_add_average_bit && !m_rotation_invariant && !m_uniform)
         {
@@ -445,7 +474,7 @@ namespace bob { namespace ip {
       case ELBP_TRANSITIONAL:{
         for (int p = 0; p < m_P; ++p){
           lbp_code <<= 1;
-          if (pixels[p] > pixels[(p+1)%m_P] || bob::core::isClose(pixels[p], pixels[(p+1)%m_P])) ++lbp_code;
+          if (_pixels[p] > _pixels[(p+1)%m_P] || bob::core::isClose(_pixels[p], _pixels[(p+1)%m_P])) ++lbp_code;
         }
         break;
       }
@@ -454,8 +483,8 @@ namespace bob { namespace ip {
         int p_half = m_P/2;
         for (int p = 0; p < p_half; ++p){
           lbp_code <<= 2;
-          if ((pixels[p] - cmp_point) * (pixels[p+p_half] - cmp_point) >= 0.) lbp_code += 1;
-          double p1 = std::abs(pixels[p] - cmp_point), p2 = std::abs(pixels[p+p_half] - cmp_point);
+          if ((_pixels[p] - cmp_point) * (_pixels[p+p_half] - cmp_point) >= 0.) lbp_code += 1;
+          double p1 = std::abs(_pixels[p] - cmp_point), p2 = std::abs(_pixels[p+p_half] - cmp_point);
           if ( p1 > p2 || bob::core::isClose(p1, p2) ) lbp_code += 2;
         }
         break;

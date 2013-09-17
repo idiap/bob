@@ -74,6 +74,31 @@ static object call_alloc (const bob::ip::LBP& lbp, bob::python::const_ndarray in
   }
 }
 
+
+template <typename T>
+static void inner_extract_inout (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bob::python::ndarray output, bool is_integral_image) {
+  blitz::Array<uint16_t,2> out_ = output.bz<uint16_t,2>();
+  lbp.extract_(input.bz<T,2>(), out_, is_integral_image);
+}
+
+static void extract_inout (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bob::python::ndarray output, bool is_integral_image) {
+  switch(input.type().dtype) {
+    case bob::core::array::t_uint8: inner_extract_inout<uint8_t>(lbp, input, output, is_integral_image); break;
+    case bob::core::array::t_uint16: inner_extract_inout<uint16_t>(lbp, input, output, is_integral_image); break;
+    case bob::core::array::t_float64: inner_extract_inout<double>(lbp, input, output, is_integral_image); break;
+    default: PYTHON_ERROR(TypeError, "LBP operator cannot process image of type '%s'", input.type().str().c_str()); break;
+  }
+}
+
+static uint16_t extract_pos (const bob::ip::LBP& lbp, bob::python::const_ndarray input, int y, int x, bool is_integral_image) {
+  switch(input.type().dtype) {
+    case bob::core::array::t_uint8: return lbp.extract_(input.bz<uint8_t,2>(), y, x, is_integral_image);
+    case bob::core::array::t_uint16: return lbp.extract_(input.bz<uint16_t,2>(), y, x, is_integral_image);
+    case bob::core::array::t_float64: return lbp.extract_(input.bz<double,2>(), y, x, is_integral_image);
+    default: PYTHON_ERROR(TypeError, "LBP operator cannot process image of type '%s'", input.type().str().c_str()); return 0;
+  }
+}
+
 template <typename T>
 static object inner_get_shape (const bob::ip::LBP& lbp, bob::python::const_ndarray input, bool is_integral_image) {
   return object(lbp.getLBPShape(input.bz<T,2>(), is_integral_image));
@@ -140,25 +165,29 @@ void bind_ip_lbp() {
     .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator"))
     .def(init<int, blitz::TinyVector<int,2>, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("block_size"), arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new multi-block LBP operator"))
 
-    .add_property("radius", &bob::ip::LBP::getRadius, &bob::ip::LBP::setRadius)
-    .add_property("radii", &bob::ip::LBP::getRadii, &bob::ip::LBP::setRadii)
-    .add_property("block_size", &bob::ip::LBP::getBlockSize, &bob::ip::LBP::setBlockSize)
-    .add_property("points", &bob::ip::LBP::getNNeighbours, &bob::ip::LBP::setNNeighbours)
-    .add_property("circular", &bob::ip::LBP::getCircular, &bob::ip::LBP::setCircular)
-    .add_property("to_average", &bob::ip::LBP::getToAverage, &bob::ip::LBP::setToAverage)
-    .add_property("add_average_bit", &bob::ip::LBP::getAddAverageBit, &bob::ip::LBP::setAddAverageBit)
-    .add_property("uniform", &bob::ip::LBP::getUniform, &bob::ip::LBP::setUniform)
-    .add_property("rotation_invariant", &bob::ip::LBP::getRotationInvariant, &bob::ip::LBP::setRotationInvariant)
+    .add_property("radius", &bob::ip::LBP::getRadius, &bob::ip::LBP::setRadius, "The radius of the round or square LBP")
+    .add_property("radii", &bob::ip::LBP::getRadii, &bob::ip::LBP::setRadii, "The radii (y,x) of the elliptical or rectangular LBP")
+    .add_property("block_size", &bob::ip::LBP::getBlockSize, &bob::ip::LBP::setBlockSize, "The size (y,x) of one block of the multi-block LBP")
+    .add_property("points", &bob::ip::LBP::getNNeighbours, &bob::ip::LBP::setNNeighbours, "The number of points in the LBP (usually, 4, 8 or 16)")
+    .add_property("circular", &bob::ip::LBP::getCircular, &bob::ip::LBP::setCircular, "Extract elliptical (True) or rectangular (false) LBP")
+    .add_property("to_average", &bob::ip::LBP::getToAverage, &bob::ip::LBP::setToAverage, "Compare the pixel values to their average (True) or to the central pixel (False)")
+    .add_property("add_average_bit", &bob::ip::LBP::getAddAverageBit, &bob::ip::LBP::setAddAverageBit, "When comparing to average, also add the comparison of the central bit with the average?")
+    .add_property("uniform", &bob::ip::LBP::getUniform, &bob::ip::LBP::setUniform, "Extract uniform (u2) patterns?")
+    .add_property("rotation_invariant", &bob::ip::LBP::getRotationInvariant, &bob::ip::LBP::setRotationInvariant, "Extract rotation-invariant patterns?")
     .add_property("elbp_type", &bob::ip::LBP::get_eLBP, &bob::ip::LBP::set_eLBP, "The type of extended LBP: bob.ip.ELBPType.REGULAR (0), bob.ip.ELBPType.TRANSITIONAL (1), bob.ip.ELBPType.DIRECTION_CODED (2)")
     .add_property("border_handling", &bob::ip::LBP::getBorderHandling, &bob::ip::LBP::setBorderHandling, "The way, how the image is treated at its borders: bob.ip.LBPBpoderHandling.SHRINK: shrinks image, bob.ip.LBPBpoderHandling.WRAP: uses pixels from other border.")
-    .add_property("max_label", &bob::ip::LBP::getMaxLabel)
-    .add_property("look_up_table", &bob::ip::LBP::getLookUpTable, &bob::ip::LBP::setLookUpTable)
-    .add_property("relative_positions", &bob::ip::LBP::getRelativePositions)
+    .add_property("max_label", &bob::ip::LBP::getMaxLabel, "The number of different LBP values that can be extracted.")
+    .add_property("look_up_table", &bob::ip::LBP::getLookUpTable, &bob::ip::LBP::setLookUpTable, "How to extract the LBP code from the binary vector (interpreted as int)")
+    .add_property("relative_positions", &bob::ip::LBP::getRelativePositions, "The vector of positions (relative), with which the central pixel (0,0) is compared.")
+    .add_property("offset", &bob::ip::LBP::getOffset, "The first valid pixel in the __call__ function that takes the position.")
 
     .def("get_lbp_shape", &get_shape, (arg("self"), arg("input"), arg("is_integral_image")=false), "Get a tuple containing the expected size of the output when extracting LBP features.")
     .def("__call__", &call_inout, (arg("self"), arg("input"), arg("output"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for the whole image.")
     .def("__call__", &call_pos, (arg("self"), arg("input"), arg("y"), arg("x"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for a given position in the image.")
     .def("__call__", &call_alloc, (arg("self"), arg("input"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for the whole image.")
+
+    .def("extract", &extract_inout, (arg("self"), arg("input"), arg("output"), arg("is_integral_image")=false), "The same as the according () operator, but for performance reasons without checks.")
+    .def("extract", &extract_pos, (arg("self"), arg("input"), arg("y"), arg("x"), arg("is_integral_image")=false), "The same as the according () operator, but for performance reasons without checks.")
 
     ;
 

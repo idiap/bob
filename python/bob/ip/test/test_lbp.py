@@ -605,36 +605,36 @@ def test_mb_lbp():
   values = numpy.array([[3,5,12], [1,3,4], [5,2,10], [13,14,0], [10,3,1], [20,12,0]], dtype=numpy.uint8)
   nose.tools.eq_(op.get_lbp_shape(values), (1,1))
   # get the multi-block code for this image
-  nose.tools.eq_(op(values)[0,0], 0xc9)
+  nose.tools.eq_(op(values)[0,0], 0x23)
 
   # generate integral image
   ii = numpy.ndarray((7,4), dtype = numpy.uint16)
   bob.ip.integral(values, ii, True)
   nose.tools.eq_(op.get_lbp_shape(ii, True), (1,1))
   # get the multi-block code for this image
-  nose.tools.eq_(op(ii, True)[0,0], 0xc9)
+  nose.tools.eq_(op(ii, True)[0,0], 0x23)
 
   # test that all the other types of LBP still work
   op = bob.ip.LBP(8, (2,1), uniform=True)
   nose.tools.eq_(op(ii, True)[0,0], 0x00)
 
   op = bob.ip.LBP(8, (2,1), rotation_invariant=True)
-  nose.tools.eq_(op(ii, True)[0,0], 0x12)
+  nose.tools.eq_(op(ii, True)[0,0], 0x0d)
 
   op = bob.ip.LBP(8, (2,1), uniform=True, rotation_invariant=True)
   nose.tools.eq_(op(ii, True)[0,0], 0x0)
 
   op = bob.ip.LBP(8, (2,1), to_average=True)
-  nose.tools.eq_(op(ii, True)[0,0], 0xc9)
+  nose.tools.eq_(op(ii, True)[0,0], 0x27)
 
   op = bob.ip.LBP(8, (2,1), to_average=True, add_average_bit=True)
-  nose.tools.eq_(op(ii, True)[0,0], 0x193)
+  nose.tools.eq_(op(ii, True)[0,0], 0x04f)
 
   op = bob.ip.LBP(8, (2,1), elbp_type=bob.ip.ELBPType.TRANSITIONAL)
-  nose.tools.eq_(op(ii, True)[0,0], 0x6d)
+  nose.tools.eq_(op(ii, True)[0,0], 0x33)
 
   op = bob.ip.LBP(8, (2,1), elbp_type=bob.ip.ELBPType.DIRECTION_CODED)
-  nose.tools.eq_(op(ii, True)[0,0], 0x46)
+  nose.tools.eq_(op(ii, True)[0,0], 0x76)
 
 
 """
