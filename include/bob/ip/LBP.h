@@ -190,7 +190,7 @@ namespace bob { namespace ip {
       bool getRotationInvariant() const { return m_rotation_invariant; }
       bob::ip::ELBPType get_eLBP() const { return m_eLBP_type; }
       bob::ip::LBPBorderHandling getBorderHandling() const { return m_border_handling; }
-      blitz::Array<double,2> getRelativePositions(){return m_positions;}
+      blitz::Array<double,2> getRelativePositions(){return m_positions.numElements() ? m_positions : bob::core::array::cast<double>(m_int_positions);}
       blitz::Array<uint16_t,1> getLookUpTable(){return m_lut;}
 
       /**
@@ -307,6 +307,7 @@ namespace bob { namespace ip {
 
       // the positions of the points that have to be processed
       blitz::Array<double, 2> m_positions;
+      blitz::Array<int, 2> m_int_positions;
 
       // a pre-allocated copy of the integral image, just for speed purposes
       mutable blitz::Array<double, 2> _integral_image;
@@ -422,18 +423,18 @@ namespace bob { namespace ip {
     double center;
     if (m_mb_y > 0 && m_mb_x > 0){
       // extract the pixels from the INTEGRAL image
-      // by wrapping around (also works for shrinking since these positions will never be used)
+      // only shrinking border handling is supported, so we don't need to care about borders here
       for (int p = 0; p < m_P; ++p){
-        const int y0 = (y + static_cast<int>(m_positions(p,0)) + src.extent(0)) % src.extent(0),
-                  y1 = (y + static_cast<int>(m_positions(p,1)) + src.extent(0)) % src.extent(0),
-                  x0 = (x + static_cast<int>(m_positions(p,2)) + src.extent(1)) % src.extent(1),
-                  x1 = (x + static_cast<int>(m_positions(p,3)) + src.extent(1)) % src.extent(1);
+        const int y0 = y + m_int_positions(p,0),
+                  y1 = y + m_int_positions(p,1),
+                  x0 = x + m_int_positions(p,2),
+                  x1 = x + m_int_positions(p,3);
         _pixels[p] = static_cast<double>(src(y0, x0)) + static_cast<double>(src(y1, x1)) - static_cast<double>(src(y0, x1)) - static_cast<double>(src(y1, x0));
       }
-      const int y0 = (y + static_cast<int>(m_positions(m_P,0)) + src.extent(0)) % src.extent(0),
-                y1 = (y + static_cast<int>(m_positions(m_P,1)) + src.extent(0)) % src.extent(0),
-                x0 = (x + static_cast<int>(m_positions(m_P,2)) + src.extent(1)) % src.extent(1),
-                x1 = (x + static_cast<int>(m_positions(m_P,3)) + src.extent(1)) % src.extent(1);
+      const int y0 = y + m_int_positions(m_P,0),
+                y1 = y + m_int_positions(m_P,1),
+                x0 = x + m_int_positions(m_P,2),
+                x1 = x + m_int_positions(m_P,3);
       center = static_cast<double>(src(y0, x0)) + static_cast<double>(src(y1, x1)) - static_cast<double>(src(y0, x1)) - static_cast<double>(src(y1, x0));
     }else if (m_circular){
       // extract the pixels from the image by interpolating the image
@@ -443,8 +444,8 @@ namespace bob { namespace ip {
     }else{
       // extract the pixels from the image by wrapping around (also works for shrinking since these positions will never be used)
       for (int p = 0; p < m_P; ++p){
-        const int cy = (y + static_cast<int>(m_positions(p,0)) + src.extent(0)) % src.extent(0);
-        const int cx = (x + static_cast<int>(m_positions(p,1)) + src.extent(1)) % src.extent(1);
+        const int cy = (y + m_int_positions(p,0) + src.extent(0)) % src.extent(0);
+        const int cx = (x + m_int_positions(p,1) + src.extent(1)) % src.extent(1);
         _pixels[p] = static_cast<double>(src(cy, cx));
       }
       center = static_cast<double>(src(y, x));
@@ -460,8 +461,7 @@ namespace bob { namespace ip {
     switch (m_eLBP_type){
       case ELBP_REGULAR:{
         for (int p = 0; p < m_P; ++p){
-          lbp_code <<= 1;
-          if (_pixels[p] > cmp_point || bob::core::isClose(_pixels[p], cmp_point)) ++lbp_code;
+          lbp_code |= (_pixels[p] > cmp_point || bob::core::isClose(_pixels[p], cmp_point)) << (m_P - p - 1);
         }
         if (m_add_average_bit && !m_rotation_invariant && !m_uniform)
         {
@@ -473,8 +473,7 @@ namespace bob { namespace ip {
 
       case ELBP_TRANSITIONAL:{
         for (int p = 0; p < m_P; ++p){
-          lbp_code <<= 1;
-          if (_pixels[p] > _pixels[(p+1)%m_P] || bob::core::isClose(_pixels[p], _pixels[(p+1)%m_P])) ++lbp_code;
+          lbp_code |= (_pixels[p] > _pixels[(p+1)%m_P] || bob::core::isClose(_pixels[p], _pixels[(p+1)%m_P])) << (m_P - p - 1);
         }
         break;
       }

@@ -94,7 +94,8 @@ bob::ip::LBP::LBP(const int P, const blitz::TinyVector<int,2> block_size,
   m_eLBP_type(eLBP_type),
   m_border_handling(border_handling),
   m_lut(0),
-  m_positions(0,0)
+  m_positions(0,0),
+  m_int_positions(0,0)
 {
   // sanity check
   if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
@@ -169,7 +170,11 @@ void bob::ip::LBP::init()
     throw std::runtime_error("LBP codes with more than 16 neighbors are not supported since our representation is UINT16.");
   }
   if ((m_mb_y < 0 || m_mb_x < 0) && (m_R_y < 0 || m_R_x < 0)){
-    throw std::runtime_error("LPB codes with negative radius or negaitve multi-block dimensions are not supported.");
+    throw std::runtime_error("LPB codes with negative radius or negative multi-block dimensions are not supported.");
+  }
+
+  if ((m_mb_y > 0 && m_mb_x > 0) && m_border_handling != LBP_BORDER_SHRINK){
+    throw std::runtime_error("Multi-block LBP codes cannot handle other border handling than LBP_BORDER_SHRINK");
   }
 
   // initialize temporal memory
@@ -178,7 +183,6 @@ void bob::ip::LBP::init()
   // initialize the positions
   if (m_mb_y > 0 && m_mb_x > 0){
     // multi-block LBP requested; store the top-left and bottom-right entry for all our positions
-    m_positions.resize(m_P+1, 4);
     // compute the top-left of the central pixel
     blitz::TinyVector<int, 8> d_y, d_x;
     int top_y = -m_mb_y/2, left_x = -m_mb_x/2;
@@ -199,30 +203,31 @@ void bob::ip::LBP::init()
         throw std::runtime_error("Multi-block LBP's with other than 4 and 8 neighbors are not supported.");
     }
     // fill the positions
+    m_int_positions.resize(m_P+1, 4);
     for (int p = 0; p < m_P; ++p){
       // top of the region
-      m_positions(p,0) = d_y[p] + top_y;
+      m_int_positions(p,0) = d_y[p] + top_y;
       // bottom of the region (not included)
-      m_positions(p,1) = d_y[p] + top_y + m_mb_y;
+      m_int_positions(p,1) = d_y[p] + top_y + m_mb_y;
       // left of the region
-      m_positions(p,2) = d_x[p] + left_x;
+      m_int_positions(p,2) = d_x[p] + left_x;
       // right of the region (not included)
-      m_positions(p,3) = d_x[p] + left_x + m_mb_x;
+      m_int_positions(p,3) = d_x[p] + left_x + m_mb_x;
     }
     // fill the last position, which is the central pixel
     // top of the region
-    m_positions(m_P,0) = top_y;
+    m_int_positions(m_P,0) = top_y;
     // bottom of the region (not included)
-    m_positions(m_P,1) = top_y + m_mb_y;
+    m_int_positions(m_P,1) = top_y + m_mb_y;
     // left of the region
-    m_positions(m_P,2) = left_x;
+    m_int_positions(m_P,2) = left_x;
     // right of the region (not included)
-    m_positions(m_P,3) = left_x + m_mb_x;
+    m_int_positions(m_P,3) = left_x + m_mb_x;
 
 
   }else{
-    m_positions.resize(m_P,2);
     if (m_circular){
+      m_positions.resize(m_P,2);
       double PI = boost::math::constants::pi<double>();
       // compute angle offset since LBP codes do not start at the x axis
       double angle_offset = m_P == 4 ? - 0.5 * PI : - 0.75 * PI;
@@ -254,9 +259,10 @@ void bob::ip::LBP::init()
           throw std::runtime_error("Rectangular LBP's with other than 4 and 8 neighbors are not supported.");
       }
       // fill the positions
+      m_int_positions.resize(m_P,2);
       for (int p = 0; p < m_P; ++p){
-        m_positions(p,0) = d_y[p];
-        m_positions(p,1) = d_x[p];
+        m_int_positions(p,0) = d_y[p];
+        m_int_positions(p,1) = d_x[p];
       }
     }
   }
