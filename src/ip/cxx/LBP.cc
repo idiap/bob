@@ -44,7 +44,8 @@ bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool c
   m_eLBP_type(eLBP_type),
   m_border_handling(border_handling),
   m_lut(0),
-  m_positions(0,0)
+  m_positions(0,0),
+  m_int_positions(0,0)
 {
   // sanity check
   if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
@@ -69,7 +70,8 @@ bob::ip::LBP::LBP(const int P, const double R, const bool circular,
   m_eLBP_type(eLBP_type),
   m_border_handling(border_handling),
   m_lut(0),
-  m_positions(0,0)
+  m_positions(0,0),
+  m_int_positions(0,0)
 {
   // sanity check
   if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
@@ -104,6 +106,27 @@ bob::ip::LBP::LBP(const int P, const blitz::TinyVector<int,2> block_size,
   init();
 }
 
+bob::ip::LBP::LBP(bob::io::HDF5File file):
+  m_P(0),
+  m_R_y(0),
+  m_R_x(0),
+  m_mb_y(0),
+  m_mb_x(0),
+  m_circular(false),
+  m_to_average(false),
+  m_add_average_bit(false),
+  m_uniform(false),
+  m_rotation_invariant(false),
+  m_eLBP_type(bob::ip::ELBPType::ELBP_REGULAR),
+  m_border_handling(bob::ip::LBPBorderHandling::LBP_BORDER_SHRINK),
+  m_lut(0),
+  m_positions(0,0),
+  m_int_positions(0,0)
+{
+  // sanity check
+  load(file);
+}
+
 
 bob::ip::LBP::LBP(const bob::ip::LBP& other):
   m_P(other.m_P),
@@ -119,7 +142,8 @@ bob::ip::LBP::LBP(const bob::ip::LBP& other):
   m_eLBP_type(other.m_eLBP_type),
   m_border_handling(other.m_border_handling),
   m_lut(0),
-  m_positions(0,0)
+  m_positions(0,0),
+  m_int_positions(0,0)
 {
   // sanity check
   if (m_eLBP_type == ELBP_DIRECTION_CODED && m_P%2) {
@@ -145,6 +169,22 @@ bob::ip::LBP& bob::ip::LBP::operator=(const bob::ip::LBP& other) {
   m_border_handling = other.m_border_handling;
   init();
   return *this;
+}
+
+bool bob::ip::LBP::operator==(const bob::ip::LBP& other) const{
+  return
+    m_P == other.m_P &&
+    m_R_y == other.m_R_y &&
+    m_R_x == other.m_R_x &&
+    m_mb_y == other.m_mb_y &&
+    m_mb_x == other.m_mb_x &&
+    m_circular == other.m_circular &&
+    m_to_average == other.m_to_average &&
+    m_add_average_bit == other.m_add_average_bit &&
+    m_uniform == other.m_uniform &&
+    m_rotation_invariant == other.m_rotation_invariant &&
+    m_eLBP_type == other.m_eLBP_type &&
+    m_border_handling == other.m_border_handling;
 }
 
 uint16_t bob::ip::LBP::right_shift_circular(uint16_t pattern, int spaces)
@@ -336,6 +376,30 @@ void bob::ip::LBP::init()
   }
 }
 
+const blitz::TinyVector<int,2> bob::ip::LBP::getLBPShape(const blitz::TinyVector<int,2>& resolution, bool is_integral_image) const
+{
+  int dy, dx;
+  if (m_border_handling == LBP_BORDER_WRAP){
+    // when wrapping borders, the resolution is not altered
+    dy = 0;
+    dx = 0;
+  } else if (m_mb_y > 0 && m_mb_x > 0){
+    dy = 3 * m_mb_y - 1;
+    dx = 3 * m_mb_x - 1;
+  } else {
+    dy = 2*(int)ceil(m_R_y);
+    dx = 2*(int)ceil(m_R_x);
+  }
+
+  if (is_integral_image){
+    // if the given image is an integral image, we have to subtract one pixel more
+    dy += 1;
+    dx += 1;
+  }
+  return blitz::TinyVector<int,2> (std::max(0, resolution[0] - dy), std::max(0, resolution[1] - dx));
+}
+
+
 blitz::TinyVector<int, 2> bob::ip::LBP::getOffset() const {
   blitz::TinyVector<int, 2> offset;
   if (m_border_handling == LBP_BORDER_WRAP){
@@ -375,4 +439,50 @@ int bob::ip::LBP::getMaxLabel() const {
         return 1 << m_P;
     }
   }
+}
+
+void bob::ip::LBP::save(bob::io::HDF5File file) const{
+  file.set("Neighbors", m_P);
+  if (m_mb_y > 0 && m_mb_y > 0) {
+    file.append("BlockSize", m_mb_y);
+    file.append("BlockSize", m_mb_x);
+  } else {
+    file.append("Radius", m_R_y);
+    file.append("Radius", m_R_x);
+    file.set("Circular", m_circular ? 1 : 0);
+    file.set("BorderHandling", m_border_handling);
+  }
+  file.set("Uniform", m_uniform ? 1 : 0);
+  file.set("RotationInvariant", m_rotation_invariant ? 1 : 0);
+  file.set("ToAverage", m_to_average ? 1 : 0);
+  file.set("AddAverageBit", m_add_average_bit ? 1 : 0);
+  file.set("ELBPType", m_eLBP_type);
+}
+
+void bob::ip::LBP::load(bob::io::HDF5File file){
+  m_P = file.read<int>("Neighbors");
+  if (file.contains("BlockSize")){
+    // multi-block LBP
+    m_mb_y = file.read<int>("BlockSize", 0);
+    m_mb_x = file.read<int>("BlockSize", 1);
+    m_R_y = m_R_x = -1.;
+    m_circular = false;
+    m_border_handling = LBP_BORDER_SHRINK;
+  } else {
+    // regular LBP
+    m_R_y = file.read<double>("Radius", 0);
+    m_R_x = file.read<double>("Radius", 1);
+    m_border_handling = static_cast<bob::ip::LBPBorderHandling>(file.read<int>("BorderHandling"));
+    m_circular = file.read<int>("Circular") > 0;
+    m_mb_y = m_mb_x = -1;
+  }
+
+  m_uniform = file.read<int>("Uniform") > 0;
+  m_rotation_invariant = file.read<int>("RotationInvariant") > 0;
+  m_to_average = file.read<int>("ToAverage") > 0;
+  m_add_average_bit = file.read<int>("AddAverageBit") > 0;
+  m_eLBP_type = static_cast<bob::ip::ELBPType>(file.read<int>("ELBPType"));
+
+  // initialize
+  init();
 }

@@ -637,6 +637,53 @@ def test_mb_lbp():
   nose.tools.eq_(op(ii, True)[0,0], 0x76)
 
 
+def test_io():
+  # Checks that the IO functionality of LBP works
+  test_file = bob.test.utils.datafile("LBP.hdf5", "bob.ip.test")
+  temp_file = bob.test.utils.temporary_filename()
+
+  # create file
+  lbp1 = bob.ip.LBP(8, (2,3), elbp_type=bob.ip.ELBPType.TRANSITIONAL, to_average=True, add_average_bit=True)
+  lbp2 = bob.ip.LBP(16, 4., 2., uniform=True, rotation_invariant=True, circular=True)
+
+  # re-generate the reference file, if wanted
+  f = bob.io.HDF5File(temp_file, 'w')
+  f.create_group("LBP1")
+  f.create_group("LBP2")
+  f.cd("/LBP1")
+  lbp1.save(f)
+  f.cd("/LBP2")
+  lbp2.save(f)
+  del f
+
+  # load the file again
+  f = bob.io.HDF5File(temp_file)
+  f.cd("/LBP1")
+  read1 = bob.ip.LBP(f)
+  f.cd("/LBP2")
+  read2 = bob.ip.LBP(f)
+  del f
+
+  # assert that the created and the read object are identical
+  assert lbp1 == read1
+  assert lbp2 == read2
+
+  # load the reference file
+  f = bob.io.HDF5File(test_file)
+  f.cd("/LBP1")
+  ref1 = bob.ip.LBP(f)
+  f.cd("/LBP2")
+  ref2 = bob.ip.LBP(f)
+  del f
+
+  # assert that the lbp objects and the reference ones are identical
+  assert lbp1 == ref1
+  assert lbp2 == ref2
+  assert read1 == ref1
+  assert read2 == ref2
+
+
+
 """
 " All planes are p=4, r=1, non uniform pattern and non RI
 """

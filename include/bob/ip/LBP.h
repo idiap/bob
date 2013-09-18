@@ -38,6 +38,7 @@
 #include <bob/core/assert.h>
 #include <bob/sp/interpolate.h>
 #include <bob/ip/integral.h>
+#include <bob/io/HDF5File.h>
 
 
 namespace bob { namespace ip {
@@ -52,8 +53,8 @@ namespace bob { namespace ip {
   } ELBPType;
 
   typedef enum{
-    LBP_BORDER_SHRINK,      //!< shrink the resulting image by 2* radius
-    LBP_BORDER_WRAP         //!< wrap around the image so that pixel[-1] == pixel[res - 1]
+    LBP_BORDER_SHRINK = 0,  //!< shrink the resulting image by 2* radius or 3*blocksize-1
+    LBP_BORDER_WRAP = 1     //!< wrap around the image so that pixel[-1] == pixel[res - 1]
   } LBPBorderHandling;
 
   /**
@@ -145,6 +146,12 @@ namespace bob { namespace ip {
           const bob::ip::LBPBorderHandling border_handling=LBP_BORDER_SHRINK);
 
       /**
+       * Constructor reading the configuration from the given HDF5File.
+       * @param file  The HDF5File, from which the configuration should be read
+       */
+      LBP(bob::io::HDF5File file);
+
+      /**
        * Copy constructor
        */
       LBP(const LBP& other);
@@ -158,6 +165,11 @@ namespace bob { namespace ip {
        * Assignment
        */
       LBP& operator= (const bob::ip::LBP& other);
+
+      /**
+       * Assignment
+       */
+      bool operator== (const bob::ip::LBP& other) const;
 
       /**
        * Return the maximum number of labels for the current LBP variant
@@ -257,6 +269,22 @@ namespace bob { namespace ip {
       template <typename T>
         const blitz::TinyVector<int,2> getLBPShape(const blitz::Array<T,2>& src, bool is_integral_image = false) const;
 
+      /**
+       * Get the required shape of the dst output blitz array,
+       *   before calling the operator() method.
+       */
+      const blitz::TinyVector<int,2> getLBPShape(const blitz::TinyVector<int,2>& resolution, bool is_integral_image = false) const;
+
+      /**
+       * Writes the LBP configuration to HDF5File
+       */
+      void save(bob::io::HDF5File file) const;
+
+      /**
+       * Reads the LBP configuration from HDF5File
+       */
+      void load(bob::io::HDF5File file);
+
     private:
 
       /**
@@ -323,25 +351,7 @@ namespace bob { namespace ip {
   template <typename T>
     const blitz::TinyVector<int,2> LBP::getLBPShape(const blitz::Array<T,2>& src, bool is_integral_image) const
     {
-      int dy, dx;
-      if (m_border_handling == LBP_BORDER_WRAP){
-        // when wrapping borders, the resolution is not altered
-        dy = 0;
-        dx = 0;
-      } else if (m_mb_y > 0 && m_mb_x > 0){
-        dy = 3 * m_mb_y - 1;
-        dx = 3 * m_mb_x - 1;
-      } else {
-        dy = 2*(int)ceil(m_R_y);
-        dx = 2*(int)ceil(m_R_x);
-      }
-
-      if (is_integral_image){
-        // if the given image is an integral image, we have to subtract one pixel more
-        dy += 1;
-        dx += 1;
-      }
-      return blitz::TinyVector<int,2> (std::max(0, src.extent(0) - dy), std::max(0, src.extent(1) - dx));
+      return getLBPShape(src.shape(), is_integral_image);
     }
 
 

@@ -113,6 +113,10 @@ static object get_shape (const bob::ip::LBP& lbp, bob::python::const_ndarray inp
   }
 }
 
+static object get_shape_2 (const bob::ip::LBP& lbp, const blitz::TinyVector<int,2>& shape, bool is_integral_image) {
+  return object(lbp.getLBPShape(shape, is_integral_image));
+}
+
 template <typename T>
 static void inner_call_lbptop (const bob::ip::LBPTop& op, bob::python::const_ndarray input, bob::python::ndarray xy, bob::python::ndarray xt, bob::python::ndarray yt) {
   blitz::Array<uint16_t,3> xy_ = xy.bz<uint16_t,3>();
@@ -164,6 +168,12 @@ void bind_ip_lbp() {
     .def(init<int, double, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius_y"), arg("radius_x"), arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator with different radii"))
     .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator"))
     .def(init<int, blitz::TinyVector<int,2>, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("block_size"), arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new multi-block LBP operator"))
+    .def(init<bob::io::HDF5File>((arg("self"), arg("hdf5file")), "Reads the LBP configuration from the given HDF5File"))
+    .def(init<bob::ip::LBP>((arg("self"), arg("other")), "Copy constructor"))
+
+    .def(self == self)
+    .def("load", &bob::ip::LBP::load, "Reads the LBP configuration from the given HDF5File")
+    .def("save", &bob::ip::LBP::save, "Writes the LBP configuration to the given HDF5File")
 
     .add_property("radius", &bob::ip::LBP::getRadius, &bob::ip::LBP::setRadius, "The radius of the round or square LBP")
     .add_property("radii", &bob::ip::LBP::getRadii, &bob::ip::LBP::setRadii, "The radii (y,x) of the elliptical or rectangular LBP")
@@ -182,6 +192,7 @@ void bind_ip_lbp() {
     .add_property("offset", &bob::ip::LBP::getOffset, "The first valid pixel in the __call__ function that takes the position.")
 
     .def("get_lbp_shape", &get_shape, (arg("self"), arg("input"), arg("is_integral_image")=false), "Get a tuple containing the expected size of the output when extracting LBP features.")
+    .def("get_lbp_shape", &get_shape_2, (arg("self"), arg("shape"), arg("is_integral_image")=false), "Get a tuple containing the expected size of the output when extracting LBP features.")
     .def("__call__", &call_inout, (arg("self"), arg("input"), arg("output"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for the whole image.")
     .def("__call__", &call_pos, (arg("self"), arg("input"), arg("y"), arg("x"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for a given position in the image.")
     .def("__call__", &call_alloc, (arg("self"), arg("input"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for the whole image.")
