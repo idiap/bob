@@ -449,6 +449,15 @@ class PLDAMachineTest(unittest.TestCase):
     m_loaded.clear_maps()
     self.assertFalse(m_loaded.has_gamma(3))
     self.assertFalse(m_loaded.has_log_like_const_term(3))
+
+    # Check exceptions
+    m_loaded2 = bob.machine.PLDAMachine()
+    m_loaded2.load(bob.io.HDF5File(filename))
+    self.assertRaises(RuntimeError, getattr, m_loaded2, 'dim_d')
+    self.assertRaises(RuntimeError, getattr, m_loaded2, 'dim_f')
+    self.assertRaises(RuntimeError, getattr, m_loaded2, 'dim_g')
+    self.assertRaises(RuntimeError, m_loaded2.forward, [1.])
+    self.assertRaises(RuntimeError, m_loaded2.compute_log_likelihood, [1.])
  
     # Clean-up
     os.unlink(filename)

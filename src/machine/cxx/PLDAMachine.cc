@@ -660,7 +660,8 @@ bob::machine::PLDAMachine& bob::machine::PLDAMachine::operator=
 bool bob::machine::PLDAMachine::operator==
     (const bob::machine::PLDAMachine& b) const
 {
-  if (!((*(m_plda_base) == *(b.m_plda_base)) &&
+  if (!(( (!m_plda_base && !b.m_plda_base) || 
+          ((m_plda_base && b.m_plda_base) && *(m_plda_base) == *(b.m_plda_base))) &&
         m_n_samples == b.m_n_samples &&
         m_nh_sum_xit_beta_xi ==b.m_nh_sum_xit_beta_xi &&
         bob::core::array::isEqual(m_weighted_sum, b.m_weighted_sum) &&
@@ -692,7 +693,9 @@ bool bob::machine::PLDAMachine::is_similar_to(
   const bob::machine::PLDAMachine& b, const double r_epsilon, 
   const double a_epsilon) const
 {
-  return (m_plda_base->is_similar_to(*(b.m_plda_base), r_epsilon, a_epsilon) &&
+  return (( (!m_plda_base && !b.m_plda_base) || 
+            ((m_plda_base && b.m_plda_base) &&
+             m_plda_base->is_similar_to(*(b.m_plda_base), r_epsilon, a_epsilon))) &&
           m_n_samples == b.m_n_samples &&
           bob::core::isClose(m_nh_sum_xit_beta_xi, b.m_nh_sum_xit_beta_xi, r_epsilon, a_epsilon) &&
           bob::core::array::isClose(m_weighted_sum, b.m_weighted_sum, r_epsilon, a_epsilon) &&
@@ -793,6 +796,7 @@ const blitz::Array<double,2>& bob::machine::PLDAMachine::getAddGamma(const size_
 double bob::machine::PLDAMachine::getLogLikeConstTerm(const size_t a) const
 {
   // Checks in both base machine and this machine
+  if (!m_plda_base) throw std::runtime_error("No PLDABase set to this machine");
   if (m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
   else if (!hasLogLikeConstTerm(a))
     throw std::runtime_error("The LogLikelihood constant term for this number of samples is not currently in cache. You could use the getAddLogLikeConstTerm() method instead");
@@ -801,6 +805,7 @@ double bob::machine::PLDAMachine::getLogLikeConstTerm(const size_t a) const
 
 double bob::machine::PLDAMachine::getAddLogLikeConstTerm(const size_t a)
 {
+  if (!m_plda_base) throw std::runtime_error("No PLDABase set to this machine");
   if (m_plda_base->hasLogLikeConstTerm(a)) return m_plda_base->getLogLikeConstTerm(a);
   else if (hasLogLikeConstTerm(a)) return m_cache_loglike_constterm[a];
   // else computes it and adds it to this machine
@@ -837,6 +842,7 @@ void bob::machine::PLDAMachine::forward(const blitz::Array<double,2>& samples, d
 double bob::machine::PLDAMachine::computeLogLikelihood(const blitz::Array<double,1>& sample,
   bool enrol) const
 {
+  if (!m_plda_base) throw std::runtime_error("No PLDABase set to this machine");
   // Check dimensionality
   bob::core::array::assertSameDimensionLength(sample.extent(0), getDimD());
 
@@ -891,6 +897,7 @@ double bob::machine::PLDAMachine::computeLogLikelihood(const blitz::Array<double
 double bob::machine::PLDAMachine::computeLogLikelihood(const blitz::Array<double,2>& samples,
   bool enrol) const
 {
+  if (!m_plda_base) throw std::runtime_error("No PLDABase set to this machine");
   // Check dimensionality
   bob::core::array::assertSameDimensionLength(samples.extent(1), getDimD());
 
