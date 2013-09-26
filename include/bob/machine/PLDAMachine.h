@@ -29,6 +29,7 @@
 #include <bob/io/HDF5File.h>
 #include <map>
 #include <iostream>
+#include <stdexcept>
 
 namespace bob { namespace machine {
 /**
@@ -525,17 +526,20 @@ class PLDAMachine: public Machine<blitz::Array<double,1>, double>
      * @brief Gets the feature dimensionality
      */
     size_t getDimD() const 
-    { return m_plda_base->getDimD(); }
+    { if (!m_plda_base) throw std::runtime_error("No PLDABase set to this machine");
+      return m_plda_base->getDimD(); }
     /**
      * @brief Gets the size/rank the \f$F\f$ subspace/matrix of the PLDA model
      */
-    size_t getDimF() const 
-    { return m_plda_base->getDimF(); }
+    size_t getDimF() const
+    { if (!m_plda_base) throw std::runtime_error("No PLDABase set to this machine");
+      return m_plda_base->getDimF(); }
     /**
      * @brief Gets the size/rank the \f$G\f$ subspace/matrix of the PLDA model
      */
     size_t getDimG() const 
-    { return m_plda_base->getDimG(); }
+    { if (!m_plda_base) throw std::runtime_error("No PLDABase set to this machine");
+      return m_plda_base->getDimG(); }
 
     /**
      * @brief Gets the number of enrolled samples
