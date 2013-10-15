@@ -25,6 +25,7 @@
 
 #include <bob/io/VideoReader.h>
 #include <bob/io/VideoWriter.h>
+#include <bob/config.h>
 
 #include <bob/io/VideoUtilities.h>
 #include <bob/python/exception.h>
