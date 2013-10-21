@@ -92,7 +92,7 @@ static void check_codec_support(std::map<std::string, const AVCodec*>& retval) {
     "msmpeg4",
     //"msmpeg4v1", /* no encoding support */
     "msmpeg4v2", // the same as msmpeg4
-    "ffv1",
+    //"ffv1", // buggy on ffmpeg >= 2.0
 #if LIBAVUTIL_VERSION_INT >= 0x320f01 //50.15.1 @ ffmpeg-0.6
     //"h263p", //bogus on libav-0.8.4
     "h264",
