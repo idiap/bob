@@ -407,7 +407,7 @@ randomly.
 
   >>> width = 50; height = 50;
   >>> framerate = 24
-  >>> outv = bob.io.VideoWriter('testvideo.avi', height, width, framerate, codec='ffv1') # output video
+  >>> outv = bob.io.VideoWriter('testvideo.avi', height, width, framerate, codec='mpeg1video') # output video
   >>> for i in range(0, 30):
   ...   newframe = (numpy.random.random_integers(0,255,(3,height,width)))
   ...   outv.append(newframe.astype('uint8'))
