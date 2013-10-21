@@ -99,11 +99,16 @@ cxx_logger = logging.getLogger('bob.c++')
 # N.B.: The devices have to exist so that our C++ logging sink is not
 # garbage collected while we try to log (see
 # http://stackoverflow.com/questions/18184209/holding-python-produced-value-in-a-c-static-boostshared-ptr)
-__debug_device__ = PythonLoggingOutputDevice(cxx_logger.debug)
-debug.reset(__debug_device__)
-__info_device__ = PythonLoggingOutputDevice(cxx_logger.info)
-info.reset(__info_device__)
-__warn_device__ = PythonLoggingOutputDevice(cxx_logger.warn)
-warn.reset(__warn_device__)
-__error_device__ = PythonLoggingOutputDevice(cxx_logger.error)
-error.reset(__error_device__)
+debug.reset(PythonLoggingOutputDevice(cxx_logger.debug))
+info.reset(PythonLoggingOutputDevice(cxx_logger.info))
+warn.reset(PythonLoggingOutputDevice(cxx_logger.warn))
+error.reset(PythonLoggingOutputDevice(cxx_logger.error))
+
+def reset_all_streams():
+  debug.reset("stderr")
+  info.reset("stderr")
+  warn.reset("stderr")
+  error.reset("stderr")
+
+import atexit
+atexit.register(reset_all_streams)
