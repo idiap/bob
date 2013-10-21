@@ -7,16 +7,16 @@
  * trainers.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,7 +36,7 @@ static void plda_train(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
   stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
   std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
   std::vector<blitz::Array<double,2> > vdata_ref;
-  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin();
       it!=vdata.end(); ++it)
     vdata_ref.push_back(it->bz<double,2>());
   // Calls the train function
@@ -48,7 +48,7 @@ static void plda_initialize(EMTrainerPLDA& t, bob::machine::PLDABase& m, object 
   stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
   std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
   std::vector<blitz::Array<double,2> > vdata_ref;
-  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin();
       it!=vdata.end(); ++it)
     vdata_ref.push_back(it->bz<double,2>());
   // Calls the initialization function
@@ -60,7 +60,7 @@ static void plda_eStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
   stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
   std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
   std::vector<blitz::Array<double,2> > vdata_ref;
-  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin();
       it!=vdata.end(); ++it)
     vdata_ref.push_back(it->bz<double,2>());
   // Calls the eStep function
@@ -72,7 +72,7 @@ static void plda_mStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
   stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
   std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
   std::vector<blitz::Array<double,2> > vdata_ref;
-  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin();
       it!=vdata.end(); ++it)
     vdata_ref.push_back(it->bz<double,2>());
   // Calls the mStep function
@@ -80,11 +80,11 @@ static void plda_mStep(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
 }
 
 static void plda_finalize(EMTrainerPLDA& t, bob::machine::PLDABase& m, object data)
-{ 
+{
   stl_input_iterator<bob::python::const_ndarray> dbegin(data), dend;
   std::vector<bob::python::const_ndarray> vdata(dbegin, dend);
   std::vector<blitz::Array<double,2> > vdata_ref;
-  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin(); 
+  for(std::vector<bob::python::const_ndarray>::iterator it=vdata.begin();
       it!=vdata.end(); ++it)
     vdata_ref.push_back(it->bz<double,2>());
   // Calls the finalization function
@@ -106,7 +106,7 @@ static object get_z_second_order(bob::trainer::PLDATrainer& m) {
 }
 
 
-void bind_trainer_plda() 
+void bind_trainer_plda()
 {
   class_<EMTrainerPLDA, boost::noncopyable>("EMTrainerPLDA", "The base python class for all EM/PLDA-based trainers.", no_init)
     .add_property("max_iterations", &EMTrainerPLDA::getMaxIterations, &EMTrainerPLDA::setMaxIterations, "Max iterations")
@@ -119,8 +119,8 @@ void bind_trainer_plda()
     .def("m_step", &plda_mStep, (arg("self"), arg("machine"), arg("data")), "Updates the Machine parameters given the hidden variable distribution (or the sufficient statistics)")
   ;
 
-  class_<bob::trainer::PLDATrainer, boost::noncopyable, bases<EMTrainerPLDA> > PLDAT("PLDATrainer", "A trainer for Probabilistic Linear Discriminant Analysis (PLDA). The train() method will learn the mu, F, G and Sigma of the model, whereas the enrol() method, will store model information about the enrolment samples for a specific class.\n\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012.");
-  
+  class_<bob::trainer::PLDATrainer, boost::noncopyable, bases<EMTrainerPLDA> > PLDAT("PLDATrainer", "A trainer for Probabilistic Linear Discriminant Analysis (PLDA). The train() method will learn the mu, F, G and Sigma of the model, whereas the enrol() method, will store model information about the enrolment samples for a specific class.\n\nReferences:\n1. 'A Scalable Formulation of Probabilistic Linear Discriminant Analysis: Applied to Face Recognition', Laurent El Shafey, Chris McCool, Roy Wallace, Sebastien Marcel, TPAMI'2013\n2. 'Probabilistic Linear Discriminant Analysis for Inference About Identity', Prince and Elder, ICCV'2007.\n3. 'Probabilistic Models for Inference about Identity', Li, Fu, Mohammed, Elder and Prince, TPAMI'2012.", no_init);
+
   PLDAT.def(init<optional<const size_t, const bool> >((arg("self"), arg("max_iterations")=100, arg("use_sum_second_order")=true),"Initializes a new PLDATrainer."))
     .def(init<const bob::trainer::PLDATrainer&>((arg("self"), arg("trainer")), "Copy constructs a PLDATrainer"))
     .def(self == self)
@@ -141,7 +141,7 @@ void bind_trainer_plda()
     .value("RANDOM_F", bob::trainer::PLDATrainer::RANDOM_F)
     .value("BETWEEN_SCATTER", bob::trainer::PLDATrainer::BETWEEN_SCATTER)
     .export_values()
-  ;   
+  ;
 
   enum_<bob::trainer::PLDATrainer::InitGMethod>("init_g_method")
     .value("RANDOM_G", bob::trainer::PLDATrainer::RANDOM_G)

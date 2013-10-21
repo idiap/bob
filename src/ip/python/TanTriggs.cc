@@ -6,16 +6,16 @@
  * @brief Binds the Tan and Triggs preprocessing filter to python
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,35 +27,35 @@ using namespace boost::python;
 
 static const char* ttdoc = "Objects of this class, after configuration, can preprocess images. It does this using the method described by Tan and Triggs in the paper titled \" Enhanced_Local_Texture_Feature_Sets for_Face_Recognition_Under_Difficult_Lighting_Conditions\", published in 2007";
 
-template <typename T> 
-static void inner_call1(bob::ip::TanTriggs& obj, 
-  bob::python::const_ndarray src, bob::python::ndarray dst) 
+template <typename T>
+static void inner_call1(bob::ip::TanTriggs& obj,
+  bob::python::const_ndarray src, bob::python::ndarray dst)
 {
   blitz::Array<double,2> dst_ = dst.bz<double,2>();
   obj(src.bz<T,2>(), dst_);
 }
 
 static void call1(bob::ip::TanTriggs& obj, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   const bob::core::array::typeinfo& info = src.type();
   switch (info.dtype) {
-    case bob::core::array::t_uint8: 
+    case bob::core::array::t_uint8:
       return inner_call1<uint8_t>(obj, src, dst);
     case bob::core::array::t_uint16:
       return inner_call1<uint16_t>(obj, src, dst);
-    case bob::core::array::t_float64: 
+    case bob::core::array::t_float64:
       return inner_call1<double>(obj, src, dst);
     default: PYTHON_ERROR(TypeError, "TanTriggs __call__ does not support array with type '%s'", info.str().c_str());
   }
 }
 
 template <typename T>
-static object inner_call2(bob::ip::TanTriggs& op, 
-  bob::python::const_ndarray src) 
+static object inner_call2(bob::ip::TanTriggs& op,
+  bob::python::const_ndarray src)
 {
   const bob::core::array::typeinfo& info = src.type();
-  bob::python::ndarray dst(bob::core::array::t_float64, info.shape[0], 
+  bob::python::ndarray dst(bob::core::array::t_float64, info.shape[0],
     info.shape[1]);
   blitz::Array<double,2> dst_ = dst.bz<double,2>();
   op(src.bz<T,2>(), dst_);
@@ -76,7 +76,7 @@ static object call2(bob::ip::TanTriggs& op, bob::python::const_ndarray src)
 
 void bind_ip_tantriggs() {
   class_<bob::ip::TanTriggs, boost::shared_ptr<bob::ip::TanTriggs> >("TanTriggs", ttdoc, init<optional<const double, const double, const double, const size_t, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("self"), arg("gamma")=0.2, arg("sigma0")=1., arg("sigma1")=2., arg("radius")=2, arg("threshold")=10., arg("alpha")=0.1, arg("conv_border")=bob::sp::Extrapolation::Mirror), "Constructs a new Tan and Triggs filter."))
-      .def(init<bob::ip::TanTriggs&>(args("other")))
+      .def(init<bob::ip::TanTriggs&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
       .add_property("gamma", &bob::ip::TanTriggs::getGamma, &bob::ip::TanTriggs::setGamma, "The value of gamma for the gamma correction")

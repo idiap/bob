@@ -44,6 +44,24 @@ bob::io::HDF5File::HDF5File(const std::string& filename, mode_t mode):
 {
 }
 
+bob::io::HDF5File::HDF5File(const std::string& filename, const char mode):
+m_file(),
+m_cwd()
+{
+  bob::io::HDF5File::mode_t new_mode = bob::io::HDF5File::inout;
+  switch (mode){
+    case 'r': new_mode = bob::io::HDF5File::in; break;
+    case 'a': new_mode = bob::io::HDF5File::inout; break;
+    case 'w': new_mode = bob::io::HDF5File::trunc; break;
+    case 'x': new_mode = bob::io::HDF5File::excl; break;
+    default:
+      throw std::runtime_error("Supported flags are 'r' (read-only), 'a' (read/write/append), 'w' (read/write/truncate) or 'x' (read/write/exclusive)");
+  }
+  m_file.reset(new bob::io::detail::hdf5::File(filename, getH5Access(new_mode)));
+  m_cwd = m_file->root(); ///< we start by looking at the root directory
+
+}
+
 bob::io::HDF5File::HDF5File(const bob::io::HDF5File& other_file):
   m_file(other_file.m_file),
   m_cwd(other_file.m_cwd)

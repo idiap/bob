@@ -62,7 +62,7 @@ void bind_machine_bic(){
 
     .def(
       boost::python::init<const bob::machine::BICMachine&>(
-          (boost::python::arg("self")),
+          (boost::python::arg("self"), boost::python::arg("other")),
           "Constructs one BICMachine from another one by doing a deep copy."
       )
     )

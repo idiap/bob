@@ -6,16 +6,16 @@
  * @brief Bindings for a WienerMachine
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -63,24 +63,16 @@ static void set_shape(bob::machine::WienerMachine& m,
   m.resize(s(0), s(1));
 }
 
-static void py_set_ps(bob::machine::WienerMachine& m, 
+static void py_set_ps(bob::machine::WienerMachine& m,
   bob::python::const_ndarray ps)
 {
   m.setPs(ps.bz<double,2>());
 }
 
-static boost::shared_ptr<bob::machine::WienerMachine> 
-wiener_machine_from_ps(bob::python::const_ndarray ps, const double pn)
-{
-  bob::machine::WienerMachine m(ps.bz<double,2>(), pn);
-  return boost::make_shared<bob::machine::WienerMachine>(m);
-}
-
-
-void bind_machine_wiener() 
+void bind_machine_wiener()
 {
   class_<bob::machine::WienerMachine, boost::shared_ptr<bob::machine::WienerMachine> >("WienerMachine", "A Wiener filter.\nReference:\n'Computer Vision: Algorithms and Applications', Richard Szeliski, (Part 3.4.3)", init<const size_t, const size_t, const double, optional<const double> >((arg("self"), arg("height"), arg("width"), arg("pn"), arg("variance_threshold")=1e-8), "Constructs a new Wiener filter dedicated to images of the given dimensions. The filter is initialized with zero values."))
-    .def("__init__", make_constructor(&wiener_machine_from_ps, default_call_policies(), (arg("ps"), arg("pn"))), "Constructs a new WienerMachine from a set of variance estimates ps, a noise level pn.")
+    .def(init<const blitz::Array<double,2>&, const double> ((arg("self"), arg("ps"), arg("pn")), "Constructs a new WienerMachine from a set of variance estimates ps, a noise level pn."))
     .def(init<>((arg("self")), "Default constructor, builds a machine as with 'WienerMachine(0,0,0)'."))
     .def(init<bob::io::HDF5File&>((arg("self"), arg("config")), "Constructs a new WienerMachine from a configuration file."))
     .def(init<const bob::machine::WienerMachine&>((arg("self"), arg("machine")), "Copy constructs an WienerMachine"))

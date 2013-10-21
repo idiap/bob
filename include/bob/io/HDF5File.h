@@ -61,6 +61,12 @@ namespace bob { namespace io {
       HDF5File (const std::string& filename, mode_t mode);
 
       /**
+       * Constructor, starts a new HDF5File object giving it a file name and an
+       * action: 'r' (read-only), 'a' (read/write/append), 'w' (read/write/truncate) or 'x' (read/write/exclusive)
+       */
+      HDF5File (const std::string& filename, const char mode='r');
+
+      /**
        * Destructor virtualization
        */
       virtual ~HDF5File();
@@ -419,7 +425,7 @@ namespace bob { namespace io {
        * compatible.
        */
       template <typename T>
-        void getAttribute(const std::string& path, const std::string& name, 
+        void getAttribute(const std::string& path, const std::string& name,
             T& value) const {
           if (m_cwd->has_dataset(path)) {
             value = (*m_cwd)[path]->get_attribute<T>(name);
@@ -440,7 +446,7 @@ namespace bob { namespace io {
        * compatible.
        */
       template <typename T, int N>
-        void getArrayAttribute(const std::string& path, 
+        void getArrayAttribute(const std::string& path,
             const std::string& name, blitz::Array<T,N>& value) const {
           if (m_cwd->has_dataset(path)) {
             value = (*m_cwd)[path]->get_array_attribute<T,N>(name);
@@ -459,7 +465,7 @@ namespace bob { namespace io {
        * Writes a scalar as an attribute to a path in this file.
        */
       template <typename T>
-        void setAttribute(const std::string& path, const std::string& name, 
+        void setAttribute(const std::string& path, const std::string& name,
             const T value) {
           if (m_cwd->has_dataset(path)) {
             (*m_cwd)[path]->set_attribute(name, value);

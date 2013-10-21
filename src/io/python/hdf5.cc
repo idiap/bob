@@ -32,23 +32,6 @@
 using namespace boost::python;
 
 /**
- * Allows us to write HDF5File("filename.hdf5", "r")
- */
-static boost::shared_ptr<bob::io::HDF5File>
-hdf5file_make_fromstr(const std::string& filename, const std::string& opmode) {
-  if (opmode.size() > 1) PYTHON_ERROR(RuntimeError, "Supported flags are 'r' (read-only), 'a' (read/write/append), 'w' (read/write/truncate) or 'x' (read/write/exclusive), but you tried to use '%s'", opmode.c_str());
-  bob::io::HDF5File::mode_t mode = bob::io::HDF5File::inout;
-  if (opmode[0] == 'r') mode = bob::io::HDF5File::in;
-  else if (opmode[0] == 'a') mode = bob::io::HDF5File::inout;
-  else if (opmode[0] == 'w') mode = bob::io::HDF5File::trunc;
-  else if (opmode[0] == 'x') mode = bob::io::HDF5File::excl;
-  else { //anything else is just unsupported for the time being
-    PYTHON_ERROR(RuntimeError, "Supported flags are 'r' (read-only), 'a' (read/write/append), 'w' (read/write/truncate) or 'x' (read/write/exclusive), but you tried to use '%s'", opmode.c_str());
-  }
-  return boost::make_shared<bob::io::HDF5File>(filename, mode);
-}
-
-/**
  * Returns a list of all paths inside a HDF5File
  */
 static list hdf5file_paths(const bob::io::HDF5File& f, const bool relative) {
@@ -689,8 +672,8 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(hdf5file_del_attributes_overloads, hdf5file_del_
 
 void bind_io_hdf5() {
   class_<bob::io::HDF5File, boost::shared_ptr<bob::io::HDF5File> >("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard bob binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
-    .def(boost::python::init<const bob::io::HDF5File&>(boost::python::args("other"), "Generates a shallow copy of the already opened file."))
-    .def("__init__", make_constructor(hdf5file_make_fromstr, default_call_policies(), (arg("filename"), arg("openmode_string") = "r")), "Opens a new file in one of these supported modes: 'r' (read-only), 'a' (read/write/append), 'w' (read/write/truncate) or 'x' (read/write/exclusive)")
+    .def(init<const bob::io::HDF5File&> ((arg("self"), arg("other")), "Generates a shallow copy of the already opened file."))
+    .def(init<const std::string&, const char> ((arg("self"), arg("filename"), arg("openmode_string")='r'), "Opens a new file in one of these supported modes: 'r' (read-only), 'a' (read/write/append), 'w' (read/write/truncate) or 'x' (read/write/exclusive)"))
     .def("cd", &bob::io::HDF5File::cd, (arg("self"), arg("path")), "Changes the current prefix path. When this object is started, the prefix path is empty, which means all following paths to data objects should be given using the full path. If you set this to a different value, it will be used as a prefix to any subsequent operation until you reset it. If path starts with '/', it is treated as an absolute path. '..' and '.' are supported. This object should be a std::string. If the value is relative, it is added to the current path. If it is absolute, it causes the prefix to be reset. Note all operations taking a relative path, following a cd(), will be considered relative to the value defined by the 'cwd' property of this object.")
     .def("has_group", &bob::io::HDF5File::hasGroup, (arg("self"), arg("path")), "Checks if a path exists inside a file - does not work for datasets, only for directories. If the given path is relative, it is take w.r.t. to the current working directory")
     .def("create_group", &bob::io::HDF5File::createGroup, (arg("self"), arg("path")), "Creates a new directory inside the file. A relative path is taken w.r.t. to the current directory. If the directory already exists (check it with hasGroup()), an exception will be raised.")
@@ -720,7 +703,7 @@ void bind_io_hdf5() {
   "  This is the path to the HDF5 dataset to replace data at\n\n" \
   "data\n" \
   "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to a list or tuple of scalars or arrays. This will cause this method to iterate over the elements and add each individually.\n\n" \
-  "compresssion\n" \
+  "compression\n" \
   "  This parameter is effective when appending arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
     .def("set", &hdf5file_set, hdf5file_set_overloads((arg("self"), arg("path"), arg("data"), arg("compression")=0), "Sets the scalar or array at position 0 to the given value. This method is equivalent to checking if the scalar or array at position 0 exists and then replacing it. If the path does not exist, we append the new scalar or array.\n\n" \
   "Keyword Parameters:\n\n" \
@@ -728,7 +711,7 @@ void bind_io_hdf5() {
   "  This is the path to the HDF5 dataset to replace data at\n\n" \
   "data\n" \
   "  This is the data that will be set on the position indicated. It may be a simple python or numpy scalar (such as :py:class:`numpy.uint8`) or a :py:class:`numpy.ndarray` of any of the supported data types. You can also, optionally, set this to an iterable of scalars or arrays. This will cause this method to collapse the whole iterable into a :py:class:`numpy.ndarray` and set that into the file.\n\n" \
-  "compresssion\n" \
+  "compression\n" \
   "  This parameter is effective when setting arrays. Set this to a number betwen 0 (default) and 9 (maximum) to compress the contents of this dataset. This setting is only effective if the dataset does not yet exist, otherwise, the previous setting is respected."))
     // attribute manipulation
     .def("get_attributes", &hdf5file_get_attributes, hdf5file_get_attributes_overloads((arg("self"), arg("path")="."), "Returns a dictionary containing all attributes related to a particular (existing) path in this file. The path may point to a subdirectory or to a particular dataset. If the path does not exist, a RuntimeError is raised."))

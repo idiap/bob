@@ -7,16 +7,16 @@
  *        Linear Programming problem (LP).
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -43,8 +43,8 @@ static object get_mu(const bob::math::LPInteriorPoint& op)
   return mu.self();
 }
 
-static object solve1(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A, 
-  bob::python::const_ndarray b, bob::python::const_ndarray c, 
+static object solve1(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A,
+  bob::python::const_ndarray b, bob::python::const_ndarray c,
   bob::python::const_ndarray x0)
 {
   const bob::core::array::typeinfo& info = x0.type();
@@ -59,7 +59,7 @@ static object solve1(bob::math::LPInteriorPoint& op, bob::python::const_ndarray 
   x = x0.bz<double,1>();
   // Solve
   op.solve(A.bz<double,2>(), b.bz<double,1>(), c.bz<double,1>(), x);
-  
+
   // Return result
   bob::python::ndarray res(info.dtype, info.shape[0]/2);
   blitz::Array<double,1> res_ = res.bz<double,1>();
@@ -67,9 +67,9 @@ static object solve1(bob::math::LPInteriorPoint& op, bob::python::const_ndarray 
   return res.self();
 }
 
-static object solve2(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A, 
-  bob::python::const_ndarray b, bob::python::const_ndarray c, 
-  bob::python::const_ndarray x0, bob::python::const_ndarray lambda, 
+static object solve2(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A,
+  bob::python::const_ndarray b, bob::python::const_ndarray c,
+  bob::python::const_ndarray x0, bob::python::const_ndarray lambda,
   bob::python::const_ndarray mu)
 {
   const bob::core::array::typeinfo& info = x0.type();
@@ -83,7 +83,7 @@ static object solve2(bob::math::LPInteriorPoint& op, bob::python::const_ndarray 
   // Copy input solution
   x = x0.bz<double,1>();
   // Solve
-  op.solve(A.bz<double,2>(), b.bz<double,1>(), c.bz<double,1>(), x, 
+  op.solve(A.bz<double,2>(), b.bz<double,1>(), c.bz<double,1>(), x,
     lambda.bz<double,1>(), mu.bz<double,1>());
 
   // Return result
@@ -93,39 +93,39 @@ static object solve2(bob::math::LPInteriorPoint& op, bob::python::const_ndarray 
   return res.self();
 }
 
-static bool is_feasible(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A, 
-  bob::python::const_ndarray b, bob::python::const_ndarray c, 
-  bob::python::const_ndarray x, bob::python::const_ndarray lambda, 
+static bool is_feasible(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A,
+  bob::python::const_ndarray b, bob::python::const_ndarray c,
+  bob::python::const_ndarray x, bob::python::const_ndarray lambda,
   bob::python::const_ndarray mu)
 {
-  return op.isFeasible(A.bz<double,2>(), b.bz<double,1>(), c.bz<double,1>(), 
+  return op.isFeasible(A.bz<double,2>(), b.bz<double,1>(), c.bz<double,1>(),
     x.bz<double,1>(), lambda.bz<double,1>(), mu.bz<double,1>());
 }
 
-static bool is_in_v(bob::math::LPInteriorPoint& op, 
+static bool is_in_v(bob::math::LPInteriorPoint& op,
   bob::python::const_ndarray x, bob::python::const_ndarray mu,
   const double theta)
 {
   return op.isInV(x.bz<double,1>(), mu.bz<double,1>(), theta);
 }
 
-static bool is_in_v_s(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A, 
-  bob::python::const_ndarray b, bob::python::const_ndarray c, 
-  bob::python::const_ndarray x, bob::python::const_ndarray lambda, 
+static bool is_in_v_s(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A,
+  bob::python::const_ndarray b, bob::python::const_ndarray c,
+  bob::python::const_ndarray x, bob::python::const_ndarray lambda,
   bob::python::const_ndarray mu, const double theta)
 {
   // Solve
-  return op.isInVS(A.bz<double,2>(), b.bz<double,1>(), c.bz<double,1>(), 
+  return op.isInVS(A.bz<double,2>(), b.bz<double,1>(), c.bz<double,1>(),
     x.bz<double,1>(), lambda.bz<double,1>(), mu.bz<double,1>(), theta);
 }
 
-static void initialize_dual_lambda_mu(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A, 
+static void initialize_dual_lambda_mu(bob::math::LPInteriorPoint& op, bob::python::const_ndarray A,
   bob::python::const_ndarray c)
 {
   op.initializeDualLambdaMu(A.bz<double,2>(), c.bz<double,1>());
 }
 
-static bool is_in_vinf(bob::math::LPInteriorPointLongstep& op, 
+static bool is_in_vinf(bob::math::LPInteriorPointLongstep& op,
   bob::python::const_ndarray x, bob::python::const_ndarray mu,
   const double gamma)
 {
@@ -153,14 +153,14 @@ void bind_math_lp_interiorpoint()
   ;
 
   class_<bob::math::LPInteriorPointShortstep, boost::shared_ptr<bob::math::LPInteriorPointShortstep>, bases<bob::math::LPInteriorPoint> >("LPInteriorPointShortstep", "A Linear Program solver based on a short step interior point method", init<const size_t, const size_t, const double, const double>((arg("self"), arg("M"), arg("N"), arg("theta"), arg("epsilon")), "Constructs a new LPInteriorPointShortstep solver"))
-    .def(init<const bob::math::LPInteriorPointShortstep&>((arg("solver")), "Copy constructs a solver"))
+    .def(init<const bob::math::LPInteriorPointShortstep&>((arg("self"), arg("solver")), "Copy constructs a solver"))
     .def(self == self)
     .def(self != self)
     .add_property("theta", &bob::math::LPInteriorPointShortstep::getTheta, &bob::math::LPInteriorPointShortstep::setTheta, "The value theta used to define a V2 neighborhood")
   ;
 
   class_<bob::math::LPInteriorPointPredictorCorrector, boost::shared_ptr<bob::math::LPInteriorPointPredictorCorrector>, bases<bob::math::LPInteriorPoint> >("LPInteriorPointPredictorCorrector", "A Linear Program solver based on a predictor-corrector interior point method", init<const size_t, const size_t, const double, const double, const double>((arg("self"), arg("M"), arg("N"), arg("theta_pred"), arg("theta_corr"), arg("epsilon")), "Constructs a new LPInteriorPointPredictorCorrector solver"))
-    .def(init<const bob::math::LPInteriorPointPredictorCorrector&>((arg("solver")), "Copy constructs a solver"))
+    .def(init<const bob::math::LPInteriorPointPredictorCorrector&>((arg("self"), arg("solver")), "Copy constructs a solver"))
     .def(self == self)
     .def(self != self)
     .add_property("theta_pred", &bob::math::LPInteriorPointPredictorCorrector::getThetaPred, &bob::math::LPInteriorPointPredictorCorrector::setThetaPred, "The value theta_pred used to define a V2 neighborhood")
@@ -168,7 +168,7 @@ void bind_math_lp_interiorpoint()
   ;
 
   class_<bob::math::LPInteriorPointLongstep, boost::shared_ptr<bob::math::LPInteriorPointLongstep>, bases<bob::math::LPInteriorPoint> >("LPInteriorPointLongstep", "A Linear Program solver based on a ong step interior point method", init<const size_t, const size_t, const double, const double, const double>((arg("self"), arg("M"), arg("N"), arg("gamma"), arg("sigma"), arg("epsilon")), "Constructs a new LPInteriorPointLongstep solver"))
-    .def(init<const bob::math::LPInteriorPointLongstep&>((arg("solver")), "Copy constructs a solver"))
+    .def(init<const bob::math::LPInteriorPointLongstep&>((arg("self"), arg("solver")), "Copy constructs a solver"))
     .def(self == self)
     .def(self != self)
     .def("is_in_v", &is_in_vinf, (arg("self"), arg("x"), arg("mu"), arg("gamma")), "Check if a primal-dual point (x,lambda,mu) belongs to the V-inf neighborhood of the central path")

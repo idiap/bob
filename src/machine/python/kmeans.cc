@@ -4,16 +4,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -69,12 +69,12 @@ static void py_setMeans(bob::machine::KMeansMachine& machine, bob::python::const
   machine.setMeans(means.bz<double,2>());
 }
 
-static double py_getDistanceFromMean(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray x, const size_t i) 
+static double py_getDistanceFromMean(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray x, const size_t i)
 {
   return machine.getDistanceFromMean(x.bz<double,1>(), i);
 }
 
-static tuple py_getClosestMean(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray x) 
+static tuple py_getClosestMean(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray x)
 {
   size_t closest_mean;
   double min_distance;
@@ -82,7 +82,7 @@ static tuple py_getClosestMean(const bob::machine::KMeansMachine& machine, bob::
   return boost::python::make_tuple(closest_mean, min_distance);
 }
 
-static double py_getMinDistance(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray input) 
+static double py_getMinDistance(const bob::machine::KMeansMachine& machine, bob::python::const_ndarray input)
 {
   return machine.getMinDistance(input.bz<double,1>());
 }
@@ -91,15 +91,15 @@ static void py_setCacheMeans(bob::machine::KMeansMachine& machine, bob::python::
   machine.setCacheMeans(cache_means.bz<double,2>());
 }
 
-void bind_machine_kmeans() 
+void bind_machine_kmeans()
 {
-  class_<bob::machine::KMeansMachine, boost::shared_ptr<bob::machine::KMeansMachine>, 
+  class_<bob::machine::KMeansMachine, boost::shared_ptr<bob::machine::KMeansMachine>,
          bases<bob::machine::Machine<blitz::Array<double,1>, double> > >("KMeansMachine",
       "This class implements a k-means classifier.\n"
       "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006",
       init<>((arg("self"))))
     .def(init<const size_t, const size_t>((arg("self"), arg("n_means"), arg("n_inputs"))))
-    .def(init<bob::machine::KMeansMachine&>((arg("self"))))
+    .def(init<bob::machine::KMeansMachine&>((arg("self"), arg("other"))))
     .def(init<bob::io::HDF5File&>((arg("self"), arg("config"))))
     .def(self == self)
     .def(self != self)

@@ -8,16 +8,16 @@
  * Bob coding standards and structure.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,8 +39,8 @@ namespace bob { namespace visioner {
   /////////////////////////////////////////////////////////////////////////////////////////
 
   static const std::string LBPNames[] = { "LBP",
-    "mLBP", 
-    "tLBP", 
+    "mLBP",
+    "tLBP",
     "dLBP",
     "MCT"};
 
@@ -63,14 +63,14 @@ namespace bob { namespace visioner {
       // Reset to new parameters
       virtual void reset(const param_t& param)
       {
-        IIModel::reset(param);                  
+        IIModel::reset(param);
         _reset();
       }
 
       // Project the selected features to a higher resolution
-      virtual bool project() 
+      virtual bool project()
       {
-        return _project();        
+        return _project();
       }
 
       // Compute the value of the feature <f> at the (x, y) position
@@ -116,7 +116,7 @@ namespace bob { namespace visioner {
     public:
 
       /**
-       * Multi-block feature parametrization:
+       * Multi-block feature parameterization:
        *	(dx, dy) displacement in the SW
        *	(cx, cy) cell size
        */
@@ -148,7 +148,7 @@ namespace bob { namespace visioner {
       {
         m_delta = 0x01 << m_param.m_projections;
 
-        // Build the MB features                                                
+        // Build the MB features
         const int min_cx = 1, max_cx = m_param.m_cols / 3;
         const int min_cy = 1, max_cy = m_param.m_rows / 3;
 
@@ -159,7 +159,7 @@ namespace bob { namespace visioner {
             const int min_x = 0, max_x = (int)m_param.m_cols - 3 * cx;
             const int min_y = 0, max_y = (int)m_param.m_rows - 3 * cy;
 
-            const int ddx = 1, ddy = 1;                                
+            const int ddx = 1, ddy = 1;
 
             // ... at each location
             for (int dx = min_x; dx < max_x; dx += ddx)
@@ -167,28 +167,28 @@ namespace bob { namespace visioner {
               {
                 // ... but make sure it is projected at the correct scale
                 if (    (dx % m_delta) == 0 &&
-                    (dy % m_delta) == 0 &&        
+                    (dy % m_delta) == 0 &&
                     (cx % m_delta) == 0 &&
                     (cy % m_delta) == 0)
                 {
-                  m_mbs.push_back(mb_t(dx, dy, cx, cy));					
+                  m_mbs.push_back(mb_t(dx, dy, cx, cy));
                 }
               }
-          }       
+          }
       }
 
       // Project the selected features to a higher resolution
-      bool _project() 
+      bool _project()
       {
         if (m_delta <= 1)
         {
           return false;
-        }                        
+        }
         m_delta >>= 1;
 
         bob::core::info << "Projecting the selected features using the <" << m_delta << ">px resolution." << std::endl;
 
-        const std::vector<uint64_t> features = IIModel::features();                         
+        const std::vector<uint64_t> features = IIModel::features();
         std::vector<mb_t> old_mbs = m_mbs;
 
         // Project each feature ...
@@ -204,7 +204,7 @@ namespace bob { namespace visioner {
           const int centerx = mb.m_dx + 3 * mb.m_cx / 2;
           const int centery = mb.m_dy + 3 * mb.m_cy / 2;
 
-          // ... by keeping its center fixed and scaling the cell size                                
+          // ... by keeping its center fixed and scaling the cell size
           for (int cx = min_cx; cx <= max_cx; cx += m_delta)
           {
             for (int cy = min_cy; cy <= max_cy; cy += m_delta)
@@ -217,7 +217,7 @@ namespace bob { namespace visioner {
                 bool found = false;
                 for (uint64_t i = 0; i < m_mbs.size() && found == false; i ++)
                 {
-                  found = 
+                  found =
                     (dx == m_mbs[i].m_dx) &&
                     (dy == m_mbs[i].m_dy) &&
                     (cx == m_mbs[i].m_cx) &&
@@ -244,14 +244,14 @@ namespace bob { namespace visioner {
       uint64_t         m_delta;        // Projection level
   };
 
-  // xLBP feature pools        
+  // xLBP feature pools
   typedef MBxxxLBPModel<mb_lbp<uint32_t, uint64_t>, 0, 256>                 MBLBPModel;
-  typedef MBxxxLBPModel<mb_mlbp<uint32_t, uint64_t>, 1, 256>                MBmLBPModel;        
+  typedef MBxxxLBPModel<mb_mlbp<uint32_t, uint64_t>, 1, 256>                MBmLBPModel;
   typedef MBxxxLBPModel<mb_tlbp<uint32_t, uint64_t>, 2, 256>                MBtLBPModel;
-  typedef MBxxxLBPModel<mb_dlbp<uint32_t, uint64_t>, 3, 256>                MBdLBPModel;                
+  typedef MBxxxLBPModel<mb_dlbp<uint32_t, uint64_t>, 3, 256>                MBdLBPModel;
 
   // MCT feature pool
-  typedef MBxxxLBPModel<mb_mct<uint32_t, 3, 3, uint64_t>, 4, 512>           MBMCTModel;                
+  typedef MBxxxLBPModel<mb_mct<uint32_t, 3, 3, uint64_t>, 4, 512>           MBMCTModel;
 
 }}
 

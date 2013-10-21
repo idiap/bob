@@ -6,16 +6,16 @@
  * @brief Binds GaussianScaleSpace to python
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -40,24 +40,24 @@ static object allocate_output(const bob::ip::GaussianScaleSpace& op)
 
 
 template <typename T>
-static void inner_call_c(const bob::ip::GaussianScaleSpace& op, 
-  bob::python::const_ndarray src, boost::python::object dst) 
+static void inner_call_c(const bob::ip::GaussianScaleSpace& op,
+  bob::python::const_ndarray src, boost::python::object dst)
 {
   stl_input_iterator<bob::python::const_ndarray> begin(dst), end;
   std::vector<bob::python::const_ndarray> ndst(begin, end);
   std::vector<blitz::Array<double,3> > vdst;
-  for(std::vector<bob::python::const_ndarray>::iterator it=ndst.begin(); 
+  for(std::vector<bob::python::const_ndarray>::iterator it=ndst.begin();
     it!=ndst.end(); ++it)
   vdst.push_back(it->bz<double,3>());
   op(src.bz<T,2>(), vdst);
 }
 
-static void call_c(bob::ip::GaussianScaleSpace& op, 
-  bob::python::const_ndarray src, boost::python::object dst) 
+static void call_c(bob::ip::GaussianScaleSpace& op,
+  bob::python::const_ndarray src, boost::python::object dst)
 {
   const bob::core::array::typeinfo& info = src.type();
-  
-  switch (info.dtype) 
+
+  switch (info.dtype)
   {
     case bob::core::array::t_uint8: inner_call_c<uint8_t>(op, src, dst); break;
     case bob::core::array::t_uint16: inner_call_c<uint16_t>(op, src, dst); break;
@@ -70,8 +70,8 @@ static void call_c(bob::ip::GaussianScaleSpace& op,
 
 
 template <typename T>
-static object inner_call_p(const bob::ip::GaussianScaleSpace& op, 
-  bob::python::const_ndarray src) 
+static object inner_call_p(const bob::ip::GaussianScaleSpace& op,
+  bob::python::const_ndarray src)
 {
   std::vector<blitz::Array<double,3> > dst;
   boost::python::list dst_p;
@@ -86,12 +86,12 @@ static object inner_call_p(const bob::ip::GaussianScaleSpace& op,
   return dst_p;
 }
 
-static object call_p(const bob::ip::GaussianScaleSpace& op, 
-  bob::python::const_ndarray src) 
+static object call_p(const bob::ip::GaussianScaleSpace& op,
+  bob::python::const_ndarray src)
 {
   const bob::core::array::typeinfo& info = src.type();
-  
-  switch(info.dtype) 
+
+  switch(info.dtype)
   {
     case bob::core::array::t_uint8: return inner_call_p<uint8_t>(op, src);
     case bob::core::array::t_uint16: return inner_call_p<uint16_t>(op, src);
@@ -101,7 +101,7 @@ static object call_p(const bob::ip::GaussianScaleSpace& op,
   }
 }
 
-void bind_ip_gaussian_scale_space() 
+void bind_ip_gaussian_scale_space()
 {
   class_<bob::ip::GSSKeypoint, boost::shared_ptr<bob::ip::GSSKeypoint> >("GSSKeypoint", "Structure to describe a keypoint on the Gaussian Scale Space. It consists of a scale sigma, a location (x,y) and an orientation o.", init<const double, const double, const double, optional<const double> >((arg("self"), arg("scale"), arg("y"), arg("x"), arg("o")=0.), "Creates a GSS keypoint"))
     .def_readwrite("sigma", &bob::ip::GSSKeypoint::sigma, "The floating point value describing the scale of the keypoint")
@@ -119,7 +119,7 @@ void bind_ip_gaussian_scale_space()
     .def_readwrite("edge_score", &bob::ip::GSSKeypointInfo::edge_score, "The edge score of the keypoint during the SIFT-like detection step")
     ;
 
-  class_<bob::ip::GaussianScaleSpace, boost::shared_ptr<bob::ip::GaussianScaleSpace> >("GaussianScaleSpace", "This class allows after configuration the generation of Gaussian Pyramids that can be used to extract SIFT features.\n\nReference:\n'Distinctive Image Features from Scale-Invariant Keypoints', D. Lowe, International Journal of Computer Vision, 2004", init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("height"), arg("width"), arg("n_octaves"), arg("n_scales"), arg("octave_min"), arg("sigma_n")=0.5, arg("sigma0")=1.6, arg("kernel_radius_factor")=4., arg("border_type")=bob::sp::Extrapolation::Mirror), "Creates an object that allows the construction of Gaussian pyramids."))
+  class_<bob::ip::GaussianScaleSpace, boost::shared_ptr<bob::ip::GaussianScaleSpace> >("GaussianScaleSpace", "This class allows after configuration the generation of Gaussian Pyramids that can be used to extract SIFT features.\n\nReference:\n'Distinctive Image Features from Scale-Invariant Keypoints', D. Lowe, International Journal of Computer Vision, 2004", init<const size_t, const size_t, const size_t, const size_t, const int, optional<const double, const double, const double, const bob::sp::Extrapolation::BorderType> >((arg("self"), arg("height"), arg("width"), arg("n_octaves"), arg("n_scales"), arg("octave_min"), arg("sigma_n")=0.5, arg("sigma0")=1.6, arg("kernel_radius_factor")=4., arg("border_type")=bob::sp::Extrapolation::Mirror), "Creates an object that allows the construction of Gaussian pyramids."))
       .def(init<bob::ip::GaussianScaleSpace&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)

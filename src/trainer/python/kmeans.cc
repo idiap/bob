@@ -4,16 +4,16 @@
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, version 3 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,7 +23,7 @@
 
 using namespace boost::python;
 
-typedef bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase; 
+typedef bob::trainer::EMTrainer<bob::machine::KMeansMachine, blitz::Array<double,2> > EMTrainerKMeansBase;
 
 static void py_setZeroethOrderStats(bob::trainer::KMeansTrainer& op, bob::python::const_ndarray stats) {
   const bob::core::array::typeinfo& info = stats.type();
@@ -39,37 +39,37 @@ static void py_setFirstOrderStats(bob::trainer::KMeansTrainer& op, bob::python::
   op.setFirstOrderStats(stats.bz<double,2>());
 }
 
-static void py_train(EMTrainerKMeansBase& trainer, 
+static void py_train(EMTrainerKMeansBase& trainer,
   bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
 {
   trainer.train(machine, sample.bz<double,2>());
 }
 
-static void py_initialize(EMTrainerKMeansBase& trainer, 
+static void py_initialize(EMTrainerKMeansBase& trainer,
   bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
 {
   trainer.initialize(machine, sample.bz<double,2>());
 }
 
-static void py_finalize(EMTrainerKMeansBase& trainer, 
+static void py_finalize(EMTrainerKMeansBase& trainer,
   bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
 {
   trainer.finalize(machine, sample.bz<double,2>());
 }
 
-static void py_eStep(EMTrainerKMeansBase& trainer, 
+static void py_eStep(EMTrainerKMeansBase& trainer,
   bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
 {
   trainer.eStep(machine, sample.bz<double,2>());
 }
 
-static void py_mStep(EMTrainerKMeansBase& trainer, 
+static void py_mStep(EMTrainerKMeansBase& trainer,
   bob::machine::KMeansMachine& machine, bob::python::const_ndarray sample)
 {
   trainer.mStep(machine, sample.bz<double,2>());
 }
 
-void bind_trainer_kmeans() 
+void bind_trainer_kmeans()
 {
   class_<EMTrainerKMeansBase, boost::noncopyable>("EMTrainerKMeans", "The base python class for all EM-based trainers.", no_init)
     .add_property("convergence_threshold", &EMTrainerKMeansBase::getConvergenceThreshold, &EMTrainerKMeansBase::setConvergenceThreshold, "Convergence threshold")
@@ -94,9 +94,10 @@ void bind_trainer_kmeans()
   // Starts binding the KMeansTrainer
   class_<bob::trainer::KMeansTrainer, boost::shared_ptr<bob::trainer::KMeansTrainer>, boost::noncopyable, bases<EMTrainerKMeansBase> > KMT("KMeansTrainer",
       "Trains a KMeans machine.\n"
-      "This class implements the expectation-maximisation algorithm for a k-means machine.\n"
+      "This class implements the expectation-maximization algorithm for a k-means machine.\n"
       "See Section 9.1 of Bishop, \"Pattern recognition and machine learning\", 2006\n"
-      "It uses a random initialisation of the means followed by the expectation-maximization algorithm"
+      "It uses a random initialization of the means followed by the expectation-maximization algorithm",
+      no_init
       );
 
   // Binds methods that does not have nested enum values as default parameters
@@ -120,7 +121,7 @@ void bind_trainer_kmeans()
     .value("KMEANS_PLUS_PLUS", bob::trainer::KMeansTrainer::KMEANS_PLUS_PLUS)
 #endif
     .export_values()
-    ;   
+    ;
 
   // Binds methods that has nested enum values as default parameters
   KMT.def(init<optional<double,int,bool,bob::trainer::KMeansTrainer::InitializationMethod> >((arg("self"), arg("convergence_threshold")=0.001, arg("max_iterations")=10, arg("compute_likelihood")=true, arg("initialization_method")=bob::trainer::KMeansTrainer::RANDOM)));

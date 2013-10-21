@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# manuel Guenther <manuel.guenther@idiap.ch>
+# Manuel Guenther <manuel.guenther@idiap.ch>
 # Tue Jan  8 13:36:12 CET 2013
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
