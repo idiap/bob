@@ -65,13 +65,32 @@ Simple image processing
 =======================
 
 The basic operations on images are the affine image conversions like image scaling, rotation, and cutting.
+For most of the operations, two ways of executing the functions exist.
+The more easy ways simply returns the processed image, but the second version accepts input and output objects (i.e., to allow to reuse memory).
+E.g. for `color type conversion`_ (see below), one could use the functions:
+
+.. doctest:: iptest
+  :options: +NORMALIZE_WHITESPACE
+
+  >>> image = bob.io.load( color_image_path )
+  >>> gray_image = numpy.ndarray( image.shape[1:3], dtype = image.dtype )  # create gray image in desired dimensions
+  >>> bob.ip.rgb_to_gray( image, gray_image )                              # Convert it to gray scale
+
+or simply:
+
+.. doctest:: iptest
+  :options: +NORMALIZE_WHITESPACE
+
+  >>> gray_image = bob.ip.rgb_to_gray( image )
+
+In the following, we will describe the more complex way of using our functions, keeping in mind that it might be even simpler!
 
 
 Scaling images
 ~~~~~~~~~~~~~~
 
 To compute a scaled version of the image, simply create the image at the desired scale. For instance, in the example
-below an image is up-scaled by first creating the image and then initialising the larger image:
+below an image is up-scaled by first creating the image and then initializing the larger image:
 
 .. doctest:: iptest
   :options: +NORMALIZE_WHITESPACE
@@ -276,7 +295,7 @@ or you can extract the LBP features for all pixels in the image. In this case yo
   >>> lbp_extractor ( cropped_image,  lbp_output_image )
   >>> # print the binary representation of the pixel at the same location as above;
   >>> # note that the index is shifted by 1 since the lbp image is smaller than the original
-  >>> print(bin ( lbp_output_image [ 68, 60 ] ))
+  >>> print(bin ( lbp_output_image [ 68, 61 ] ))
   0b11110000
 
 
