@@ -129,6 +129,7 @@ namespace bob { namespace ip {
        * Constructor for multi-block LBP codes
        * @param P     number of neighbors
        * @param block_size   the block size for the multi-block LBP in both y and x direction
+       * @param block_overlap  the overlap of the blocks in the multi-block LBP (must be smaller than the block size)
        * @param to_average  compare to average value or to central pixel value
        * @param add_average_bit  if to_average: also add a bit for the comparison of the central bit with the average
        * @param uniform  compute LBP^u2 uniform LBP's (see paper listed above)
@@ -138,6 +139,7 @@ namespace bob { namespace ip {
        */
       LBP(const int P,
           const blitz::TinyVector<int,2> block_size,
+          const blitz::TinyVector<int,2> block_overlap = blitz::TinyVector<int,2> (0,0),
           const bool to_average=false,
           const bool add_average_bit=false,
           const bool uniform=false,
@@ -193,7 +195,8 @@ namespace bob { namespace ip {
         return m_R_x;
       }
       blitz::TinyVector<double,2> getRadii() const { return blitz::TinyVector<double,2>(m_R_y, m_R_x); }
-      blitz::TinyVector<double,2> getBlockSize() const { return blitz::TinyVector<int,2>(m_mb_y, m_mb_x); }
+      blitz::TinyVector<int,2> getBlockSize() const { return blitz::TinyVector<int,2>(m_mb_y, m_mb_x); }
+      blitz::TinyVector<int,2> getBlockOverlap() const { return blitz::TinyVector<int,2>(m_ov_y, m_ov_x); }
       int getNNeighbours() const { return m_P; }
       bool getCircular() const { return m_circular; }
       bool getToAverage() const { return m_to_average; }
@@ -211,6 +214,7 @@ namespace bob { namespace ip {
       void setRadius(const double R){ m_R_y = R; m_R_x = R; init(); }
       void setRadii(blitz::TinyVector<double,2> r){ m_R_y = r[0]; m_R_x = r[1]; init(); }
       void setBlockSize(blitz::TinyVector<int,2> mb){ m_mb_y = mb[0]; m_mb_x = mb[1]; init(); }
+      void setBlockOverlap(blitz::TinyVector<int,2> ov){ m_ov_y = ov[0]; m_ov_x = ov[1]; init(); }
       void setNNeighbours(const int neighbors) { m_P = neighbors; init(); }
       void setCircular(const bool circ){ m_circular = circ; init(); }
       void setToAverage(const bool to_average){ m_to_average = to_average; init(); }
@@ -322,6 +326,8 @@ namespace bob { namespace ip {
       double m_R_x;
       int m_mb_y; // size of multi-block block in y
       int m_mb_x; // size of multi-block block in x
+      int m_ov_y; // overlap of multi-block block in y
+      int m_ov_x; // overlap of multi-block block in x
       bool m_circular;
       bool m_to_average;
       bool m_add_average_bit;

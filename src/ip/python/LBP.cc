@@ -167,7 +167,7 @@ void bind_ip_lbp() {
   class_<bob::ip::LBP, boost::shared_ptr<bob::ip::LBP> >("LBP", "A class for the LBP operators", no_init)
     .def(init<int, double, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius_y"), arg("radius_x"), arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator with different radii"))
     .def(init<int, double, bool, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("radius")=1., arg("circular")=false, arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new LBP operator"))
-    .def(init<int, blitz::TinyVector<int,2>, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("block_size"), arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new multi-block LBP operator"))
+    .def(init<int, blitz::TinyVector<int,2>, blitz::TinyVector<int,2>, bool, bool, bool, bool, bob::ip::ELBPType, bob::ip::LBPBorderHandling >((arg("self"), arg("neighbors"), arg("block_size"), arg("block_overlap")=blitz::TinyVector<int,2>(0,0), arg("to_average")=false, arg("add_average_bit")=false, arg("uniform")=false, arg("rotation_invariant")=false, arg("elbp_type")=bob::ip::ELBP_REGULAR, arg("border_handling")=bob::ip::LBP_BORDER_SHRINK), "Constructs a new multi-block LBP operator with possibly overlapping blocks"))
     .def(init<bob::io::HDF5File>((arg("self"), arg("hdf5file")), "Reads the LBP configuration from the given HDF5File"))
     .def(init<bob::ip::LBP>((arg("self"), arg("other")), "Copy constructor"))
 
@@ -178,6 +178,7 @@ void bind_ip_lbp() {
     .add_property("radius", &bob::ip::LBP::getRadius, &bob::ip::LBP::setRadius, "The radius of the round or square LBP")
     .add_property("radii", &bob::ip::LBP::getRadii, &bob::ip::LBP::setRadii, "The radii (y,x) of the elliptical or rectangular LBP")
     .add_property("block_size", &bob::ip::LBP::getBlockSize, &bob::ip::LBP::setBlockSize, "The size (y,x) of one block of the multi-block LBP")
+    .add_property("block_overlap", &bob::ip::LBP::getBlockOverlap, &bob::ip::LBP::setBlockOverlap, "The overlap (y,x) of the blocks in the multi-block LBP")
     .add_property("points", &bob::ip::LBP::getNNeighbours, &bob::ip::LBP::setNNeighbours, "The number of points in the LBP (usually, 4, 8 or 16)")
     .add_property("circular", &bob::ip::LBP::getCircular, &bob::ip::LBP::setCircular, "Extract elliptical (True) or rectangular (false) LBP")
     .add_property("to_average", &bob::ip::LBP::getToAverage, &bob::ip::LBP::setToAverage, "Compare the pixel values to their average (True) or to the central pixel (False)")

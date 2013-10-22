@@ -36,6 +36,8 @@ bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool c
   m_R_x(R_x),
   m_mb_y(-1),
   m_mb_x(-1),
+  m_ov_y(0),
+  m_ov_x(0),
   m_circular(circular),
   m_to_average(to_average),
   m_add_average_bit(add_average_bit),
@@ -62,6 +64,8 @@ bob::ip::LBP::LBP(const int P, const double R, const bool circular,
   m_R_x(R),
   m_mb_y(-1),
   m_mb_x(-1),
+  m_ov_y(0),
+  m_ov_x(0),
   m_circular(circular),
   m_to_average(to_average),
   m_add_average_bit(add_average_bit),
@@ -80,14 +84,23 @@ bob::ip::LBP::LBP(const int P, const double R, const bool circular,
   init();
 }
 
-bob::ip::LBP::LBP(const int P, const blitz::TinyVector<int,2> block_size,
-    const bool to_average, const bool add_average_bit, const bool uniform,
-    const bool rotation_invariant, const bob::ip::ELBPType eLBP_type, const bob::ip::LBPBorderHandling border_handling):
+bob::ip::LBP::LBP(
+    const int P,
+    const blitz::TinyVector<int,2> block_size,
+    const blitz::TinyVector<int,2> block_overlap,
+    const bool to_average,
+    const bool add_average_bit,
+    const bool uniform,
+    const bool rotation_invariant,
+    const bob::ip::ELBPType eLBP_type,
+    const bob::ip::LBPBorderHandling border_handling):
   m_P(P),
   m_R_y(-1.),
   m_R_x(-1.),
   m_mb_y(block_size[0]),
   m_mb_x(block_size[1]),
+  m_ov_y(block_overlap[0]),
+  m_ov_x(block_overlap[1]),
   m_circular(false),
   m_to_average(to_average),
   m_add_average_bit(add_average_bit),
@@ -112,6 +125,8 @@ bob::ip::LBP::LBP(bob::io::HDF5File file):
   m_R_x(0),
   m_mb_y(0),
   m_mb_x(0),
+  m_ov_y(0),
+  m_ov_x(0),
   m_circular(false),
   m_to_average(false),
   m_add_average_bit(false),
@@ -134,6 +149,8 @@ bob::ip::LBP::LBP(const bob::ip::LBP& other):
   m_R_x(other.m_R_x),
   m_mb_y(other.m_mb_y),
   m_mb_x(other.m_mb_x),
+  m_ov_y(other.m_ov_y),
+  m_ov_x(other.m_ov_x),
   m_circular(other.m_circular),
   m_to_average(other.m_to_average),
   m_add_average_bit(other.m_add_average_bit),
@@ -160,6 +177,8 @@ bob::ip::LBP& bob::ip::LBP::operator=(const bob::ip::LBP& other) {
   m_R_x = other.m_R_x;
   m_mb_y = other.m_mb_y;
   m_mb_x = other.m_mb_x;
+  m_ov_y = other.m_ov_y;
+  m_ov_x = other.m_ov_x;
   m_circular = other.m_circular;
   m_to_average = other.m_to_average;
   m_add_average_bit = other.m_add_average_bit;
@@ -178,6 +197,8 @@ bool bob::ip::LBP::operator==(const bob::ip::LBP& other) const{
     m_R_x == other.m_R_x &&
     m_mb_y == other.m_mb_y &&
     m_mb_x == other.m_mb_x &&
+    m_ov_y == other.m_ov_y &&
+    m_ov_x == other.m_ov_x &&
     m_circular == other.m_circular &&
     m_to_average == other.m_to_average &&
     m_add_average_bit == other.m_add_average_bit &&
@@ -217,6 +238,10 @@ void bob::ip::LBP::init()
     throw std::runtime_error("Multi-block LBP codes cannot handle other border handling than LBP_BORDER_SHRINK");
   }
 
+  if ((m_mb_y > 0 && m_mb_x > 0) && (m_ov_y < 0 || m_ov_y >= m_mb_y || m_ov_x < 0 || m_ov_x >= m_mb_x)){
+    throw std::runtime_error("Overlap of Multi-block LBP's must be positive and smaller than the multi-block size");
+  }
+
   // initialize temporal memory
   _pixels.resize(m_P);
 
@@ -229,13 +254,13 @@ void bob::ip::LBP::init()
     switch (m_P){
       case 4:{
         // 4 neighbors: (-y,0), (0,x), (y,0), (0,-x)
-        d_y = -m_mb_y, 0, m_mb_y, 0;
-        d_x = 0, m_mb_x, 0, -m_mb_x;
+        d_y = -m_mb_y + m_ov_y, 0, m_mb_y - m_ov_y, 0;
+        d_x = 0, m_mb_x - m_ov_x, 0, -m_mb_x + m_ov_x;
       }break;
       case 8:{
         // 8 neighbors: (-y,-x), (-y,0), (-y,x), (0,x), (y,x), (y,0), (y,-x), (0,-x)
-        d_y = -m_mb_y, -m_mb_y, -m_mb_y, 0, m_mb_y, m_mb_y, m_mb_y, 0;
-        d_x = -m_mb_x, 0, m_mb_x, m_mb_x, m_mb_x, 0, -m_mb_x, -m_mb_x;
+        d_y = -m_mb_y + m_ov_y, -m_mb_y + m_ov_y, -m_mb_y + m_ov_y, 0, m_mb_y - m_ov_y, m_mb_y - m_ov_y, m_mb_y - m_ov_y, 0;
+        d_x = -m_mb_x + m_ov_x, 0, m_mb_x - m_ov_x, m_mb_x - m_ov_x, m_mb_x - m_ov_x, 0, -m_mb_x + m_ov_x, -m_mb_x + m_ov_x;
         break;
       }
       default:
@@ -384,8 +409,8 @@ const blitz::TinyVector<int,2> bob::ip::LBP::getLBPShape(const blitz::TinyVector
     dy = 0;
     dx = 0;
   } else if (m_mb_y > 0 && m_mb_x > 0){
-    dy = 3 * m_mb_y - 1;
-    dx = 3 * m_mb_x - 1;
+    dy = 3 * m_mb_y - 2 * m_ov_y - 1;
+    dx = 3 * m_mb_x - 2 * m_ov_x - 1;
   } else {
     dy = 2*(int)ceil(m_R_y);
     dx = 2*(int)ceil(m_R_x);
@@ -408,8 +433,8 @@ blitz::TinyVector<int, 2> bob::ip::LBP::getOffset() const {
     offset[1] = 0;
   } else if (m_mb_y > 0 && m_mb_x > 0){
     // for multi-block LBP features, the offset is defined as 1.5 times the block size
-    offset[0] = m_mb_y + m_mb_y/2;
-    offset[1] = m_mb_x + m_mb_x/2;
+    offset[0] = m_mb_y - m_ov_y + m_mb_y/2;
+    offset[1] = m_mb_x - m_ov_x + m_mb_x/2;
   } else {
     /// for normal LBP, the offset is equal to the radius
     offset[0] = (int)ceil(m_R_y);
@@ -446,6 +471,8 @@ void bob::ip::LBP::save(bob::io::HDF5File file) const{
   if (m_mb_y > 0 && m_mb_y > 0) {
     file.append("BlockSize", m_mb_y);
     file.append("BlockSize", m_mb_x);
+    file.append("BlockOverlap", m_ov_y);
+    file.append("BlockOverlap", m_ov_x);
   } else {
     file.append("Radius", m_R_y);
     file.append("Radius", m_R_x);
@@ -461,10 +488,16 @@ void bob::ip::LBP::save(bob::io::HDF5File file) const{
 
 void bob::ip::LBP::load(bob::io::HDF5File file){
   m_P = file.read<int>("Neighbors");
+  m_ov_y = m_ov_x = 0;
   if (file.contains("BlockSize")){
     // multi-block LBP
     m_mb_y = file.read<int>("BlockSize", 0);
     m_mb_x = file.read<int>("BlockSize", 1);
+    // block overlap
+    if (file.contains("BlockOverlap")){
+      m_ov_y = file.read<int>("BlockOverlap", 0);
+      m_ov_x = file.read<int>("BlockOverlap", 1);
+    }
     m_R_y = m_R_x = -1.;
     m_circular = false;
     m_border_handling = LBP_BORDER_SHRINK;

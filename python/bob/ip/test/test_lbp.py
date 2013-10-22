@@ -601,6 +601,7 @@ def test_mb_lbp():
   # Tests multi-block LBP
   op = bob.ip.LBP(8, (2,1))
   nose.tools.eq_(op.block_size, (2,1))
+  nose.tools.eq_(op.block_overlap, (0,0))
 
   values = numpy.array([[3,5,12], [1,3,4], [5,2,10], [13,14,0], [10,3,1], [20,12,0]], dtype=numpy.uint8)
   nose.tools.eq_(op.get_lbp_shape(values), (1,1))
@@ -635,6 +636,47 @@ def test_mb_lbp():
 
   op = bob.ip.LBP(8, (2,1), elbp_type=bob.ip.ELBPType.DIRECTION_CODED)
   nose.tools.eq_(op(ii, True)[0,0], 0x76)
+
+
+def test_omb_lbp():
+  # Tests overlapping multi-block LBP
+  op = bob.ip.LBP(8, (3,3),(2,1))
+  nose.tools.eq_(op.block_size, (3,3))
+  nose.tools.eq_(op.block_overlap, (2,1))
+
+  values = numpy.array([[0,0,1,1,1,2,2], [1,1,2,2,2,3,3], [1,1,3,3,3,5,5], [3,3,5,5,5,7,7], [5,5,7,7,7,9,9]], dtype=numpy.uint8)
+  nose.tools.eq_(op.get_lbp_shape(values), (1,1))
+  # get the offset multi-block code for this image
+  nose.tools.eq_(op(values)[0,0], 0x1e)
+
+  # generate integral image
+  ii = numpy.ndarray((6,8), dtype = numpy.uint16)
+  bob.ip.integral(values, ii, True)
+  nose.tools.eq_(op.get_lbp_shape(ii, True), (1,1))
+  # get the offset multi-block code for this image
+  nose.tools.eq_(op(ii, True)[0,0], 0x1e)
+
+  # test that all the other types of LBP still work
+  op = bob.ip.LBP(8, (3,3), (2,1), uniform=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x1d)
+
+  op = bob.ip.LBP(8, (3,3), (2,1), rotation_invariant=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x08)
+
+  op = bob.ip.LBP(8, (3,3), (2,1), uniform=True, rotation_invariant=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x05)
+
+  op = bob.ip.LBP(8, (3,3), (2,1), to_average=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x1e)
+
+  op = bob.ip.LBP(8, (3,3), (2,1), to_average=True, add_average_bit=True)
+  nose.tools.eq_(op(ii, True)[0,0], 0x3c)
+
+  op = bob.ip.LBP(8, (3,3), (2,1), elbp_type=bob.ip.ELBPType.TRANSITIONAL)
+  nose.tools.eq_(op(ii, True)[0,0], 0x0f)
+
+  op = bob.ip.LBP(8, (3,3), (2,1), elbp_type=bob.ip.ELBPType.DIRECTION_CODED)
+  nose.tools.eq_(op(ii, True)[0,0], 0x0a)
 
 
 def test_io():

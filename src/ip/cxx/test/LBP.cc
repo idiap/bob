@@ -347,6 +347,37 @@ BOOST_AUTO_TEST_CASE( test_mb_lbp ){
   BOOST_CHECK_EQUAL( lbp_8_a2, result(0,0) );
 }
 
+BOOST_AUTO_TEST_CASE( test_omb_lbp ){
+  // overlapping multi-block LBP 8,(3,3),(2,1)
+  bob::ip::LBP lbp83321(8, blitz::TinyVector<int,2>(3, 3), blitz::TinyVector<int,2>(2,1));
+  blitz::Array<double,2> positions = lbp83321.getRelativePositions();
+
+  BOOST_CHECK_EQUAL(positions.shape()[0], 9);
+  BOOST_CHECK_EQUAL(positions.shape()[1], 4);
+
+  // check some positions
+  BOOST_CHECK_EQUAL(positions(0,0), -2);
+  BOOST_CHECK_EQUAL(positions(0,1), 1);
+  BOOST_CHECK_EQUAL(positions(0,2), -3);
+  BOOST_CHECK_EQUAL(positions(0,3), 0);
+
+  BOOST_CHECK_EQUAL(positions(4,0), 0);
+  BOOST_CHECK_EQUAL(positions(4,1), 3);
+  BOOST_CHECK_EQUAL(positions(4,2), 1);
+  BOOST_CHECK_EQUAL(positions(4,3), 4);
+
+  // check that the image resolution and offset is computed correctly
+  blitz::TinyVector<int,2> resolution = lbp83321.getLBPShape(blitz::TinyVector<int,2>(10,10));
+  BOOST_CHECK_EQUAL(resolution(0), 6);
+  BOOST_CHECK_EQUAL(resolution(1), 4);
+
+  // check that the image resolution and offset is computed correctly
+  blitz::TinyVector<int,2> offset = lbp83321.getOffset();
+  BOOST_CHECK_EQUAL(offset(0), 2);
+  BOOST_CHECK_EQUAL(offset(1), 3);
+
+}
+
 BOOST_AUTO_TEST_CASE( test_lbp_other )
 {
   // direction-coded LBP; should be identical for both test patterns
