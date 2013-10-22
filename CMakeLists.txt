@@ -38,8 +38,8 @@ if(NOT BOB_VERSION)
   set(BOB_VERSION ${BOB_VERSION_INTERNAL})
 endif()
 
-set(BOB_SOVERSION_INTERNAL "OFF" CACHE INTERNAL "If we need to use a SOVERSION
-on libraries, this should set it")
+execute_process(COMMAND ${WITH_PYTHON} ${CMAKE_SOURCE_DIR}/bin/soversion.py ${BOB_VERSION} OUTPUT_VARIABLE BOB_DISCOVERED_SOVERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(BOB_SOVERSION_INTERNAL "${BOB_DISCOVERED_SOVERSION}" CACHE INTERNAL "The version of the Bob shared libraries we are building (matches API)")
 if(NOT BOB_SOVERSION)
   set(BOB_SOVERSION ${BOB_SOVERSION_INTERNAL})
 endif()
@@ -53,7 +53,7 @@ option(WITH_FFMPEG "Make FFmpeg detection obligatory" ON)
 option(WITH_PERFTOOLS "Make Google Perftools detection obligatory" OFF)
 option(WITH_MKL "Compile against the Intel MKL" OFF)
 
-message(STATUS "Bob version '${BOB_VERSION}' (${BOB_PLATFORM_STR})")
+message(STATUS "Bob version '${BOB_VERSION}' [${BOB_SOVERSION}] (${BOB_PLATFORM_STR})")
 
 # ---------------
 # END of options.
