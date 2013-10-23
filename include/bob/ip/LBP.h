@@ -139,7 +139,7 @@ namespace bob { namespace ip {
        */
       LBP(const int P,
           const blitz::TinyVector<int,2> block_size,
-          const blitz::TinyVector<int,2> block_overlap = blitz::TinyVector<int,2> (0,0),
+          const blitz::TinyVector<int,2> block_overlap = (blitz::TinyVector<int,2> (0,0)),
           const bool to_average=false,
           const bool add_average_bit=false,
           const bool uniform=false,
