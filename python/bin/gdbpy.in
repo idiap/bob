@@ -26,12 +26,6 @@ while [ "$(echo $1 | sed 's%^-%%')" != "$1" ]; do
 done
 
 # allows user created scripts to run
-if [ "@BOB_SOVERSION@" != "OFF" ]; then
-  export LD_LIBRARY_PATH=$(dirname $(dirname "@BOB_PYTHONPATH@"))
-fi
-if [ -n "@CYGWIN@" ]; then
-  export PATH=@CMAKE_RUNTIME_OUTPUT_DIRECTORY@:${PATH};
-fi
 export PYTHONPATH="@BOB_PYTHONPATH@:${PYTHONPATH}"; 
 
 exec gdb ${gdbopt} --args @PYTHON_EXECUTABLE@ "$@"

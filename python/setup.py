@@ -139,8 +139,6 @@ def bob_variables():
     raise RuntimeError('Cannot retrieve Bob version from pkg-config:\n%s' % \
         output)
 
-  kw['soversion'] = get_var('soversion')
-
   kw['base_libdir'] = get_var('libdir')
   kw['base_includedir'] = get_var('includedir')
 
@@ -213,10 +211,6 @@ def setup_extension(ext_name, pc_file):
     library_dirs.insert(0, os.path.join(DESTDIR, BOB['base_libdir'].lstrip(os.sep)))
     include_dirs.insert(0, os.path.join(DESTDIR, BOB['base_includedir'].strip(os.sep)))
 
-  runtime_library_dirs = None
-  if BOB['soversion'].lower() == 'off':
-    runtime_library_dirs = library_dirs
-
   # Tricks setuptools into letting us use the --compiler=cygwin during
   # extension building. Unfortunately, for that option to work, at least one
   # compiled file has to go into the extension.
@@ -229,7 +223,7 @@ def setup_extension(ext_name, pc_file):
       language="c++",
       include_dirs=include_dirs + [numpy.get_include()],
       library_dirs=library_dirs,
-      runtime_library_dirs=runtime_library_dirs,
+      runtime_library_dirs=library_dirs,
       libraries=pc['libraries'],
       )
 

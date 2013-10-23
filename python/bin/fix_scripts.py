@@ -32,8 +32,6 @@ import os
 import sys
 import fnmatch
 
-CYGWIN=(__import__('platform').system().find('CYGWIN') != -1)
-
 if len(sys.argv) > 2:
   print("Not tunning scripts (DESTDIR environment set to '%s')" % sys.argv[2])
   sys.exit(0)
@@ -54,9 +52,6 @@ for script in fnmatch.filter(os.listdir(sys.argv[1]), 'bob_*.py'):
   for l in open(path, 'rt'):
     if l.strip() == 'import sys':
       out.append('\n### start modifications by Bob ###\n')
-      if CYGWIN:
-        out.append("import os\n")
-        out.append("os.environ['PATH'] = os.pathsep.join(['%s', os.environ['PATH']])\n" % lib)
       out.append(l)
       out.append("sys.path.insert(0, '%s')\n" % site)
       out.append('### end modifications by Bob ###\n\n')

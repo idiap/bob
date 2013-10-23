@@ -14,11 +14,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if [ "@BOB_SOVERSION@" != "OFF" ]; then
-  export LD_LIBRARY_PATH=$(dirname $(dirname "@BOB_PYTHONPATH@"))
-fi
-if [ -n "@CYGWIN@" ]; then
-  export PATH=@CMAKE_RUNTIME_OUTPUT_DIRECTORY@:${PATH};
-fi
 export PYTHONPATH="@BOB_PYTHONPATH@:${PYTHONPATH}";
 @PYTHON_EXECUTABLE@ "${@}"
