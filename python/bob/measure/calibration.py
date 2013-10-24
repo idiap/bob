@@ -47,7 +47,7 @@ def min_cllr(negatives, positives):
   neg_indices = [0]*N
   pos_indices = [0]*P
   for i in range(I):
-    if n == N or neg[n] > pos[p]:
+    if p < P and (n == N or neg[n] > pos[p]):
       pos_indices[p] = i
       p += 1
       ideal[i] = 1
