@@ -68,33 +68,6 @@ namespace bob {
        * @brief Closes this device
        */
       virtual void close() {}
-
-      /**
-       * @brief Clones this device and all its properties
-       */
-      virtual boost::shared_ptr<OutputDevice> clone() const =0;
-    };
-
-    /**
-     * @brief The device is what tells the source where to actually read the
-     * messages from. If the AutoInputDevice does not have a device, the
-     * messages are discarded.
-     */
-    struct InputDevice {
-      /**
-       * @brief Virtual destructor.
-       */
-      virtual ~InputDevice();
-
-      /**
-       * @brief Reads n bytes of data from this device
-       */
-      virtual std::streamsize read(char* s, std::streamsize n) =0;
-
-      /**
-       * @brief Closes this device
-       */
-      virtual void close() {}
     };
 
     /**
@@ -125,14 +98,9 @@ namespace bob {
         AutoOutputDevice(const std::string& configuration);
 
         /**
-         * @brief Copies the configuration from the other AutoOutputDevice
-         */
-        AutoOutputDevice(const AutoOutputDevice& other);
-
-        /**
          * @brief Intializes with a device.
          */
-        AutoOutputDevice(const OutputDevice& device);
+        AutoOutputDevice(boost::shared_ptr<OutputDevice> device);
 
         /**
          * @brief D'tor
@@ -152,62 +120,6 @@ namespace bob {
       private:
 
         boost::shared_ptr<OutputDevice> m_device; ///< Who does the real job.
-
-    };
-
-    /**
-     * @brief Use this source always in bob C++ programs. You can configure it
-     * to read messages from stdin or a file.
-     */
-    class AutoInputDevice: public boost::iostreams::source {
-
-      public:
-
-        /**
-         * @brief C'tor, empty, reads from stdin.
-         */
-        AutoInputDevice();
-
-        /**
-         * @brief Creates a new source using one of the built-in strategies.
-         * - stdin: reads from the standard input
-         * - filename: read all messages from the file named "filename"
-         * - filename.gz: read all messagses from the file named "filename.gz",
-         *   in compressed format.
-         *
-         * @param configuration The configuration string to use for this source
-         * as declared above
-         */
-        AutoInputDevice(const std::string& configuration);
-
-        /**
-         * @brief Copies the configuration from the other AutoInputDevice
-         */
-        AutoInputDevice(const AutoInputDevice& other);
-
-        /**
-         * @brief Intializes with a device.
-         */
-        AutoInputDevice(const boost::shared_ptr<InputDevice>& device);
-
-        /**
-         * @brief D'tor
-         */
-        virtual ~AutoInputDevice();
-
-        /**
-         * @brief Forwards call to underlying InputDevice
-         */
-        virtual std::streamsize read(char* s, std::streamsize n);
-
-        /**
-         * @brief Closes this base source
-         */
-        virtual void close();
-
-      private:
-
-        boost::shared_ptr<InputDevice> m_device; ///< Who does the real job.
 
     };
 

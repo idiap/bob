@@ -211,7 +211,7 @@ static void ostream_open_1(boost::iostreams::stream<bob::core::AutoOutputDevice>
   s.open(config);
 }
 
-static void ostream_open_2(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, const bob::core::OutputDevice& device) {
+static void ostream_open_2(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, boost::shared_ptr<bob::core::OutputDevice> device) {
   s.open(device);
 }
 
@@ -220,7 +220,7 @@ static void ostream_reset_1(boost::iostreams::stream<bob::core::AutoOutputDevice
   s.open(config);
 }
 
-static void ostream_reset_2(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, const bob::core::OutputDevice& device) {
+static void ostream_reset_2(boost::iostreams::stream<bob::core::AutoOutputDevice>& s, boost::shared_ptr<bob::core::OutputDevice> device) {
   s.close();
   s.open(device);
 }
@@ -234,7 +234,7 @@ void bind_core_logging() {
 
   class_<boost::iostreams::stream<bob::core::AutoOutputDevice>, boost::noncopyable>("OutputStream", "The OutputStream object represents a normal C++ stream and is used as the basis for configuring the message output re-direction inside bob.", init<>("Initializes a stream w/o a device (it should be closed by default)"))
     .def(init<const std::string&>((arg("config")), "Initializes this stream with one of the default C++ methods available: ``stdout``, ``stderr``, ``null`` or a filename (if the filename ends in ``.gz``, it will be compressed on the fly)."))
-    .def(init<const bob::core::OutputDevice&>((arg("device")), "Initializes this stream with an existing device"))
+    .def(init<boost::shared_ptr<bob::core::OutputDevice>>((arg("device")), "Initializes this stream with an existing device"))
     .def("open", &ostream_open_1, (arg("self"), arg("config")), "Opens a connection to a new output device as defined by the parameter ``config``.\n\nCommon values for the parameter ``config`` are ``stdout``, ``stderr``, ``null`` or a filename (possibly ending in ``.gz`` for on-the-fly compression).")
     .def("open", &ostream_open_2, (arg("self"), arg("device")), "Connects to an existing device by copying the device information.")
     .def("reset", &ostream_reset_1, (arg("self"), arg("config")), "Closes the current device and then opens a connection to a new output device as defined by the parameter ``config``.\n\nCommon values for the parameter ``config`` are ``stdout``, ``stderr``, ``null`` or a filename (possibly ending in ``.gz`` for on-the-fly compression).")

@@ -49,15 +49,11 @@
 #endif
 
 bob::core::OutputDevice::~OutputDevice() {}
-bob::core::InputDevice::~InputDevice() {}
 
 struct NullOutputDevice: public bob::core::OutputDevice {
   virtual ~NullOutputDevice() {}
   virtual std::streamsize write(const char*, std::streamsize n) {
     return n;
-  }
-  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
-    return boost::make_shared<NullOutputDevice>();
   }
 };
 
@@ -71,9 +67,6 @@ struct StdoutOutputDevice: public bob::core::OutputDevice {
     std::cout.write(s, n);
     return n;
   }
-  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
-    return boost::make_shared<StdoutOutputDevice>();
-  }
 };
 
 struct StderrOutputDevice: public bob::core::OutputDevice {
@@ -84,21 +77,6 @@ struct StderrOutputDevice: public bob::core::OutputDevice {
     boost::lock_guard<boost::mutex> lock(mutex);
 #endif
     std::cerr.write(s, n);
-    return n;
-  }
-  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
-    return boost::make_shared<StderrOutputDevice>();
-  }
-};
-
-struct StdinInputDevice: public bob::core::InputDevice {
-  virtual ~StdinInputDevice() {}
-  virtual std::streamsize read(char* s, std::streamsize n) {
-    static boost::mutex mutex;
-#if ((BOOST_VERSION / 100) % 1000) > 35
-    boost::lock_guard<boost::mutex> lock(mutex);
-#endif
-    std::cin.read(s, n);
     return n;
   }
 };
@@ -148,51 +126,12 @@ struct FileOutputDevice: public bob::core::OutputDevice {
     return n;
   }
 
-  virtual boost::shared_ptr<bob::core::OutputDevice> clone() const {
-    return boost::make_shared<FileOutputDevice>(*this);
-  }
-
   //internal representation
   private:
     std::string m_filename; ///< the name of the file I'm writing to
     boost::shared_ptr<std::ofstream> m_file; ///< the file output stream
     boost::shared_ptr<boost::iostreams::filtering_ostream> m_ostream; ///< the output stream
     boost::shared_ptr<boost::mutex> m_mutex; ///< multi-threading guardian
-
-};
-
-struct FileInputDevice: public bob::core::InputDevice {
-  FileInputDevice(const std::string& filename)
-    : m_filename(filename),
-      m_file(),
-      m_istream(),
-      m_mutex()
-  {
-    //this first bit creates the input file handle
-    std::ios_base::openmode mode = std::ios_base::in;
-    if (is_dot_gz(filename)) mode |= std::ios_base::binary;
-    m_file.open(filename.c_str(), mode);
-    //this second part configures gzip'ing if necessary and associates the
-    //input file with the filtering stream.
-    if (is_dot_gz(filename))
-      m_istream.push(boost::iostreams::basic_gzip_decompressor<>());
-    m_istream.push(m_file);
-  }
-  virtual ~FileInputDevice() {}
-  virtual std::streamsize read(char* s, std::streamsize n) {
-#if ((BOOST_VERSION / 100) % 1000) > 35
-    boost::lock_guard<boost::mutex> lock(m_mutex);
-#endif
-    m_istream.read(s, n);
-    return n;
-  }
-
-  //internal representation
-  private:
-    std::string m_filename; ///< the name of the file I'm reading from
-    std::ifstream m_file; ///< the file input stream
-    boost::iostreams::filtering_istream m_istream; ///< the input stream
-    boost::mutex m_mutex; ///< multi-threading guardian
 
 };
 
@@ -210,16 +149,6 @@ bob::core::AutoOutputDevice::AutoOutputDevice()
 {
 }
 
-bob::core::AutoOutputDevice::AutoOutputDevice(const AutoOutputDevice& other)
-: m_device(other.m_device->clone())
-{
-}
-
-bob::core::AutoOutputDevice::AutoOutputDevice(const OutputDevice& device)
-: m_device(device.clone())
-{
-}
-
 bob::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration)
 : m_device()
 {
@@ -231,6 +160,11 @@ bob::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration)
   else m_device.reset(new FileOutputDevice(configuration));
 }
 
+bob::core::AutoOutputDevice::AutoOutputDevice(boost::shared_ptr<bob::core::OutputDevice> d)
+: m_device(d)
+{
+}
+
 bob::core::AutoOutputDevice::~AutoOutputDevice() {
 }
 
@@ -239,33 +173,6 @@ std::streamsize bob::core::AutoOutputDevice::write(const char* s, std::streamsiz
 }
 
 void bob::core::AutoOutputDevice::close() {
-  m_device->close();
-}
-
-bob::core::AutoInputDevice::AutoInputDevice()
-: m_device(new StdinInputDevice)
-{}
-
-bob::core::AutoInputDevice::AutoInputDevice(const AutoInputDevice& other)
-: m_device(other.m_device)
-{}
-
-bob::core::AutoInputDevice::AutoInputDevice(const std::string& configuration)
-: m_device()
-{
-  std::string str(configuration);
-  str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
-  if (str == "stdin" || str.size() == 0) m_device.reset(new StdinInputDevice);
-  else m_device.reset(new FileInputDevice(configuration));
-}
-
-bob::core::AutoInputDevice::~AutoInputDevice() {}
-
-std::streamsize bob::core::AutoInputDevice::read(char* s, std::streamsize n) {
-  return m_device->read(s, n);
-}
-
-void bob::core::AutoInputDevice::close() {
   m_device->close();
 }
 

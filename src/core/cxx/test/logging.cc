@@ -109,35 +109,3 @@ BOOST_AUTO_TEST_CASE( test_switch )
 
   info << "NOT SUPPOSED TO BE PRINTED!" << std::endl;
 }
-
-//tests if I can read from files
-BOOST_AUTO_TEST_CASE( test_input )
-{
-  std::string testfilename = bob::core::tmpfile("");
-  boost::iostreams::stream<bob::core::AutoOutputDevice> ofile(testfilename);
-  std::string testdata = "12345678,a_single_sentence";
-  ofile << testdata << std::endl;
-  ofile.close();
-  boost::iostreams::stream<bob::core::AutoInputDevice> ifile(testfilename);
-  std::string back;
-  ifile >> back;
-  BOOST_CHECK_EQUAL(testdata, back);
-  //error << "File saved at: " << testfilename << std::endl;
-  boost::filesystem::remove(testfilename);
-}
-
-//tests if I can read from compressed files
-BOOST_AUTO_TEST_CASE( test_compressed_input )
-{
-  std::string testfilename = bob::core::tmpfile(".gz");
-  boost::iostreams::stream<bob::core::AutoOutputDevice> ofile(testfilename);
-  std::string testdata = "12345678,a_single_sentence";
-  ofile << testdata << std::endl;
-  ofile.close();
-  boost::iostreams::stream<bob::core::AutoInputDevice> ifile(testfilename);
-  std::string back;
-  ifile >> back;
-  BOOST_CHECK_EQUAL(testdata, back);
-  //error << "File saved at: " << testfilename << std::endl;
-  boost::filesystem::remove(testfilename);
-}
