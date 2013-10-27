@@ -774,14 +774,10 @@ bob::io::detail::ffmpeg::make_frame(const std::string& filename,
     m % filename;
     throw std::runtime_error(m.str());
   }
-  retval->format = pixfmt;
-  retval->width  = codec->width;
-  retval->height = codec->height;
 
 #if LIBAVCODEC_VERSION_INT < 0x363b64 //54.59.100 @ ffmpeg-1.0
 
-  size_t size = avpicture_get_size(retval->format,
-      retval->width, retval->height);
+  size_t size = avpicture_get_size(pixfmt, width, height);
 
   uint8_t* picture_buf = (uint8_t*)av_malloc(size);
 
@@ -811,6 +807,9 @@ bob::io::detail::ffmpeg::make_frame(const std::string& filename,
       codec->width, codec->height);
 
 #else // >= 54.59.100 @ ffmpeg-1.0
+  retval->format = pixfmt;
+  retval->width  = codec->width;
+  retval->height = codec->height;
 
   AVPicture picture;
 
