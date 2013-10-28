@@ -777,7 +777,7 @@ bob::io::detail::ffmpeg::make_frame(const std::string& filename,
 
 #if LIBAVCODEC_VERSION_INT < 0x363b64 //54.59.100 @ ffmpeg-1.0
 
-  size_t size = avpicture_get_size(pixfmt, width, height);
+  size_t size = avpicture_get_size(pixfmt, codec->width, codec->height);
 
   uint8_t* picture_buf = (uint8_t*)av_malloc(size);
 
