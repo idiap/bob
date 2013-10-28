@@ -160,7 +160,7 @@ bob::core::AutoOutputDevice::AutoOutputDevice(const std::string& configuration)
   else m_device.reset(new FileOutputDevice(configuration));
 }
 
-bob::core::AutoOutputDevice::AutoOutputDevice(boost::shared_ptr<bob::core::OutputDevice> d)
+bob::core::AutoOutputDevice::AutoOutputDevice(boost::shared_ptr<OutputDevice> d)
 : m_device(d)
 {
 }
