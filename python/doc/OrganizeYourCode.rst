@@ -1,6 +1,6 @@
 .. vim: set fileencoding=utf-8 :
 .. Andre Anjos <andre.dos.anjos@gmail.com>
-.. Wed 15 Aug 09:08:47 2012 
+.. Wed 15 Aug 09:08:47 2012
 
 ==========================================
  Organize Your Work in Satellite Packages
@@ -34,8 +34,8 @@ particular publication that depends on |project|.
   <http://docs.python.org/distutils/>`_ are mechanisms to *define and
   distribute* python code in a packaged format, optionally through `PyPI
   <http://pypi.python.org/pypi>`_, a web-based Python package index and
-  distribution portal. 
-  
+  distribution portal.
+
   `Buildout <http://www.buildout.org>`_ is a tool to *deploy* Python packages
   locally, automatically setting up and encapsulating your work environment.
 
@@ -94,8 +94,8 @@ In the remaining of this document, we explain how to setup ``buildout.cfg`` so
 you can work in different operational modes - the ones which are more common
 development scenarios.
 
-A Simple Python-only Package - Bob installed on the Host System
-===============================================================
+A Simple Python-only Package - |project| installed on the Host System
+=====================================================================
 
 This is the typical case when you have installed one of our `pre-packaged
 versions of Bob <https://github.com/idiap/bob/wiki/Packages>`_ or you have
@@ -153,7 +153,7 @@ You should now be able to execute ``./bin/version.py``:
 
 .. code-block:: sh
 
-  $ ./bin/version.py 
+  $ ./bin/version.py
   The installed version of bob is 1.1.1
   bob is installed at: /usr/lib/python2.7/dist-packages
   bob depends on the following Python packages:
@@ -219,7 +219,7 @@ Once you have edited both ``docs/conf.py`` and ``docs/index.rst`` you can run
 the document generator executing:
 
 .. code-block:: sh
-  
+
   $ ./bin/sphinx-build docs sphinx
   ...
 
@@ -228,7 +228,7 @@ This example generates the output of the sphinx processing in the directory
 flag:
 
 .. code-block:: sh
-  
+
   $ ./bin/sphinx-build -h
   ...
 
@@ -246,7 +246,7 @@ platforms and a great way to make sure all is OK. Test units are run with `nose
 package:
 
 .. code-block:: sh
-  
+
   $ ./bin/nosetests -v xbob
   test_version (xbob.example.test.MyTests) ... ok
 
@@ -310,7 +310,7 @@ so that you include the following:
   ...
 
   setup(
-    
+
     name="xbob.myext",
     version="1.0.0",
     ...
@@ -438,8 +438,8 @@ your satellite package:
 
 2. In case you are making an API modification to your package, you should think
    if you would like to branch your repository at this position. You don't have
-   to care about this detail with new packages, naturally. 
-   
+   to care about this detail with new packages, naturally.
+
    If required, branching will allow you to still make modifications (patches)
    on the old version of the code and develop on the ``master`` branch for the
    new release, in parallel.  It is important to branch when you break
@@ -450,22 +450,22 @@ your satellite package:
       ----> time
 
       initial commit
-      o---------------o---------o-----o-----------------------> master 
-                      |         |     |                   
+      o---------------o---------o-----o-----------------------> master
+                      |         |     |
                       |         |     |   v2.0.0
                       |         |     +---x----------> 2.0
-                      |         |                         
-                      |         | v1.1.0  v1.1.1          
+                      |         |
+                      |         | v1.1.0  v1.1.1
                       |         +-x-------x------> 1.1
-                      |                                   
+                      |
                       |   v1.0.0  v1.0.1a0
                       +---x-------x-------> 1.0
 
    The ``o``'s mark the points in which you decided to branch your project.
    The ``x``'s mark places where you decided to release a new version of your
    satellite package on PyPI. The ``-``'s mark commits on your repository. Time
-   flies from left to right. 
-   
+   flies from left to right.
+
    In this ficticious representation, the ``master`` branch continue under
    development, but one can see older branches don't receive much attention
    anymore.
@@ -493,7 +493,66 @@ your satellite package:
     $ python setup.py register #if you modified your setup.py or README.rst
     $ python setup.py sdist --formats=zip upload
 
+    .. note::
+      You can also check the .zip file that will be uploaded to PyPI before
+      actually uploading it. Just call::
+
+        $ python setup.py sdist --formats=zip upload
+
+      and check what was put into the ``dist`` directory.
+
 5. Announce the update on the relevant channels.
+
+
+Upload Additional Documentation to PythonHosted.org
+---------------------------------------------------
+In case you have written additional sphinx documentation in your satellite
+package that you want to share with the world, there is an easy way to push the
+documentation to `PythonHosted.org <http://pythonhosted.org>`_.
+More detailed information are given `here
+<http://pythonhosted.org/an_example_pypi_project/buildanduploadsphinx.html>`_,
+which translates roughly into:
+
+1. Edit your setup.py and add the required package ``sphinx-pypi-upload``:
+
+  .. code-block:: python
+
+    setup(
+      ...
+
+      setup_requires=[
+        ...
+        'sphinx-pypi-upload',
+      ],
+
+      ...
+    )
+
+  And re-run ``buildout``::
+
+    $ ./bin/buildout
+
+2. Create or edit the file ``setup.cfg`` in the root directory of your package.
+   The content should be something like:
+
+  .. code-block:: ini
+
+    [build_sphinx]
+    source-dir = docs
+    build-dir  = build/sphinx
+    all_files  = 1
+
+    [upload_sphinx]
+    upload-dir = build/sphinx/html
+
+3. Create and upload the documentation::
+
+    $ ./bin/python setup.py build_sphinx
+    $ ./bin/python setup.py upload_sphinx
+
+The link to the documentation will automatically be added to the PyPI page of
+your package. Usually it is a good idea to check the documentation after
+building and before uploading.
 
 Satellite Packages Available
 ----------------------------
