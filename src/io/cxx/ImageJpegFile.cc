@@ -49,6 +49,24 @@ static boost::shared_ptr<std::FILE> make_cfile(const char *filename, const char 
   return boost::shared_ptr<std::FILE>(fp, std::fclose);
 }
 
+
+/**
+ * ERROR HANDLING
+ */
+static void my_error_exit (j_common_ptr cinfo){
+  // get error message
+  char message[JMSG_LENGTH_MAX];
+  cinfo->err->format_message(cinfo, message);
+  // format error
+  boost::format m("Fatal JPEG error (%d) has occurred -> %s");
+  m % cinfo->err->msg_code % message;
+
+  // Clean-up JPEG structures IS NOT required,
+  // just raise the exception
+  throw std::runtime_error(m.str());
+}
+
+
 /**
  * LOADING
  */
@@ -57,6 +75,7 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
   cinfo.err = jpeg_std_error(&jerr);
+  jerr.error_exit = my_error_exit;
   jpeg_create_decompress(&cinfo);
 
   // 2. JPEG file opening
@@ -94,7 +113,6 @@ static void im_peek(const std::string& path, bob::core::array::typeinfo& info) {
   }
   info.update_strides();
 
-  // TODO: check depth
 }
 
 template <typename T> static
@@ -147,6 +165,7 @@ static void im_load(const std::string& filename, bob::core::array::interface& b)
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
   cinfo.err = jpeg_std_error(&jerr);
+  jerr.error_exit = my_error_exit;
   jpeg_create_decompress(&cinfo);
 
   // 2. JPEG file opening
@@ -244,6 +263,7 @@ static void im_save (const std::string& filename, const bob::core::array::interf
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;
   cinfo.err = jpeg_std_error(&jerr);
+  jerr.error_exit = my_error_exit;
   jpeg_create_compress(&cinfo);
 
   // 2. JPEG opening
