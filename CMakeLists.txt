@@ -80,7 +80,12 @@ endif(APPLE)
 
 # For both RELEASE and DEBUG builds
 if(APPLE AND CMAKE_COMPILER_IS_GNUCC)
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4")
+    message(FATAL_ERROR "Minimum GCC version required on OSX is 4.4, but you have ${CMAKE_CXX_COMPILER_VERSION}")
+  endif()
   set(COMMON_FLAGS "${COMMON_FLAGS} -Wno-long-long -Wno-variadic-macros")
+  set(COMMON_CXX_FLAGS "-std=c++0x")
+  set(COMMON_C_FLAGS "-std=c99")
 elseif(WIN32)
   set(COMMON_CXX_FLAGS "-std=gnu++0x")
   set(COMMON_C_FLAGS "-std=gnu99")
