@@ -36,6 +36,7 @@ extern "C" {
 
 #include <bob/io/VideoUtilities.h>
 #include <bob/core/logging.h>
+#include <bob/core/assert.h>
 #include <bob/config.h>
 
 /**
@@ -924,6 +925,11 @@ static void image_to_context(const blitz::Array<uint8_t,3>& data,
     boost::shared_ptr<AVStream> stream,
     boost::shared_ptr<SwsContext> scaler,
     boost::shared_ptr<AVFrame> output_frame) {
+
+  /** The ffmpeg sws scaler requires contiguous planes of data **/
+  if (!bob::core::array::isCContiguous(data)) {
+    throw std::runtime_error("sws_scale() check failed: cannot encode blitz::Array<uint8_t,3> in video stream - ffmpeg/libav requires contiguous color planes");
+  }
 
   int width = stream->codec->width;
   int height = stream->codec->height;
