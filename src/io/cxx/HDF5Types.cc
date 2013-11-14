@@ -612,6 +612,13 @@ DEFINE_SUPPORT(std::complex<double>,bob::io::c128)
 DEFINE_SUPPORT(std::complex<long double>,bob::io::c256)
 #undef DEFINE_SUPPORT
 
+bob::io::HDF5Type::HDF5Type(const char* value):
+  m_type(bob::io::s),
+  m_shape(1)
+{
+  m_shape[0] = std::strlen(value);
+}
+
 bob::io::HDF5Type::HDF5Type(const std::string& value):
   m_type(bob::io::s),
   m_shape(1)
