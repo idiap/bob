@@ -372,6 +372,9 @@ blitz::Array<double,2> bob::measure::roc_for_far(const blitz::Array<double,1>& n
  const blitz::Array<double,1>& positives, const blitz::Array<double,1>& far_list) {
   int n_points = far_list.extent(0);
 
+  if (negatives.extent(0) == 0) throw std::runtime_error("The given set of negatives is empty.");
+  if (positives.extent(0) == 0) throw std::runtime_error("The given set of positives is empty.");
+
   // sort negative scores ascendingly
   std::vector<double> negatives_(negatives.extent(0));;
   std::copy(negatives.begin(), negatives.end(), negatives_.begin());
