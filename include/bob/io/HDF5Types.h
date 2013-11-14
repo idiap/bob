@@ -313,6 +313,7 @@ namespace bob { namespace io {
       /**
        * Builds the type from a string (special HDF5 handling)
        */
+      HDF5Type(const char* value);
       HDF5Type(const std::string& value);
 
 #     define DECLARE_SUPPORT(T,N) HDF5Type(const blitz::Array<T,N>& value);
