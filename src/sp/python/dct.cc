@@ -186,6 +186,6 @@ void bind_sp_dct()
     ;
 
   // dct function-like
-  def("dct_numpy", &script_dct, (arg("array")), DCT_DOC);
-  def("idct_numpy", &script_idct, (arg("array")), IDCT_DOC);
+  def("dct", &script_dct, (arg("array")), DCT_DOC);
+  def("idct", &script_idct, (arg("array")), IDCT_DOC);
 }
