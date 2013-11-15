@@ -34,6 +34,12 @@ def _dct1D(N, t, eps, obj):
   for i in range(N):
     obj.assertTrue(compare(u_dct_idct[i], t[i], 1e-3))
 
+  v_dct_idct = idct(dct(t))
+  # get answer and compare to original
+  for i in range(N):
+    obj.assertTrue(compare(v_dct_idct[i], t[i], 1e-3))
+
+
 def _dct2D(M, N, t, eps, obj):
   # process using DCT
   u_dct = numpy.zeros((M,N), 'float64')
@@ -50,6 +56,13 @@ def _dct2D(M, N, t, eps, obj):
     for j in range(N):
       obj.assertTrue(compare(u_dct_idct[i,j], t[i,j], 1e-3))
 
+  v_dct_idct = idct(dct(t))
+  # get answer and compare to original
+  for i in range(M):
+    for j in range(N):
+      obj.assertTrue(compare(u_dct_idct[i,j], t[i,j], 1e-3))
+
+
 
 def _fft1D(N, t, eps, obj):
   # process using FFT
@@ -65,6 +78,11 @@ def _fft1D(N, t, eps, obj):
   # get answer and compare to original
   for i in range(N):
     obj.assertTrue(compare(u_fft_ifft[i], t[i], 1e-3))
+
+  v_fft_ifft = ifft(fft(t))
+  # get answer and compare to original
+  for i in range(N):
+    obj.assertTrue(compare(v_fft_ifft[i], t[i], 1e-3))
 
 
 def _fft2D(M, N, t, eps, obj):
@@ -83,6 +101,11 @@ def _fft2D(M, N, t, eps, obj):
     for j in range(N):
       obj.assertTrue(compare(u_fft_ifft[i,j], t[i,j], 1e-3))
 
+  v_fft_ifft = ifft(fft(t))
+  # get answer and compare to original
+  for i in range(M):
+    for j in range(N):
+      obj.assertTrue(compare(v_fft_ifft[i,j], t[i,j], 1e-3))
 
 
 ##################### Unit Tests ##################  
@@ -207,3 +230,196 @@ class TransformTest(unittest.TestCase):
 
       # call the test function
       _fft2D(M, N, t, 1e-3, self)
+
+  def test_dct1d_methods(self):
+    r = numpy.random.randn(7).astype(numpy.float64)
+    # 1.a DCT1D
+    a = DCT1D(7)
+    o_i = a(r)
+    b = DCT1D(7)
+    c = DCT1D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.length = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,))
+    o_f = a(r)
+    self.assertTrue( numpy.allclose(o_i, o_f) )
+    # 1.b IDCT1D
+    a = IDCT1D(7)
+    o_i = a(r)
+    b = IDCT1D(7)
+    c = IDCT1D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.length = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,))
+    o_f = a(r)
+    self.assertTrue( numpy.allclose(o_i, o_f) )
+
+  def test_dct2d_methods(self):
+    r = numpy.random.randn(7,9).astype(numpy.float64)
+    # 2.a DCT2D
+    a = DCT2D(7,9)
+    o_i = a(r)
+    b = DCT2D(7,9)
+    c = DCT2D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.height = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,9))
+    a.width = 10
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b ) 
+    o_f = a(r)
+    self.assertTrue( numpy.allclose(o_i, o_f) )
+    # 2.b IDCT2D
+    a = IDCT2D(7,9)
+    o_i = a(r)
+    b = IDCT2D(7,9)
+    c = IDCT2D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.height = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,9))
+    a.width = 10
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b ) 
+    o_f = a(r)
+    self.assertTrue( numpy.allclose(o_i, o_f) )
+
+  def test_fft1d_methods(self):
+    v = numpy.random.randn(7).astype(numpy.complex128)
+    # 3.a FFT1D
+    a = FFT1D(7)
+    o_i = a(v)
+    b = FFT1D(7)
+    c = FFT1D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.length = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,))
+    o_f = a(v)
+    self.assertTrue( numpy.allclose(o_i, o_f) )
+    # 3.b IFFT1D
+    a = IFFT1D(7)
+    o_i = a(v)
+    b = IFFT1D(7)
+    c = IFFT1D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.length = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,))
+    o_f = a(v)
+    self.assertTrue( numpy.allclose(o_i, o_f) )
+    
+  def test_fft2d_methods(self):
+    v = numpy.random.randn(7,9).astype(numpy.complex128)
+    # 4.a FFT2D
+    a = FFT2D(7,9)
+    o_i = a(v)
+    b = FFT2D(7,9)
+    c = FFT2D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.height = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,9))
+    a.width = 10
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b ) 
+    o_f = a(v)
+    self.assertTrue( numpy.allclose(o_i, o_f) )
+
+    # 4.b IFFT2D
+    a = IFFT2D(7,9)
+    o_i = a(v)
+    b = IFFT2D(7,9)
+    c = IFFT2D(a)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertFalse( a != c )
+    a.height = 8
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b )
+    self.assertTrue(a.shape == (7,9))
+    a.width = 10
+    self.assertFalse( a == b )
+    self.assertTrue( a != b )
+    a.shape = (7,9)
+    self.assertTrue( a == b )
+    self.assertTrue( a == c )
+    self.assertFalse( a != b ) 
+    o_f = a(v)
+    self.assertTrue( numpy.allclose(o_i, o_f) )

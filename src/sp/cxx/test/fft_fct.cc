@@ -172,6 +172,43 @@ void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
       BOOST_CHECK_SMALL( abs(t_fft_ifft(i,j)-t(i,j)), eps);
 }
 
+void test_fftshift( const blitz::Array<std::complex<double>,1> t, double eps)
+{
+  // process using fftshift
+  blitz::Array<std::complex<double>,1> t_fft(t.extent(0));
+  bob::sp::fftshift<std::complex<double> >(t, t_fft);
+  BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
+
+  // process using ifftshift
+  blitz::Array<std::complex<double>,1> t_fft_ifft(t.extent(0));
+  bob::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
+  BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
+
+  // Compare to original
+  for (int i=0; i < t.extent(0); ++i)
+    BOOST_CHECK_SMALL( abs(t_fft_ifft(i)-t(i)), eps);
+}
+
+void test_fftshift( const blitz::Array<std::complex<double>,2> t, double eps)
+{
+  // process using fftshift
+  blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1));
+  bob::sp::fftshift<std::complex<double> >(t, t_fft);
+  BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
+  BOOST_REQUIRE_EQUAL(t_fft.extent(1), t.extent(1));
+
+  // process using ifftshift
+  blitz::Array<std::complex<double>,2> t_fft_ifft(t.extent(0), t.extent(1));
+  bob::sp::ifftshift<std::complex<double> >(t_fft, t_fft_ifft);
+  BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
+  BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(1), t.extent(1));
+
+  // Compare to original
+  for (int i=0; i < t.extent(0); ++i)
+    for (int j=0; j < t.extent(1); ++j)
+      BOOST_CHECK_SMALL( abs(t_fft_ifft(i,j)-t(i,j)), eps);
+}
+
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
@@ -311,6 +348,102 @@ BOOST_AUTO_TEST_CASE( test_fft2D_range1x1to64x64_random )
 
     // call the test function
     test_fft2D( t, eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_fftshift1D_simple )
+{
+  // set up simple 1D random tensor
+  blitz::Array<std::complex<double>,1> t4(4), t4_s_ref(4), t5(5), t5_s_ref(5);
+  t4 = 0, 1, 2, 3;
+  t4_s_ref = 2, 3, 0, 1;
+  t5 = 0, 1, 2, 3, 4;
+  t5_s_ref = 3, 4, 0, 1, 2;
+
+  // 1/ Process t4
+  blitz::Array<std::complex<double>,1> t4_s(4);
+  bob::sp::fftshift(t4, t4_s);
+  // Compare to reference
+  for (int i=0; i < t4.extent(0); ++i)
+    BOOST_CHECK_SMALL( abs(t4_s(i)-t4_s_ref(i)), eps);
+  
+  blitz::Array<std::complex<double>,1> t4_si(4);
+  bob::sp::ifftshift(t4_s, t4_si);
+  // Compare to original
+  for (int i=0; i < t4.extent(0); ++i)
+    BOOST_CHECK_SMALL( abs(t4_si(i)-t4(i)), eps);
+
+  // 2/ Process t5
+  blitz::Array<std::complex<double>,1> t5_s(5);
+  bob::sp::fftshift(t5, t5_s);
+  // Compare to reference
+  for (int i=0; i < t5.extent(0); ++i)
+    BOOST_CHECK_SMALL( abs(t5_s(i)-t5_s_ref(i)), eps);
+  
+  blitz::Array<std::complex<double>,1> t5_si(5);
+  bob::sp::ifftshift(t5_s, t5_si);
+  // Compare to original
+  for (int i=0; i < t5.extent(0); ++i)
+    BOOST_CHECK_SMALL( abs(t5_si(i)-t5(i)), eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_fftshift2D_simple )
+{
+  // set up simple 1D random tensor
+  blitz::Array<std::complex<double>,2> t(3,4), t_s_ref(3,4);
+  t = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11;
+  t_s_ref = 10, 11, 8, 9, 2, 3, 0, 1, 6, 7, 4, 5;
+
+  blitz::Array<std::complex<double>,2> t_s(3,4);
+  bob::sp::fftshift(t, t_s);
+  // Compare to reference
+  for (int i=0; i < t.extent(0); ++i)
+    for (int j=0; j < t.extent(1); ++j)
+      BOOST_CHECK_SMALL( abs(t_s(i,j)-t_s_ref(i,j)), eps);
+  
+  blitz::Array<std::complex<double>,2> t_si(3,4);
+  bob::sp::ifftshift(t_s, t_si);
+  // Compare to original
+  for (int i=0; i < t.extent(0); ++i)
+    for (int j=0; j < t.extent(1); ++j)
+      BOOST_CHECK_SMALL( abs(t_si(i,j)-t(i,j)), eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_fftshift1D_random )
+{
+  // This tests the 1D fftshift using 10 random vectors
+  // The size of each vector is randomly chosen between 3 and 2048
+  for (int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 64 + 1);
+
+    // set up simple 1D random tensor
+    blitz::Array<std::complex<double>,1> t(M);
+    for (int i=0; i < M; ++i)
+      t(i) = std::complex<double>((rand()/(double)RAND_MAX)*10.,0);
+
+    // call the test function
+    test_fftshift( t, eps);
+  }
+}
+
+BOOST_AUTO_TEST_CASE( test_fftshift2D_random )
+{
+  // This tests the 2D fftshift using 10 random vectors
+  // The size of each vector is randomly chosen between 3 and 2048
+  for (int loop=0; loop < 10; ++loop) {
+    // size of the data
+    int M = (rand() % 64 + 1);
+    int N = (rand() % 64 + 1);
+
+    // set up simple 1D random tensor
+    blitz::Array<std::complex<double>,2> t(M,N);
+    for (int i=0; i < M; ++i)
+      for (int j=0; j < N; ++j)
+        t(i,j) = std::complex<double>((rand()/(double)RAND_MAX)*10.,0);
+
+    // call the test function
+    test_fftshift( t, eps);
   }
 }
 
