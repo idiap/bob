@@ -66,22 +66,22 @@ class DrawingTest(unittest.TestCase):
     image.fill(0)
 
     # Draws a white line on the middle (horizontal)
-    bob.ip.draw_line(image, 50, 50, 50, 70, 255)
+    bob.ip.draw_line(image, 50, 50, 70, 50, 255)
     for k in range(50,70):
       self.assertEqual(image[k,50], 255)
 
     # Draws a white line on the middle (vertical)
-    bob.ip.draw_line(image, 50, 50, 70, 50, 230)
+    bob.ip.draw_line(image, 50, 50, 50, 70, 230)
     for k in range(50,70):
       self.assertEqual(image[50,k], 230)
 
     # Draws a white line on the middle (horizontal, backwards)
-    bob.ip.draw_line(image, 50, 70, 50, 50, 128)
+    bob.ip.draw_line(image, 70, 50, 50, 50, 128)
     for k in range(50,70):
       self.assertEqual(image[k,50], 128)
 
     # Draws a white line on the middle (vertical, backwards)
-    bob.ip.draw_line(image, 70, 50, 50, 50, 65)
+    bob.ip.draw_line(image, 50, 70, 50, 50, 65)
     for k in range(50,70):
       self.assertEqual(image[50,k], 65)
 
