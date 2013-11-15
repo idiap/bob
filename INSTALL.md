@@ -11,7 +11,6 @@ Bob depends on:
  * Blitz++
  * Boost
  * Lapack
- * fftw
  * giflib
  * libjpeg
  * libnetpbm
@@ -30,7 +29,7 @@ Bob depends on:
 
 There are also optional dependencies we strongly recommend:
 
- * FFMpeg
+ * FFMpeg/LibAV
  * MatIO
  * Qt4
  * VLFeat
