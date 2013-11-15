@@ -24,12 +24,20 @@
 #include <bob/core/cast.h>
 #include <bob/sp/FFT1D.h>
 #include <bob/sp/FFT1DNaive.h>
+#include <bob/sp/FFT1DKiss.h>
+#include <bob/sp/FFT1DNumpy.h>
 #include <bob/sp/FFT2D.h>
 #include <bob/sp/FFT2DNaive.h>
+#include <bob/sp/FFT2DKiss.h>
+#include <bob/sp/FFT2DNumpy.h>
 #include <bob/sp/DCT1D.h>
 #include <bob/sp/DCT1DNaive.h>
+#include <bob/sp/DCT1DKiss.h>
+#include <bob/sp/DCT1DNumpy.h>
 #include <bob/sp/DCT2D.h>
 #include <bob/sp/DCT2DNaive.h>
+#include <bob/sp/DCT2DKiss.h>
+#include <bob/sp/DCT2DNumpy.h>
 
 #include <boost/random.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -52,6 +60,22 @@ void benchmark_fct1D(const blitz::Array<double,1> t)
   t2 = boost::posix_time::microsec_clock::local_time();
   diff = t2 - t1;
   std::cout << "  FCT duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
+  // process using DCT
+  bob::sp::DCT1DKiss fct_kiss(M);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fct_kiss(t, t_fct);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FCT (kiss) duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
+  // process using DCT
+  bob::sp::DCT1DKiss fct_numpy(M);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fct_numpy(t, t_fct);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FCT (numpy) duration in (microseconds) " << diff.total_microseconds() << std::endl;
 
   // process using DFT answer
   bob::sp::detail::DCT1DNaive dct(M);
@@ -81,6 +105,22 @@ void benchmark_fct2D(const blitz::Array<double,2> t)
   diff = t2 - t1;
   std::cout << "  FCT duration in (microseconds) " << diff.total_microseconds() << std::endl;
 
+  // process using DCT
+  bob::sp::DCT2DKiss fct_kiss(M, N);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fct_kiss(t, t_fct);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FCT (kiss) duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
+  // process using DCT
+  bob::sp::DCT2DKiss fct_numpy(M, N);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fct_numpy(t, t_fct);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FCT (numpy) duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
   // process using DFT answer
   bob::sp::detail::DCT2DNaive dct(M, N);
   t1 = boost::posix_time::microsec_clock::local_time();
@@ -109,6 +149,22 @@ void benchmark_fft1D(const blitz::Array<std::complex<double>,1> t)
   diff = t2 - t1;
   std::cout << "  FFT duration in (microseconds) " << diff.total_microseconds() << std::endl;
 
+  // process using FFT
+  bob::sp::FFT1DKiss fft_kiss(M);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fft_kiss(t, t_fft);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FFT (kiss) duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
+  // process using FFT
+  bob::sp::FFT1DNumpy fft_numpy(M);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fft_numpy(t, t_fft);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FFT (numpy) duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
   // process using DFT answer
   bob::sp::detail::FFT1DNaive dft(M);
   t1 = boost::posix_time::microsec_clock::local_time();
@@ -136,6 +192,22 @@ void benchmark_fft2D(const blitz::Array<std::complex<double>,2> t)
   t2 = boost::posix_time::microsec_clock::local_time();
   diff = t2 - t1;
   std::cout << "  FFT duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
+  // process using FFT
+  bob::sp::FFT2DKiss fft_kiss(M, N);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fft_kiss(t, t_fft);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FFT (kiss) duration in (microseconds) " << diff.total_microseconds() << std::endl;
+
+  // process using FFT
+  bob::sp::FFT2DNumpy fft_numpy(M, N);
+  t1 = boost::posix_time::microsec_clock::local_time();
+  fft_numpy(t, t_fft);
+  t2 = boost::posix_time::microsec_clock::local_time();
+  diff = t2 - t1;
+  std::cout << "  FFT (numpy) duration in (microseconds) " << diff.total_microseconds() << std::endl;
 
   // process using DFT answer
   bob::sp::detail::FFT2DNaive dft(M, N);
