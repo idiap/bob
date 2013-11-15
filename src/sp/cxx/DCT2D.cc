@@ -23,6 +23,10 @@ bob::sp::DCT2DAbstract::DCT2DAbstract(
   m_buffer_hw(height, width), m_buffer_h(height),
   m_buffer_h2(height)
 {
+  if (m_height < 1) 
+    throw std::runtime_error("DCT height should be at least 1.");
+  if (m_width < 1) 
+    throw std::runtime_error("DCT width should be at least 1.");
 }
 
 bob::sp::DCT2DAbstract::DCT2DAbstract(
@@ -78,6 +82,8 @@ void bob::sp::DCT2DAbstract::operator()(const blitz::Array<double,2>& src,
 
 void bob::sp::DCT2DAbstract::setHeight(const size_t height)
 {
+  if (height < 1) 
+    throw std::runtime_error("DCT height should be at least 1.");
   m_height = height;
   m_buffer_hw.resize(m_height, m_width);
   m_buffer_h.resize(m_height);
@@ -86,12 +92,18 @@ void bob::sp::DCT2DAbstract::setHeight(const size_t height)
 
 void bob::sp::DCT2DAbstract::setWidth(const size_t width)
 {
+  if (width < 1) 
+    throw std::runtime_error("DCT width should be at least 1.");
   m_width = width;
   m_buffer_hw.resize(m_height, m_width);
 }
 
 void bob::sp::DCT2DAbstract::setShape(const size_t height, const size_t width)
 {
+  if (height < 1) 
+    throw std::runtime_error("DCT height should be at least 1.");
+  if (width < 1) 
+    throw std::runtime_error("DCT width should be at least 1.");
   m_height = height;
   m_width = width;
   m_buffer_hw.resize(m_height, m_width);

@@ -24,6 +24,8 @@ bob::sp::DCT1DAbstract::DCT1DAbstract(const size_t length):
   m_length(length),
   m_working_array(length)
 {
+  if (m_length < 1) 
+    throw std::runtime_error("DCT length should be at least 1.");
   initNormFactors();
 }
 
@@ -79,6 +81,8 @@ void bob::sp::DCT1DAbstract::operator()(const blitz::Array<double,1>& src,
 
 void bob::sp::DCT1DAbstract::setLength(const size_t length)
 {
+  if (length < 1) 
+    throw std::runtime_error("DCT length should be at least 1.");
   m_length = length;
   m_working_array.resize(length);
   initWorkingArray();

@@ -19,8 +19,8 @@ bob::machine::WienerMachine::WienerMachine():
   m_variance_threshold(1e-8),
   m_Pn(0),
   m_W(0,0),
-  m_fft(0,0),
-  m_ifft(0,0),
+  m_fft(),
+  m_ifft(),
   m_buffer1(0,0), m_buffer2(0,0)
 {
 }
@@ -65,8 +65,7 @@ bob::machine::WienerMachine::WienerMachine(const bob::machine::WienerMachine& ot
 {
 }
 
-bob::machine::WienerMachine::WienerMachine(bob::io::HDF5File& config):
-  m_fft(0,0), m_ifft(0,0)
+bob::machine::WienerMachine::WienerMachine(bob::io::HDF5File& config)
 {
   load(config);
 }

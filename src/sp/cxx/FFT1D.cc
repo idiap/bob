@@ -20,6 +20,8 @@ bob::sp::FFT1DAbstract::FFT1DAbstract():
 bob::sp::FFT1DAbstract::FFT1DAbstract(const size_t length):
   m_length(length), m_wsave(4*length+15), m_buffer(2*length)
 {
+  if (length < 1) 
+    throw std::runtime_error("FFT length should be at least 1.");
   initWorkingArray();
 }
 
@@ -74,6 +76,8 @@ void bob::sp::FFT1DAbstract::operator()(const blitz::Array<std::complex<double>,
 
 void bob::sp::FFT1DAbstract::setLength(const size_t length)
 {
+  if (length < 1) 
+    throw std::runtime_error("FFT length should be at least 1.");
   m_length = length;
   m_wsave.resize(4*length+15);
   initWorkingArray();
