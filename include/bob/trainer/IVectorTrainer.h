@@ -1,22 +1,10 @@
 /**
-* @file bob/trainer/IVectorTrainer.h
-* @date Sat Mar 30 20:55:00 2013 +0200
-* @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-*
-* Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * @file bob/trainer/IVectorTrainer.h
+ * @date Sat Mar 30 20:55:00 2013 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ *
+ * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ */
 
 #ifndef BOB_TRAINER_IVECTOR_H
 #define BOB_TRAINER_IVECTOR_H
@@ -40,7 +28,7 @@ namespace bob { namespace trainer {
  *  (and eventually a covariance matrix \f$\Sigma\f$).\n
  * Reference:\n
  * "Front-End Factor Analysis For Speaker Verification",
- *    N. Dehak, P. Kenny, R. Dehak, P. Dumouchel, P. Ouellet, 
+ *    N. Dehak, P. Kenny, R. Dehak, P. Dumouchel, P. Ouellet,
  *   IEEE Trans. on Audio, Speech and Language Processing
  */
 class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachine, std::vector<bob::machine::GMMStats> >
@@ -49,7 +37,7 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     /**
      * @brief Default constructor. Builds an IVectorTrainer
      */
-    IVectorTrainer(const bool update_sigma=false, 
+    IVectorTrainer(const bool update_sigma=false,
       const double convergence_threshold=0.001,
       const size_t max_iterations=10, const bool compute_likelihood=false);
 
@@ -66,31 +54,31 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     /**
      * @brief Initialization before the EM loop
      */
-    virtual void initialize(bob::machine::IVectorMachine& ivector, 
+    virtual void initialize(bob::machine::IVectorMachine& ivector,
       const std::vector<bob::machine::GMMStats>& data);
-    
+
     /**
-     * @brief Calculates statistics across the dataset, 
+     * @brief Calculates statistics across the dataset,
      * and saves these as:
      * - m_acc_Nij_wij2
      * - m_acc_Fnormij_wij
      * - m_acc_Nij (only if update_sigma is enabled)
      * - m_acc_Snormij (only if update_sigma is enabled)
-     * 
+     *
      * These statistics will be used in the mStep() that follows.
      */
-    virtual void eStep(bob::machine::IVectorMachine& ivector, 
+    virtual void eStep(bob::machine::IVectorMachine& ivector,
       const std::vector<bob::machine::GMMStats>& data);
 
     /**
      * @brief Maximisation step: Update the Total Variability matrix \f$T\f$
      * and \f$\Sigma\f$ if update_sigma is enabled.
      */
-    virtual void mStep(bob::machine::IVectorMachine& ivector, 
+    virtual void mStep(bob::machine::IVectorMachine& ivector,
       const std::vector<bob::machine::GMMStats>& data);
 
     /**
-     * @brief Computes the likelihood using current estimates 
+     * @brief Computes the likelihood using current estimates
      * @warning (currently unsupported)
      */
     virtual double computeLikelihood(bob::machine::IVectorMachine& ivector);
@@ -98,7 +86,7 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     /**
      * @brief Finalization after the EM loop
      */
-    virtual void finalize(bob::machine::IVectorMachine& ivector, 
+    virtual void finalize(bob::machine::IVectorMachine& ivector,
       const std::vector<bob::machine::GMMStats>& data);
 
     /**
@@ -125,7 +113,7 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     /**
      * @brief Getters for the accumulators
      */
-    const blitz::Array<double,3>& getAccNijWij2() const 
+    const blitz::Array<double,3>& getAccNijWij2() const
     { return m_acc_Nij_wij2; }
     const blitz::Array<double,3>& getAccFnormijWij() const
     { return m_acc_Fnormij_wij; }
@@ -160,7 +148,7 @@ class IVectorTrainer: public bob::trainer::EMTrainer<bob::machine::IVectorMachin
     blitz::Array<double,3> m_acc_Fnormij_wij;
     blitz::Array<double,1> m_acc_Nij;
     blitz::Array<double,2> m_acc_Snormij;
-    
+
     // Working arrays
     mutable blitz::Array<double,1> m_tmp_wij;
     mutable blitz::Array<double,2> m_tmp_wij2;

@@ -1,22 +1,10 @@
 /**
-* @file bob/machine/IVectorMachine.h
-* @date Sat Mar 30 20:55:00 2013 +0200
-* @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
-*
-* Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, version 3 of the License.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ * @file bob/machine/IVectorMachine.h
+ * @date Sat Mar 30 20:55:00 2013 +0200
+ * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ *
+ * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ */
 
 #ifndef BOB_MACHINE_IVECTOR_H
 #define BOB_MACHINE_IVECTOR_H
@@ -38,7 +26,7 @@ namespace bob { namespace machine {
  *   and allows the extraction of IVector\n
  * Reference:\n
  * "Front-End Factor Analysis For Speaker Verification",
- *    N. Dehak, P. Kenny, R. Dehak, P. Dumouchel, P. Ouellet, 
+ *    N. Dehak, P. Kenny, R. Dehak, P. Dumouchel, P. Ouellet,
  *   IEEE Trans. on Audio, Speech and Language Processing
  */
 class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz::Array<double,1> >
@@ -46,14 +34,14 @@ class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz
   public:
     /**
      * @brief Default constructor. Builds an IVectorMachine.
-     * The Universal Background Model and the matrices \f$T\f$ and 
+     * The Universal Background Model and the matrices \f$T\f$ and
      * \f$diag(\Sigma)\f$ are not initialized.
      */
     IVectorMachine();
 
     /**
      * @brief Constructor. Builds a new IVectorMachine.
-     * The Universal Background Model and the matrices \f$T\f$ and 
+     * The Universal Background Model and the matrices \f$T\f$ and
      * \f$diag(\Sigma)\f$ are not initialized.
      *
      * @param ubm The Universal Background Model
@@ -133,12 +121,12 @@ class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz
     /**
      * @brief Gets the variance flooring threshold
      */
-    const double getVarianceThreshold() const 
+    const double getVarianceThreshold() const
     { return m_variance_threshold; }
 
     /**
      * @brief Returns the number of Gaussian components C.
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
     const size_t getDimC() const
@@ -146,7 +134,7 @@ class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz
 
     /**
      * @brief Returns the feature dimensionality D.
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
     const size_t getDimD() const
@@ -155,7 +143,7 @@ class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz
     /**
      * @brief Returns the supervector length CD.
      * (CxD: Number of Gaussian components by the feature dimensionality)
-     * @warning An exception is thrown if no Universal Background Model has 
+     * @warning An exception is thrown if no Universal Background Model has
      *   been set yet.
      */
     const size_t getDimCD() const
@@ -175,7 +163,7 @@ class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz
 
     /**
      * @brief Returns the \f$T\f$ matrix in order to update it.
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
     blitz::Array<double,2>& updateT()
@@ -183,7 +171,7 @@ class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz
 
     /**
      * @brief Returns the \f$\Sigma\f$ (diagonal) matrix in order to update it.
-     * @warning Should only be used by the trainer for efficiency reason, 
+     * @warning Should only be used by the trainer for efficiency reason,
      *   or for testing purpose.
      */
     blitz::Array<double,1>& updateSigma()
@@ -205,7 +193,7 @@ class IVectorMachine: public bob::machine::Machine<bob::machine::GMMStats, blitz
      */
     void setSigma(const blitz::Array<double,1>& sigma);
 
-    /** 
+    /**
      * @brief Set the variance flooring threshold
      */
     void setVarianceThreshold(const double value);
