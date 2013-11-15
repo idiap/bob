@@ -25,13 +25,12 @@ static const char* FFT2DNumpy_DOC = "Objects of this class, after configuration,
 static const char* IFFT2DNumpy_DOC = "Objects of this class, after configuration, can compute the inverse FFT of a 2D array/signal.";
 
 // free methods documentation
-/*
 static const char* FFT_DOC = "Compute the direct FFT of a 1 or 2D array/signal of type complex128.";
 static const char* IFFT_DOC = "Compute the inverse FFT of a 1 or 2D array/signalof type complex128.";
 
 static const char* FFTSHIFT_DOC = "If a 1D complex128 array is passed, inverses the two halves of that array and returns the result as a new array. If a 2D complex128 array is passed, swaps the four quadrants of the array and returns the result as a new array.";
 static const char* IFFTSHIFT_DOC = "This method undo what fftshift() does. Accepts 1 or 2D array of type complex128.";
-*/
+
 
 static void py_fft1d_c(bob::sp::FFT1DNumpy& op, bob::python::const_ndarray src,
   bob::python::ndarray dst)
@@ -96,7 +95,6 @@ static object py_ifft2d_p(bob::sp::IFFT2DNumpy& op, bob::python::const_ndarray s
   return dst.self();
 }
 
-/*
 static object script_fft(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
@@ -242,7 +240,6 @@ static void py_ifftshift(bob::python::const_ndarray ar, bob::python::ndarray t)
       PYTHON_ERROR(TypeError, "iFFTshift operation only supports 1 or 2D complex128 input arrays - you provided an array of dimensionality '" SIZE_T_FMT "'.", info.nd);
   }
 }
-*/
 
 void bind_sp_fft_numpy()
 {
@@ -287,7 +284,7 @@ void bind_sp_fft_numpy()
       .def("__call__", &py_ifft2d_c, (arg("self"), arg("input"), arg("output")), "Compute the inverse FFT of the input 2D array/signal. The output should have the expected size and type (numpy.float64).")
       .def("__call__", &py_ifft2d_p, (arg("self"), arg("input")), "Compute the inverse FFT of the input 2D array/signal. The output is allocated and returned.")
     ;
-/*
+
   // fft function-like
   def("fft", &script_fft, (arg("array")), FFT_DOC);
   def("ifft", &script_ifft, (arg("array")), IFFT_DOC);
@@ -299,5 +296,4 @@ void bind_sp_fft_numpy()
 
   def("fftshift", &py_fftshift, (arg("input"),arg("output")), FFTSHIFT_DOC);
   def("ifftshift", &py_ifftshift, (arg("input"),arg("output")), IFFTSHIFT_DOC);
-*/
 }

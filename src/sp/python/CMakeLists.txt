@@ -3,17 +3,13 @@ project(bob_sp_py${PYVER})
 # This defines the dependencies of this package
 set(bob_deps "bob_sp;bob_python")
 set(shared "${bob_deps}")
-set(incdir ${py_incdir};${FFTW3_INCLUDE_DIR})
+set(incdir ${py_incdir})
 
 # Python bindings
 set(src
    "version.cc"
    "extrapolate.cc"
-   "dct.cc"
-   "dct_kiss.cc"
    "dct_numpy.cc"
-   "fft.cc"
-   "fft_kiss.cc"
    "fft_numpy.cc"
    "conv.cc"
    "Quantization.cc"

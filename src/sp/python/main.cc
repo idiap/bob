@@ -12,11 +12,7 @@
 
 void bind_sp_version();
 void bind_sp_extrapolate();
-void bind_sp_dct();
-void bind_sp_dct_kiss();
 void bind_sp_dct_numpy();
-void bind_sp_fft();
-void bind_sp_fft_kiss();
 void bind_sp_fft_numpy();
 void bind_sp_convolution();
 void bind_sp_convolution();
@@ -28,11 +24,7 @@ BOOST_PYTHON_MODULE(_sp) {
 
   bind_sp_version();
   bind_sp_extrapolate();
-  bind_sp_dct();
-  bind_sp_dct_kiss();
   bind_sp_dct_numpy();
-  bind_sp_fft();
-  bind_sp_fft_kiss();
   bind_sp_fft_numpy();
   bind_sp_convolution();
   bind_sp_quantization();

@@ -2,27 +2,19 @@ project(bob_sp)
 
 # This defines the dependencies of this package
 set(bob_deps "bob_core")
-set(shared "${bob_deps};${FFTW3_LIBRARY}")
-set(incdir ${cxx_incdir};${FFT3_INCLUDE_DIR})
+set(shared "${bob_deps}")
+set(incdir ${cxx_incdir})
 
 # This defines the list of source files inside this package.
 set(src
     "fftpack.c"
-    "FFT1D.cc"
     "FFT1DNaive.cc"
-    "FFT1DKiss.cc"
     "FFT1DNumpy.cc"
-    "FFT2D.cc"
     "FFT2DNaive.cc"
-    "FFT2DKiss.cc"
     "FFT2DNumpy.cc"
-    "DCT1D.cc"
     "DCT1DNaive.cc"
-    "DCT1DKiss.cc"
     "DCT1DNumpy.cc"
-    "DCT2D.cc"
     "DCT2DNaive.cc"
-    "DCT2DKiss.cc"
     "DCT2DNumpy.cc"
     "Quantization.cc"
     )
@@ -37,8 +29,6 @@ target_link_libraries(${PROJECT_NAME} ${shared})
 
 # Defines tests for this package
 bob_add_test(${PROJECT_NAME} convolution test/conv.cc)
-bob_add_test(${PROJECT_NAME} fft_fct test/fft_fct.cc)
-bob_add_test(${PROJECT_NAME} fftkiss test/fftkiss.cc)
 bob_add_test(${PROJECT_NAME} fftnumpy test/fftnumpy.cc)
 
 bob_add_benchmark(${PROJECT_NAME} fft_fct benchmark/fft_fct.cc)
