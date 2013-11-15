@@ -329,7 +329,7 @@ setup(
       'Development Status :: 5 - Production/Stable',
       'Environment :: Console (Text Based)',
       'Intended Audience :: Science/Research',
-      'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+      'License :: OSI Approved :: BSD License',
       'Programming Language :: C++',
       'Programming Language :: Python',
       'Programming Language :: Python :: 3',

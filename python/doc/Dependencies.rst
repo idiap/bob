@@ -60,11 +60,9 @@ Required at runtime
 +----------------------+--------------+---------------------------------------+
 | `Matplotlib`_        | 0.99         | Based on `Python-2.0`_                |
 +----------------------+--------------+---------------------------------------+
-| `fftw`_              | 3.0?         | `GPL-2.0`_ or later (also commercial) |
-+----------------------+--------------+---------------------------------------+
 | `SQLAlchemy`_        | 0.5          | `MIT`_                                |
 +----------------------+--------------+---------------------------------------+
-| `libjpeg`_           | 6.2?         | `GPL-2.0`_ or later (also commercial) |
+| `libjpeg`_           | 6.2?         | BSD-style                             |
 +----------------------+--------------+---------------------------------------+
 | `libnetpbm`_         | 10.0?        | `MIT`_                                |
 +----------------------+--------------+---------------------------------------+
@@ -171,7 +169,6 @@ Core dependencies
   (cf. ticket #46 on the github bug tracker).
 * `Lapack`_: we use this library for mathematical operations
   on vectors and matrices. Any modern version of this library will do.
-* `FFTW`_: provides fast computation of Fourier, Sine and Cosine transforms
 * `Boost`_: is used for our unit test framework and python bindings. Any
   version superior to 1.34 will work.
 * `Python`_: if you want to compile our python bindings we recommend using
@@ -196,9 +193,10 @@ Data access
 * `FFMpeg`_: is used to give bob support for input and output videos.
   bob distributions will be compiled and shipped against version 0.6 or
   superior because of licensing incompatibilities. That being said, for
-  '''private development''', you can use version 0.5.1 and above. bob will
-  work seemlessly. Please note that if you decide to distribute bob compiled
-  with a version of ffmpeg prior to 0.6, then the whole package becomes GPL'ed.
+  '''private development''', you can use version 0.5.1 and above. |project|
+  will work seemlessly. Please note that if you decide to distribute bob
+  compiled with a version of ffmpeg prior to 0.6, then the whole package
+  becomes GPL'ed.
 * `libjpeg`_: is used for reading and writing JPEG images. We
   currently compile against version 6.2, but older versions might work.
 * `libnetpbm`_: is used for reading and writing PBM/PGM/PMM images. We
