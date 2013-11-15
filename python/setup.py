@@ -4,18 +4,6 @@
 # Thu 16 Aug 2012 11:36:19 CEST
 #
 # Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """A setup file for Bob Python bindings using Boost.Python
 """
@@ -323,7 +311,7 @@ setup(
     author='Bob Developers',
     author_email='bob-devel@googlegroups.com',
     keywords=['signal processing', 'machine learning', 'biometrics'],
-    license='GPLv3',
+    license='BSD License',
 
     classifiers=[
       'Development Status :: 5 - Production/Stable',
