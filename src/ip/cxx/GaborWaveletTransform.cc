@@ -209,8 +209,8 @@ bob::ip::GaborWaveletTransform::GaborWaveletTransform(
   m_k_max(k_max),
   m_k_fac(k_fac),
   m_dc_free(dc_free),
-  m_fft(0,0),
-  m_ifft(0,0),
+  m_fft(),
+  m_ifft(),
   m_number_of_scales(number_of_scales),
   m_number_of_directions(number_of_directions)
 {
@@ -226,8 +226,8 @@ bob::ip::GaborWaveletTransform::GaborWaveletTransform(
   m_k_max(other.m_k_max),
   m_k_fac(other.m_k_fac),
   m_dc_free(other.m_dc_free),
-  m_fft(0,0),
-  m_ifft(0,0),
+  m_fft(),
+  m_ifft(),
   m_number_of_scales(other.m_number_of_scales),
   m_number_of_directions(other.m_number_of_directions)
 {
@@ -245,8 +245,8 @@ bob::ip::GaborWaveletTransform::operator =
   m_k_max = other.m_k_max;
   m_k_fac = other.m_k_fac;
   m_dc_free = other.m_dc_free;
-  m_fft = bob::sp::FFT2D(0,0);
-  m_ifft = bob::sp::IFFT2D(0,0);
+  m_fft = bob::sp::FFT2D();
+  m_ifft = bob::sp::IFFT2D();
   m_number_of_scales = other.m_number_of_scales;
   m_number_of_directions = other.m_number_of_directions;
 
@@ -340,9 +340,10 @@ void bob::ip::GaborWaveletTransform::generateKernels(
     }
 
     // reset fft sizes
-    m_fft.reset(resolution[0], resolution[1]);
-    m_ifft.reset(resolution[0], resolution[1]);
+    m_fft.setShape(resolution[0], resolution[1]);
+    m_ifft.setShape(resolution[0], resolution[1]);
     m_temp_array.resize(blitz::shape(resolution[0],resolution[1]));
+    m_temp_array2.resize(m_temp_array.shape());
     m_frequency_image.resize(m_temp_array.shape());
   }
 }
@@ -414,9 +415,9 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
   // now, let each kernel compute the transformation result
   for (int j = 0; j < (int)m_gabor_kernels.size(); ++j){
     // get a reference to the current layer of the trafo image
-    m_gabor_kernels[j].transform(m_frequency_image, m_temp_array);
+    m_gabor_kernels[j].transform(m_frequency_image, m_temp_array2);
     // perform ifft of transformed image
-    m_ifft(m_temp_array);
+    m_ifft(m_temp_array2, m_temp_array);
     // convert into absolute and phase part
     blitz::Array<double,2> abs_part(jet_image(blitz::Range::all(), blitz::Range::all(), 0, j));
     abs_part = blitz::abs(m_temp_array);
@@ -460,9 +461,9 @@ void bob::ip::GaborWaveletTransform::computeJetImage(
   // now, let each kernel compute the transformation result
   for (int j = 0; j < (int)m_gabor_kernels.size(); ++j){
     // get a reference to the current layer of the trafo image
-    m_gabor_kernels[j].transform(m_frequency_image, m_temp_array);
+    m_gabor_kernels[j].transform(m_frequency_image, m_temp_array2);
     // perform ifft of transformed image
-    m_ifft(m_temp_array);
+    m_ifft(m_temp_array2, m_temp_array);
     // convert into absolute part
     blitz::Array<double,2> abs_part(jet_image(blitz::Range::all(), blitz::Range::all(), j));
     abs_part = blitz::abs(m_temp_array);

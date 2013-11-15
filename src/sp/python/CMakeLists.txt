@@ -9,8 +9,8 @@ set(incdir ${py_incdir})
 set(src
    "version.cc"
    "extrapolate.cc"
-   "dct_numpy.cc"
-   "fft_numpy.cc"
+   "dct.cc"
+   "fft.cc"
    "conv.cc"
    "Quantization.cc"
    "main.cc"

@@ -264,7 +264,6 @@ class Spectrogram: public Energy
     bool m_energy_bands;
     double m_log_fb_out_floor;
 
-    blitz::Array<double,2> m_dct_kernel;
     blitz::Array<double,1> m_hamming_kernel;
     blitz::Array<int,1> m_p_index;
     std::vector<blitz::Array<double,1> > m_filter_bank;

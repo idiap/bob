@@ -16,13 +16,13 @@
 #include <boost/test/floating_point_comparison.hpp>
 
 #include <bob/sp/fftshift.h>
-#include <bob/sp/FFT1DNumpy.h>
+#include <bob/sp/FFT1D.h>
 #include <bob/sp/FFT1DNaive.h>
-#include <bob/sp/FFT2DNumpy.h>
+#include <bob/sp/FFT2D.h>
 #include <bob/sp/FFT2DNaive.h>
-#include <bob/sp/DCT1DNumpy.h>
+#include <bob/sp/DCT1D.h>
 #include <bob/sp/DCT1DNaive.h>
-#include <bob/sp/DCT2DNumpy.h>
+#include <bob/sp/DCT2D.h>
 #include <bob/sp/DCT2DNaive.h>
 
 // Random number
@@ -39,7 +39,7 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
 {
   // process using FCT
   blitz::Array<double,1> t_fct(t.extent(0)), t_dct(t.extent(0));
-  bob::sp::DCT1DNumpy fct(t.extent(0));
+  bob::sp::DCT1D fct(t.extent(0));
   fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
 
@@ -52,7 +52,7 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
 
   // process using inverse FCT
   blitz::Array<double,1> t_fct_ifct(t.extent(0));
-  bob::sp::IDCT1DNumpy ifct(t.extent(0));
+  bob::sp::IDCT1D ifct(t.extent(0));
   ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
 
@@ -76,7 +76,7 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
   // process using FCT
   blitz::Array<double,2> t_fct(t.extent(0), t.extent(1)),
     t_dct(t.extent(0), t.extent(1));
-  bob::sp::DCT2DNumpy fct(t.extent(0), t.extent(1));
+  bob::sp::DCT2D fct(t.extent(0), t.extent(1));
   fct(t, t_fct);
   BOOST_REQUIRE_EQUAL(t_fct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct.extent(1), t.extent(1));
@@ -91,7 +91,7 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
 
   // process using inverse FCT
   blitz::Array<double,2> t_fct_ifct(t.extent(0), t.extent(1));
-  bob::sp::IDCT2DNumpy ifct(t.extent(0), t.extent(1));
+  bob::sp::IDCT2D ifct(t.extent(0), t.extent(1));
   ifct(t_fct, t_fct_ifct);
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fct_ifct.extent(1), t.extent(1));
@@ -119,7 +119,7 @@ void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps)
 {
   // process using FFT
   blitz::Array<std::complex<double>,1> t_fft(t.extent(0)), t_dft(t.extent(0));
-  bob::sp::FFT1DNumpy fft(t.extent(0));
+  bob::sp::FFT1D fft(t.extent(0));
   fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
 
@@ -132,7 +132,7 @@ void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps)
 
   // process using inverse FFT
   blitz::Array<std::complex<double>,1> t_fft_ifft(t.extent(0));
-  bob::sp::IFFT1DNumpy ifft(t.extent(0));
+  bob::sp::IFFT1D ifft(t.extent(0));
   ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
 
@@ -146,7 +146,7 @@ void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
   // process using FFT
   blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1)),
     t_dft(t.extent(0), t.extent(1));
-  bob::sp::FFT2DNumpy fft(t.extent(0), t.extent(1));
+  bob::sp::FFT2D fft(t.extent(0), t.extent(1));
   fft(t, t_fft);
   BOOST_REQUIRE_EQUAL(t_fft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft.extent(1), t.extent(1));
@@ -161,7 +161,7 @@ void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
 
   // process using inverse FFT
   blitz::Array<std::complex<double>,2> t_fft_ifft(t.extent(0), t.extent(1));
-  bob::sp::IFFT2DNumpy ifft(t.extent(0), t.extent(1));
+  bob::sp::IFFT2D ifft(t.extent(0), t.extent(1));
   ifft(t_fft, t_fft_ifft);
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(0), t.extent(0));
   BOOST_REQUIRE_EQUAL(t_fft_ifft.extent(1), t.extent(1));

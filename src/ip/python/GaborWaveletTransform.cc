@@ -51,14 +51,15 @@ static inline const blitz::Array<std::complex<double>, 2> convert_image(bob::pyt
 static inline void transform (bob::ip::GaborKernel& kernel, blitz::Array<std::complex<double>,2>& input, blitz::Array<std::complex<double>,2>& output){
  // perform fft on input image
   bob::sp::FFT2D fft(input.extent(0), input.extent(1));
-  fft(input);
+  blitz::Array<std::complex<double>,2> tmp(input.shape());
+  fft(input, output);
 
   // apply the kernel in frequency domain
-  kernel.transform(input, output);
+  kernel.transform(output, tmp);
 
   // perform ifft on the result
   bob::sp::IFFT2D ifft(output.extent(0), output.extent(1));
-  ifft(output);
+  ifft(tmp, output);
 }
 
 static void gabor_wavelet_transform_1 (bob::ip::GaborKernel& kernel, bob::python::const_ndarray input_image, bob::python::ndarray output_image){

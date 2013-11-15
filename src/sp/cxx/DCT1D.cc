@@ -1,5 +1,5 @@
 /**
- * @file sp/cxx/DCT1DNumpy.cc
+ * @file sp/cxx/DCT1D.cc
  * @date Thu Nov 14 18:15:49 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -8,34 +8,39 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#include <bob/sp/DCT1DNumpy.h>
+#include <bob/sp/DCT1D.h>
 #include <cmath>
 #include <bob/core/assert.h>
 #include <bob/core/cast.h>
 #include <bob/core/array_copy.h>
 #include <boost/math/constants/constants.hpp>
 
-bob::sp::DCT1DNumpyAbstract::DCT1DNumpyAbstract(const size_t length):
+bob::sp::DCT1DAbstract::DCT1DAbstract():
+  bob::sp::DCT1DAbstract::DCT1DAbstract(1)
+{
+}
+
+bob::sp::DCT1DAbstract::DCT1DAbstract(const size_t length):
   m_length(length),
   m_working_array(length)
 {
   initNormFactors();
 }
 
-bob::sp::DCT1DNumpyAbstract::DCT1DNumpyAbstract(
-    const bob::sp::DCT1DNumpyAbstract& other):
+bob::sp::DCT1DAbstract::DCT1DAbstract(
+    const bob::sp::DCT1DAbstract& other):
   m_length(other.m_length),
   m_working_array(other.m_length)
 {
   initNormFactors();
 }
 
-bob::sp::DCT1DNumpyAbstract::~DCT1DNumpyAbstract()
+bob::sp::DCT1DAbstract::~DCT1DAbstract()
 {
 }
 
-bob::sp::DCT1DNumpyAbstract&
-bob::sp::DCT1DNumpyAbstract::operator=(const DCT1DNumpyAbstract& other)
+bob::sp::DCT1DAbstract&
+bob::sp::DCT1DAbstract::operator=(const DCT1DAbstract& other)
 {
   if (this != &other) {
     m_length = other.m_length;
@@ -46,17 +51,17 @@ bob::sp::DCT1DNumpyAbstract::operator=(const DCT1DNumpyAbstract& other)
   return *this;
 }
 
-bool bob::sp::DCT1DNumpyAbstract::operator==(const bob::sp::DCT1DNumpyAbstract& b) const
+bool bob::sp::DCT1DAbstract::operator==(const bob::sp::DCT1DAbstract& b) const
 {
   return (this->m_length == b.m_length);
 }
 
-bool bob::sp::DCT1DNumpyAbstract::operator!=(const bob::sp::DCT1DNumpyAbstract& b) const
+bool bob::sp::DCT1DAbstract::operator!=(const bob::sp::DCT1DAbstract& b) const
 {
   return !(this->operator==(b));
 }
 
-void bob::sp::DCT1DNumpyAbstract::operator()(const blitz::Array<double,1>& src,
+void bob::sp::DCT1DAbstract::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst) const
 {
   // Check input, inclusive dimension
@@ -72,7 +77,7 @@ void bob::sp::DCT1DNumpyAbstract::operator()(const blitz::Array<double,1>& src,
   processNoCheck(src, dst);
 }
 
-void bob::sp::DCT1DNumpyAbstract::setLength(const size_t length)
+void bob::sp::DCT1DAbstract::setLength(const size_t length)
 {
   m_length = length;
   m_working_array.resize(length);
@@ -80,7 +85,7 @@ void bob::sp::DCT1DNumpyAbstract::setLength(const size_t length)
   initNormFactors();
 }
 
-void bob::sp::DCT1DNumpyAbstract::initNormFactors()
+void bob::sp::DCT1DAbstract::initNormFactors()
 {
   // Precompute multiplicative factors
   m_sqrt_1byl = sqrt(1./(double)m_length);
@@ -88,8 +93,13 @@ void bob::sp::DCT1DNumpyAbstract::initNormFactors()
 }
 
 
-bob::sp::DCT1DNumpy::DCT1DNumpy(const size_t length):
-  bob::sp::DCT1DNumpyAbstract(length),
+bob::sp::DCT1D::DCT1D():
+  bob::sp::DCT1D(1)
+{
+}
+
+bob::sp::DCT1D::DCT1D(const size_t length):
+  bob::sp::DCT1DAbstract(length),
   m_fft(2*length),
   m_buffer_1(2*length),
   m_buffer_2(2*length)
@@ -97,8 +107,8 @@ bob::sp::DCT1DNumpy::DCT1DNumpy(const size_t length):
   initWorkingArray();
 }
 
-bob::sp::DCT1DNumpy::DCT1DNumpy(const bob::sp::DCT1DNumpy& other):
-  bob::sp::DCT1DNumpyAbstract(other),
+bob::sp::DCT1D::DCT1D(const bob::sp::DCT1D& other):
+  bob::sp::DCT1DAbstract(other),
   m_fft(other.m_length),
   m_buffer_1(2*other.m_length),
   m_buffer_2(2*other.m_length)
@@ -106,15 +116,15 @@ bob::sp::DCT1DNumpy::DCT1DNumpy(const bob::sp::DCT1DNumpy& other):
   initWorkingArray();
 }
 
-bob::sp::DCT1DNumpy::~DCT1DNumpy()
+bob::sp::DCT1D::~DCT1D()
 {
 }
 
-bob::sp::DCT1DNumpy&
-bob::sp::DCT1DNumpy::operator=(const DCT1DNumpy& other)
+bob::sp::DCT1D&
+bob::sp::DCT1D::operator=(const DCT1D& other)
 {
   if (this != &other) {
-    bob::sp::DCT1DNumpyAbstract::operator=(other);
+    bob::sp::DCT1DAbstract::operator=(other);
     m_fft.setLength(other.m_length);
     m_buffer_1.resize(2*other.m_length);
     m_buffer_2.resize(2*other.m_length);
@@ -122,15 +132,15 @@ bob::sp::DCT1DNumpy::operator=(const DCT1DNumpy& other)
   return *this;
 }
 
-void bob::sp::DCT1DNumpy::setLength(const size_t length)
+void bob::sp::DCT1D::setLength(const size_t length)
 {
-  bob::sp::DCT1DNumpyAbstract::setLength(length);
+  bob::sp::DCT1DAbstract::setLength(length);
   m_fft.setLength(2*m_length);
   m_buffer_1.resize(2*length);
   m_buffer_2.resize(2*length);
 }
 
-void bob::sp::DCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src,
+void bob::sp::DCT1D::processNoCheck(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst) const
 {
   blitz::Range r1 = blitz::Range(0,m_length-1);
@@ -156,7 +166,7 @@ void bob::sp::DCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src,
   }
 }
 
-void bob::sp::DCT1DNumpy::initWorkingArray()
+void bob::sp::DCT1D::initWorkingArray()
 {
   std::complex<double> J(0., 1.);
   const double PI = boost::math::constants::pi<double>();
@@ -166,8 +176,13 @@ void bob::sp::DCT1DNumpy::initWorkingArray()
 }
 
 
-bob::sp::IDCT1DNumpy::IDCT1DNumpy(const size_t length):
-  bob::sp::DCT1DNumpyAbstract(length),
+bob::sp::IDCT1D::IDCT1D():
+  bob::sp::IDCT1D(1)
+{
+}
+
+bob::sp::IDCT1D::IDCT1D(const size_t length):
+  bob::sp::DCT1DAbstract(length),
   m_ifft(length),
   m_buffer_1(length),
   m_buffer_2(length)
@@ -175,8 +190,8 @@ bob::sp::IDCT1DNumpy::IDCT1DNumpy(const size_t length):
   initWorkingArray();
 }
 
-bob::sp::IDCT1DNumpy::IDCT1DNumpy(const bob::sp::IDCT1DNumpy& other):
-  bob::sp::DCT1DNumpyAbstract(other),
+bob::sp::IDCT1D::IDCT1D(const bob::sp::IDCT1D& other):
+  bob::sp::DCT1DAbstract(other),
   m_ifft(other.m_length),
   m_buffer_1(other.m_length),
   m_buffer_2(other.m_length)
@@ -184,15 +199,15 @@ bob::sp::IDCT1DNumpy::IDCT1DNumpy(const bob::sp::IDCT1DNumpy& other):
   initWorkingArray();
 }
 
-bob::sp::IDCT1DNumpy::~IDCT1DNumpy()
+bob::sp::IDCT1D::~IDCT1D()
 {
 }
 
-bob::sp::IDCT1DNumpy&
-bob::sp::IDCT1DNumpy::operator=(const IDCT1DNumpy& other)
+bob::sp::IDCT1D&
+bob::sp::IDCT1D::operator=(const IDCT1D& other)
 {
   if (this != &other) {
-    bob::sp::DCT1DNumpyAbstract::operator=(other);
+    bob::sp::DCT1DAbstract::operator=(other);
     m_ifft.setLength(other.m_length);
     m_buffer_1.resize(other.m_length);
     m_buffer_2.resize(other.m_length);
@@ -201,15 +216,15 @@ bob::sp::IDCT1DNumpy::operator=(const IDCT1DNumpy& other)
 }
 
 
-void bob::sp::IDCT1DNumpy::setLength(const size_t length)
+void bob::sp::IDCT1D::setLength(const size_t length)
 {
-  bob::sp::DCT1DNumpyAbstract::setLength(length);
+  bob::sp::DCT1DAbstract::setLength(length);
   m_ifft.setLength(length);
   m_buffer_1.resize(length);
   m_buffer_2.resize(length);
 }
 
-void bob::sp::IDCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src,
+void bob::sp::IDCT1D::processNoCheck(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst) const
 {
   // Compute the DCT
@@ -228,7 +243,7 @@ void bob::sp::IDCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src,
     dst(m_length-1) = bob::core::cast<double>(m_buffer_2(m_length/2));
 }
 
-void bob::sp::IDCT1DNumpy::initWorkingArray()
+void bob::sp::IDCT1D::initWorkingArray()
 {
   std::complex<double> J(0., 1.);
   const double PI = boost::math::constants::pi<double>();

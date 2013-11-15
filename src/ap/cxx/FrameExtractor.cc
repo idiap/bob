@@ -83,8 +83,10 @@ void bob::ap::FrameExtractor::setWinShiftMs(const double win_shift_ms)
 }
 
 void bob::ap::FrameExtractor::initWinLength()
-{ 
+{  
   m_win_length = (size_t)(m_sampling_frequency * m_win_length_ms / 1000);
+  if (m_win_length == 0)
+    throw std::runtime_error("The length of the window is 0. You should use a larger sampling rate or window length in miliseconds");
   initWinSize();
 }
 

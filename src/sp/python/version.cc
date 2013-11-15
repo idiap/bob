@@ -12,21 +12,10 @@
 #include <bob/config.h>
 
 #include <boost/python.hpp>
-#include <fftw3.h>
 
 using namespace boost::python;
 
-/**
- * FFTW3 support
- */
-static tuple fftw3_version() {
-  return make_tuple((const char*)fftw_version, 
-                    (const char*)fftw_cc, 
-                    (const char*)fftw_codelet_optim);
-}
-
 void bind_sp_version() {
   dict vdict;
-  vdict["FFTW"] = fftw3_version();
   scope().attr("version") = vdict;
 }

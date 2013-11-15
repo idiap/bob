@@ -21,7 +21,7 @@ bob::ap::Spectrogram::Spectrogram(const double sampling_frequency,
   m_n_filters(n_filters), m_f_min(f_min), m_f_max(f_max),
   m_pre_emphasis_coeff(pre_emphasis_coeff), m_mel_scale(mel_scale),
   m_fb_out_floor(1.), m_energy_filter(false), m_log_filter(true),
-  m_energy_bands(false), m_fft(1)
+  m_energy_bands(false), m_fft()
 {
   // Check pre-emphasis coefficient
   if (pre_emphasis_coeff < 0. || pre_emphasis_coeff > 1.) {
@@ -264,7 +264,7 @@ void bob::ap::Spectrogram::initWinLength()
 void bob::ap::Spectrogram::initWinSize()
 {
   bob::ap::Energy::initWinSize();
-  m_fft.reset(m_win_size);
+  m_fft.setLength(m_win_size);
   m_cache_frame_c1.resize(m_win_size);
   m_cache_frame_c2.resize(m_win_size);
 }

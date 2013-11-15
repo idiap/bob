@@ -9,13 +9,13 @@ set(incdir ${cxx_incdir})
 set(src
     "fftpack.c"
     "FFT1DNaive.cc"
-    "FFT1DNumpy.cc"
+    "FFT1D.cc"
     "FFT2DNaive.cc"
-    "FFT2DNumpy.cc"
+    "FFT2D.cc"
     "DCT1DNaive.cc"
-    "DCT1DNumpy.cc"
+    "DCT1D.cc"
     "DCT2DNaive.cc"
-    "DCT2DNumpy.cc"
+    "DCT2D.cc"
     "Quantization.cc"
     )
 
@@ -29,7 +29,7 @@ target_link_libraries(${PROJECT_NAME} ${shared})
 
 # Defines tests for this package
 bob_add_test(${PROJECT_NAME} convolution test/conv.cc)
-bob_add_test(${PROJECT_NAME} fftnumpy test/fftnumpy.cc)
+bob_add_test(${PROJECT_NAME} fft_fct test/fft_fct.cc)
 
 bob_add_benchmark(${PROJECT_NAME} fft_fct benchmark/fft_fct.cc)
 

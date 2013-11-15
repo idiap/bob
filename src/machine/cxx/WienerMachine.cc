@@ -65,7 +65,8 @@ bob::machine::WienerMachine::WienerMachine(const bob::machine::WienerMachine& ot
 {
 }
 
-bob::machine::WienerMachine::WienerMachine(bob::io::HDF5File& config)
+bob::machine::WienerMachine::WienerMachine(bob::io::HDF5File& config):
+  m_fft(0,0), m_ifft(0,0)
 {
   load(config);
 }
@@ -81,8 +82,8 @@ bob::machine::WienerMachine& bob::machine::WienerMachine::operator=
     m_Pn = other.m_Pn;
     m_variance_threshold = other.m_variance_threshold;
     m_W.reference(bob::core::array::ccopy(other.m_W));
-    m_fft.reset(m_Ps.extent(0),m_Ps.extent(1));
-    m_ifft.reset(m_Ps.extent(0),m_Ps.extent(1));
+    m_fft.setShape(m_Ps.extent(0),m_Ps.extent(1));
+    m_ifft.setShape(m_Ps.extent(0),m_Ps.extent(1));
     m_buffer1.resize(m_Ps.extent(0),m_Ps.extent(1));
     m_buffer2.resize(m_Ps.extent(0),m_Ps.extent(1));
   }
@@ -118,8 +119,8 @@ void bob::machine::WienerMachine::load(bob::io::HDF5File& config)
   m_Pn = config.read<double>("Pn");
   m_variance_threshold = config.read<double>("variance_threshold");
   m_W.reference(config.readArray<double,2>("W"));
-  m_fft.reset(m_Ps.extent(0),m_Ps.extent(1));
-  m_ifft.reset(m_Ps.extent(0),m_Ps.extent(1));
+  m_fft.setShape(m_Ps.extent(0),m_Ps.extent(1));
+  m_ifft.setShape(m_Ps.extent(0),m_Ps.extent(1));
   m_buffer1.resize(m_Ps.extent(0),m_Ps.extent(1));
   m_buffer2.resize(m_Ps.extent(0),m_Ps.extent(1));
 }
@@ -129,8 +130,8 @@ void bob::machine::WienerMachine::resize(const size_t height,
 {
   m_Ps.resizeAndPreserve(height,width);
   m_W.resizeAndPreserve(height,width);
-  m_fft.reset(height,width);
-  m_ifft.reset(height,width);
+  m_fft.setShape(height,width);
+  m_ifft.setShape(height,width);
   m_buffer1.resizeAndPreserve(height,width);
   m_buffer2.resizeAndPreserve(height,width);
 }

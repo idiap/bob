@@ -1,5 +1,5 @@
 /**
- * @file sp/cxx/FFT2DNumpy.cc
+ * @file sp/cxx/FFT2D.cc
  * @date Wed Apr 13 23:08:13 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -8,10 +8,15 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#include <bob/sp/FFT2DNumpy.h>
+#include <bob/sp/FFT2D.h>
 #include <bob/core/assert.h>
 
-bob::sp::FFT2DNumpyAbstract::FFT2DNumpyAbstract(
+bob::sp::FFT2DAbstract::FFT2DAbstract():
+  bob::sp::FFT2DAbstract::FFT2DAbstract(1,1)
+{
+}
+
+bob::sp::FFT2DAbstract::FFT2DAbstract(
     const size_t height, const size_t width):
   m_height(height), m_width(width),
   m_buffer_hw(height, width), m_buffer_h(height),
@@ -19,20 +24,20 @@ bob::sp::FFT2DNumpyAbstract::FFT2DNumpyAbstract(
 {
 }
 
-bob::sp::FFT2DNumpyAbstract::FFT2DNumpyAbstract(
-    const bob::sp::FFT2DNumpyAbstract& other):
+bob::sp::FFT2DAbstract::FFT2DAbstract(
+    const bob::sp::FFT2DAbstract& other):
   m_height(other.m_height), m_width(other.m_width),
   m_buffer_hw(other.m_height, other.m_width), m_buffer_h(other.m_height),
   m_buffer_h2(other.m_height)
 {
 }
 
-bob::sp::FFT2DNumpyAbstract::~FFT2DNumpyAbstract()
+bob::sp::FFT2DAbstract::~FFT2DAbstract()
 {
 }
 
-bob::sp::FFT2DNumpyAbstract&
-bob::sp::FFT2DNumpyAbstract::operator=(const FFT2DNumpyAbstract& other)
+bob::sp::FFT2DAbstract&
+bob::sp::FFT2DAbstract::operator=(const FFT2DAbstract& other)
 {
   if (this != &other) {
     setHeight(other.m_height);
@@ -44,17 +49,17 @@ bob::sp::FFT2DNumpyAbstract::operator=(const FFT2DNumpyAbstract& other)
   return *this;
 }
 
-bool bob::sp::FFT2DNumpyAbstract::operator==(const bob::sp::FFT2DNumpyAbstract& b) const
+bool bob::sp::FFT2DAbstract::operator==(const bob::sp::FFT2DAbstract& b) const
 {
   return (this->m_height == b.m_height && this->m_width == b.m_width);
 }
 
-bool bob::sp::FFT2DNumpyAbstract::operator!=(const bob::sp::FFT2DNumpyAbstract& b) const
+bool bob::sp::FFT2DAbstract::operator!=(const bob::sp::FFT2DAbstract& b) const
 {
   return !(this->operator==(b));
 }
 
-void bob::sp::FFT2DNumpyAbstract::operator()(const blitz::Array<std::complex<double>,2>& src,
+void bob::sp::FFT2DAbstract::operator()(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst) const
 {
   // Check input, inclusive dimension
@@ -70,7 +75,7 @@ void bob::sp::FFT2DNumpyAbstract::operator()(const blitz::Array<std::complex<dou
   processNoCheck(src, dst);
 }
 
-void bob::sp::FFT2DNumpyAbstract::setHeight(const size_t height)
+void bob::sp::FFT2DAbstract::setHeight(const size_t height)
 {
   m_height = height;
   m_buffer_hw.resize(m_height, m_width);
@@ -78,57 +83,76 @@ void bob::sp::FFT2DNumpyAbstract::setHeight(const size_t height)
   m_buffer_h2.resize(m_height);
 }
 
-void bob::sp::FFT2DNumpyAbstract::setWidth(const size_t width)
+void bob::sp::FFT2DAbstract::setWidth(const size_t width)
 {
   m_width = width;
   m_buffer_hw.resize(m_height, m_width);
-  m_buffer_h.resize(m_height);
-  m_buffer_h2.resize(m_height);
+}
+
+void bob::sp::FFT2DAbstract::setShape(const size_t height, const size_t width)
+{
+  m_height = height;
+  m_width = width;
+  m_buffer_hw.resize(height, width);
+  m_buffer_h.resize(height);
+  m_buffer_h2.resize(height);
 }
 
 
-bob::sp::FFT2DNumpy::FFT2DNumpy(const size_t height, const size_t width):
-  bob::sp::FFT2DNumpyAbstract::FFT2DNumpyAbstract(height, width),
+bob::sp::FFT2D::FFT2D():
+  bob::sp::FFT2D::FFT2D(1, 1)
+{
+}
+
+bob::sp::FFT2D::FFT2D(const size_t height, const size_t width):
+  bob::sp::FFT2DAbstract::FFT2DAbstract(height, width),
   m_fft_h(height),
   m_fft_w(width)
 {
 }
 
-bob::sp::FFT2DNumpy::FFT2DNumpy(const bob::sp::FFT2DNumpy& other):
-  bob::sp::FFT2DNumpyAbstract(other),
+bob::sp::FFT2D::FFT2D(const bob::sp::FFT2D& other):
+  bob::sp::FFT2DAbstract(other),
   m_fft_h(other.m_height),
   m_fft_w(other.m_width)
 {
 }
 
-bob::sp::FFT2DNumpy::~FFT2DNumpy()
+bob::sp::FFT2D::~FFT2D()
 {
 }
 
-bob::sp::FFT2DNumpy&
-bob::sp::FFT2DNumpy::operator=(const FFT2DNumpy& other)
+bob::sp::FFT2D&
+bob::sp::FFT2D::operator=(const FFT2D& other)
 {
   if (this != &other) {
-    bob::sp::FFT2DNumpyAbstract::operator=(other);
+    bob::sp::FFT2DAbstract::operator=(other);
     m_fft_h.setLength(other.m_height);
     m_fft_w.setLength(other.m_width);
   }
   return *this;
 }
 
-void bob::sp::FFT2DNumpy::setHeight(const size_t height)
+void bob::sp::FFT2D::setHeight(const size_t height)
 {
-  bob::sp::FFT2DNumpyAbstract::setHeight(height);
+  bob::sp::FFT2DAbstract::setHeight(height);
   m_fft_h.setLength(height);
 }
 
-void bob::sp::FFT2DNumpy::setWidth(const size_t width)
+void bob::sp::FFT2D::setWidth(const size_t width)
 {
-  bob::sp::FFT2DNumpyAbstract::setWidth(width);
+  bob::sp::FFT2DAbstract::setWidth(width);
   m_fft_w.setLength(width);
 }
 
-void bob::sp::FFT2DNumpy::processNoCheck(const blitz::Array<std::complex<double>,2>& src,
+void bob::sp::FFT2D::setShape(const size_t height, const size_t width)
+{
+  bob::sp::FFT2DAbstract::setShape(height, width);
+  m_fft_h.setLength(height);
+  m_fft_w.setLength(width);
+}
+
+void bob::sp::FFT2D::processNoCheck(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst) const
 {
   blitz::Range rall = blitz::Range::all();
@@ -147,48 +171,60 @@ void bob::sp::FFT2DNumpy::processNoCheck(const blitz::Array<std::complex<double>
 }
 
 
-bob::sp::IFFT2DNumpy::IFFT2DNumpy(const size_t height, const size_t width):
-  bob::sp::FFT2DNumpyAbstract::FFT2DNumpyAbstract(height, width),
+bob::sp::IFFT2D::IFFT2D():
+  bob::sp::IFFT2D::IFFT2D(1, 1)
+{
+}
+
+bob::sp::IFFT2D::IFFT2D(const size_t height, const size_t width):
+  bob::sp::FFT2DAbstract::FFT2DAbstract(height, width),
   m_ifft_h(height),
   m_ifft_w(width)
 {
 }
 
-bob::sp::IFFT2DNumpy::IFFT2DNumpy(const bob::sp::IFFT2DNumpy& other):
-  bob::sp::FFT2DNumpyAbstract(other),
+bob::sp::IFFT2D::IFFT2D(const bob::sp::IFFT2D& other):
+  bob::sp::FFT2DAbstract(other),
   m_ifft_h(other.m_height),
   m_ifft_w(other.m_width)
 {
 }
 
-bob::sp::IFFT2DNumpy::~IFFT2DNumpy()
+bob::sp::IFFT2D::~IFFT2D()
 {
 }
 
-bob::sp::IFFT2DNumpy&
-bob::sp::IFFT2DNumpy::operator=(const IFFT2DNumpy& other)
+bob::sp::IFFT2D&
+bob::sp::IFFT2D::operator=(const IFFT2D& other)
 {
   if (this != &other) {
-    bob::sp::FFT2DNumpyAbstract::operator=(other);
+    bob::sp::FFT2DAbstract::operator=(other);
     m_ifft_h.setLength(other.m_height);
     m_ifft_w.setLength(other.m_width);
   }
   return *this;
 }
 
-void bob::sp::IFFT2DNumpy::setHeight(const size_t height)
+void bob::sp::IFFT2D::setHeight(const size_t height)
 {
-  bob::sp::FFT2DNumpyAbstract::setHeight(height);
+  bob::sp::FFT2DAbstract::setHeight(height);
   m_ifft_h.setLength(height);
 }
 
-void bob::sp::IFFT2DNumpy::setWidth(const size_t width)
+void bob::sp::IFFT2D::setWidth(const size_t width)
 {
-  bob::sp::FFT2DNumpyAbstract::setWidth(width);
+  bob::sp::FFT2DAbstract::setWidth(width);
   m_ifft_w.setLength(width);
 }
 
-void bob::sp::IFFT2DNumpy::processNoCheck(const blitz::Array<std::complex<double>,2>& src,
+void bob::sp::IFFT2D::setShape(const size_t height, const size_t width)
+{
+  bob::sp::FFT2DAbstract::setShape(height, width);
+  m_ifft_h.setLength(height);
+  m_ifft_w.setLength(width);
+}
+
+void bob::sp::IFFT2D::processNoCheck(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst) const
 {
   blitz::Range rall = blitz::Range::all();

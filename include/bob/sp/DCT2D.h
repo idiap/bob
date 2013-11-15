@@ -1,5 +1,5 @@
 /**
- * @file bob/sp/DCT2DNumpy.h
+ * @file bob/sp/DCT2D.h
  * @date Thu Nov 14 22:58:14 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -21,12 +21,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_SP_DCT2DNUMPY_H
-#define BOB_SP_DCT2DNUMPY_H
+#ifndef BOB_SP_DCT2D_H
+#define BOB_SP_DCT2D_H
 
 #include <complex>
 #include <blitz/array.h>
-#include <bob/sp/DCT1DNumpy.h>
+#include <bob/sp/DCT1D.h>
 
 
 namespace bob { namespace sp {
@@ -39,28 +39,28 @@ namespace bob { namespace sp {
  * @brief This class implements a 2D Discrete Cosine Transform using a
  * 1D DCT implementation.
  */
-class DCT2DNumpyAbstract
+class DCT2DAbstract
 {
   public:
     /**
      * @brief Destructor
      */
-    virtual ~DCT2DNumpyAbstract();
+    virtual ~DCT2DAbstract();
 
     /**
      * @brief Assignment operator
      */
-    DCT2DNumpyAbstract& operator=(const DCT2DNumpyAbstract& other);
+    DCT2DAbstract& operator=(const DCT2DAbstract& other);
 
     /**
      * @brief Equal operator
      */
-    bool operator==(const DCT2DNumpyAbstract& other) const;
+    bool operator==(const DCT2DAbstract& other) const;
 
     /**
      * @brief Not equal operator
      */
-    bool operator!=(const DCT2DNumpyAbstract& other) const;
+    bool operator!=(const DCT2DAbstract& other) const;
 
     /**
      * @brief process an array by applying the DCT
@@ -77,19 +77,25 @@ class DCT2DNumpyAbstract
     /**
      * @brief Setters
      */
-    void setHeight(const size_t height);
-    void setWidth(const size_t width);
+    virtual void setHeight(const size_t height);
+    virtual void setWidth(const size_t width);
+    virtual void setShape(const size_t height, const size_t width);
 
   protected:
     /**
      * @brief Constructor
      */
-    DCT2DNumpyAbstract(const size_t height, const size_t width);
+    DCT2DAbstract();
+
+    /**
+     * @brief Constructor
+     */
+    DCT2DAbstract(const size_t height, const size_t width);
 
     /**
      * @brief Copy constructor
      */
-    DCT2DNumpyAbstract(const DCT2DNumpyAbstract& other);
+    DCT2DAbstract(const DCT2DAbstract& other);
 
     /**
      * @brief process an array assuming that all the 'check' are done
@@ -112,34 +118,40 @@ class DCT2DNumpyAbstract
  * @brief This class implements a direct 2D Discrete Cosine Transform using
  * a 1D DCT implementation.
  */
-class DCT2DNumpy: public DCT2DNumpyAbstract
+class DCT2D: public DCT2DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    DCT2DNumpy(const size_t height, const size_t width);
+    DCT2D();
+
+    /**
+     * @brief Constructor
+     */ 
+    DCT2D(const size_t height, const size_t width);
 
     /**
      * @brief Copy constructor
      */
-    DCT2DNumpy(const DCT2DNumpy& other);
+    DCT2D(const DCT2D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~DCT2DNumpy();
+    virtual ~DCT2D();
 
     /**
      * @brief Assignment operator
      */
-    DCT2DNumpy& operator=(const DCT2DNumpy& other);
+    DCT2D& operator=(const DCT2D& other);
 
     /**
      * @brief Setters
      */
     void setHeight(const size_t height);
     void setWidth(const size_t width);
+    void setShape(const size_t height, const size_t width);
 
   private:
     /**
@@ -151,8 +163,8 @@ class DCT2DNumpy: public DCT2DNumpyAbstract
     /**
      * @brief DCT1D instances
      */
-    bob::sp::DCT1DNumpy m_dct_h;
-    bob::sp::DCT1DNumpy m_dct_w;
+    bob::sp::DCT1D m_dct_h;
+    bob::sp::DCT1D m_dct_w;
 };
 
 
@@ -160,34 +172,40 @@ class DCT2DNumpy: public DCT2DNumpyAbstract
  * @brief This class implements an inverse 2D Discrete Fourier Transform using
  * a inverse 1D DCT implementation.
  */
-class IDCT2DNumpy: public DCT2DNumpyAbstract
+class IDCT2D: public DCT2DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    IDCT2DNumpy(const size_t height, const size_t width);
+    IDCT2D();
+
+    /**
+     * @brief Constructor
+     */ 
+    IDCT2D(const size_t height, const size_t width);
 
     /**
      * @brief Copy constructor
      */
-    IDCT2DNumpy(const IDCT2DNumpy& other);
+    IDCT2D(const IDCT2D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~IDCT2DNumpy();
+    virtual ~IDCT2D();
 
     /**
      * @brief Assignment operator
      */
-    IDCT2DNumpy& operator=(const IDCT2DNumpy& other);
+    IDCT2D& operator=(const IDCT2D& other);
 
     /**
      * @brief Setters
      */
     void setHeight(const size_t height);
     void setWidth(const size_t width);
+    void setShape(const size_t height, const size_t width);
 
   private:
     /**
@@ -199,8 +217,8 @@ class IDCT2DNumpy: public DCT2DNumpyAbstract
     /**
      * @brief IDCT1D instances
      */
-    bob::sp::IDCT1DNumpy m_idct_h;
-    bob::sp::IDCT1DNumpy m_idct_w;
+    bob::sp::IDCT1D m_idct_h;
+    bob::sp::IDCT1D m_idct_w;
 };
 
 /**
@@ -208,4 +226,4 @@ class IDCT2DNumpy: public DCT2DNumpyAbstract
  */
 }}
 
-#endif /* BOB_SP_DCT2DNUMPY_H */
+#endif /* BOB_SP_DCT2D_H */

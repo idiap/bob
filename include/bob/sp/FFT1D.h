@@ -1,5 +1,5 @@
 /**
- * @file bob/sp/FFT1DNumpy.h
+ * @file bob/sp/FFT1D.h
  * @date Thu Nov 14 11:58:53 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -21,8 +21,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_SP_FFT1DNUMPY_H
-#define BOB_SP_FFT1DNUMPY_H
+#ifndef BOB_SP_FFT1D_H
+#define BOB_SP_FFT1D_H
 
 #include <complex>
 #include <blitz/array.h>
@@ -41,38 +41,28 @@ namespace bob { namespace sp {
  * the NumPY FFT implementation. It is used as a base class for FFT1D and
  * IFFT1D classes.
  */
-class FFT1DNumpyAbstract
+class FFT1DAbstract
 {
   public:
     /**
-     * @brief Constructor
-     */
-    FFT1DNumpyAbstract(const size_t length);
-
-    /**
-     * @brief Copy constructor
-     */
-    FFT1DNumpyAbstract(const FFT1DNumpyAbstract& other);
-
-    /**
      * @brief Destructor
      */
-    virtual ~FFT1DNumpyAbstract();
+    virtual ~FFT1DAbstract();
 
     /**
      * @brief Assignment operator
      */
-    FFT1DNumpyAbstract& operator=(const FFT1DNumpyAbstract& other);
+    FFT1DAbstract& operator=(const FFT1DAbstract& other);
 
     /**
      * @brief Equal operator
      */
-    bool operator==(const FFT1DNumpyAbstract& other) const;
+    bool operator==(const FFT1DAbstract& other) const;
 
     /**
      * @brief Not equal operator
      */
-    bool operator!=(const FFT1DNumpyAbstract& other) const;
+    bool operator!=(const FFT1DAbstract& other) const;
 
     /**
      * @brief process an array by applying the FFT
@@ -90,6 +80,21 @@ class FFT1DNumpyAbstract
     virtual void setLength(const size_t length);
 
   protected:
+    /**
+     * @brief Constructor
+     */
+    FFT1DAbstract();
+
+    /**
+     * @brief Constructor
+     */
+    FFT1DAbstract(const size_t length);
+
+    /**
+     * @brief Copy constructor
+     */
+    FFT1DAbstract(const FFT1DAbstract& other);
+
     /**
      * @brief process an array assuming that all the 'check' are done
      */
@@ -113,28 +118,33 @@ class FFT1DNumpyAbstract
  * @brief This class implements a direct 1D Discrete Fourier Transform 
  * based on the NumPy FFT implementation.
  */
-class FFT1DNumpy: public FFT1DNumpyAbstract
+class FFT1D: public FFT1DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    FFT1DNumpy(const size_t length);
+    FFT1D();
+
+    /**
+     * @brief Constructor
+     */ 
+    FFT1D(const size_t length);
 
     /**
      * @brief Copy constructor
      */
-    FFT1DNumpy(const FFT1DNumpy& other);
+    FFT1D(const FFT1D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~FFT1DNumpy();
+    virtual ~FFT1D();
 
     /**
      * @brief Assignment operator
      */
-    FFT1DNumpy& operator=(const FFT1DNumpy& other);
+    FFT1D& operator=(const FFT1D& other);
 
     /**
      * @brief Setters
@@ -154,28 +164,33 @@ class FFT1DNumpy: public FFT1DNumpyAbstract
  * @brief This class implements a inverse 1D Discrete Fourier Transform 
  * based on the NumPy FFT implementation.
  */
-class IFFT1DNumpy: public FFT1DNumpyAbstract
+class IFFT1D: public FFT1DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    IFFT1DNumpy(const size_t length);
+    IFFT1D();
+
+    /**
+     * @brief Constructor
+     */ 
+    IFFT1D(const size_t length);
 
     /**
      * @brief Copy constructor
      */
-    IFFT1DNumpy(const IFFT1DNumpy& other);
+    IFFT1D(const IFFT1D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~IFFT1DNumpy();
+    virtual ~IFFT1D();
 
     /**
      * @brief Assignment operator
      */
-    IFFT1DNumpy& operator=(const IFFT1DNumpy& other);
+    IFFT1D& operator=(const IFFT1D& other);
 
     /**
      * @brief Setters
@@ -195,4 +210,4 @@ class IFFT1DNumpy: public FFT1DNumpyAbstract
  */
 }}
 
-#endif /* BOB_SP_FFT1DNUMPY_H */
+#endif /* BOB_SP_FFT1D_H */

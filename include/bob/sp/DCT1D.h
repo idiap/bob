@@ -1,5 +1,5 @@
 /**
- * @file bob/sp/DCT1DNumpy.h
+ * @file bob/sp/DCT1D.h
  * @date Thu Nov 14 18:16:30 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -21,13 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_SP_DCT1DNUMPY_H
-#define BOB_SP_DCT1DNUMPY_H
+#ifndef BOB_SP_DCT1D_H
+#define BOB_SP_DCT1D_H
 
 #include <complex>
 #include <blitz/array.h>
 #include <boost/shared_ptr.hpp>
-#include <bob/sp/FFT1DNumpy.h>
+#include <bob/sp/FFT1D.h>
 
 
 namespace bob { namespace sp {
@@ -41,28 +41,28 @@ namespace bob { namespace sp {
  * the kiss DCT library. It is used as a base class for DCT1D and
  * IDCT1D classes.
  */
-class DCT1DNumpyAbstract
+class DCT1DAbstract
 {
   public:
     /**
      * @brief Destructor
      */
-    virtual ~DCT1DNumpyAbstract();
+    virtual ~DCT1DAbstract();
 
     /**
      * @brief Assignment operator
      */
-    DCT1DNumpyAbstract& operator=(const DCT1DNumpyAbstract& other);
+    DCT1DAbstract& operator=(const DCT1DAbstract& other);
 
     /**
      * @brief Equal operator
      */
-    bool operator==(const DCT1DNumpyAbstract& other) const;
+    bool operator==(const DCT1DAbstract& other) const;
 
     /**
      * @brief Not equal operator
      */
-    bool operator!=(const DCT1DNumpyAbstract& other) const;
+    bool operator!=(const DCT1DAbstract& other) const;
 
     /**
      * @brief process an array by applying the DCT
@@ -83,12 +83,17 @@ class DCT1DNumpyAbstract
     /**
      * @brief Constructor
      */
-    DCT1DNumpyAbstract(const size_t length);
+    DCT1DAbstract();
+
+    /**
+     * @brief Constructor
+     */
+    DCT1DAbstract(const size_t length);
 
     /**
      * @brief Copy constructor
      */
-    DCT1DNumpyAbstract(const DCT1DNumpyAbstract& other);
+    DCT1DAbstract(const DCT1DAbstract& other);
 
     /**
      * @brief process an array assuming that all the 'check' are done
@@ -118,28 +123,33 @@ class DCT1DNumpyAbstract
  * @brief This class implements a direct 1D Discrete Fourier Transform 
  * based on the kiss DCT library
  */
-class DCT1DNumpy: public DCT1DNumpyAbstract
+class DCT1D: public DCT1DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    DCT1DNumpy(const size_t length);
+    DCT1D();
+
+    /**
+     * @brief Constructor
+     */ 
+    DCT1D(const size_t length);
 
     /**
      * @brief Copy constructor
      */
-    DCT1DNumpy(const DCT1DNumpy& other);
+    DCT1D(const DCT1D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~DCT1DNumpy();
+    virtual ~DCT1D();
 
     /**
      * @brief Assignment operator
      */
-    DCT1DNumpy& operator=(const DCT1DNumpy& other);
+    DCT1D& operator=(const DCT1D& other);
 
     /**
      * @brief Setters
@@ -161,7 +171,7 @@ class DCT1DNumpy: public DCT1DNumpyAbstract
     /**
      * Private attributes
      */
-    bob::sp::FFT1DNumpy m_fft;
+    bob::sp::FFT1D m_fft;
     mutable blitz::Array<std::complex<double>,1> m_buffer_1;
     mutable blitz::Array<std::complex<double>,1> m_buffer_2;
 };
@@ -171,28 +181,33 @@ class DCT1DNumpy: public DCT1DNumpyAbstract
  * @brief This class implements a inverse 1D Discrete Fourier Transform 
  * based on the kiss DCT library
  */
-class IDCT1DNumpy: public DCT1DNumpyAbstract
+class IDCT1D: public DCT1DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    IDCT1DNumpy(const size_t length);
+    IDCT1D();
+
+    /**
+     * @brief Constructor
+     */ 
+    IDCT1D(const size_t length);
 
     /**
      * @brief Copy constructor
      */
-    IDCT1DNumpy(const IDCT1DNumpy& other);
+    IDCT1D(const IDCT1D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~IDCT1DNumpy();
+    virtual ~IDCT1D();
 
     /**
      * @brief Assignment operator
      */
-    IDCT1DNumpy& operator=(const IDCT1DNumpy& other);
+    IDCT1D& operator=(const IDCT1D& other);
 
     /**
      * @brief Setters
@@ -214,7 +229,7 @@ class IDCT1DNumpy: public DCT1DNumpyAbstract
     /**
      * Private attributes
      */
-    bob::sp::IFFT1DNumpy m_ifft;
+    bob::sp::IFFT1D m_ifft;
     mutable blitz::Array<std::complex<double>,1> m_buffer_1;
     mutable blitz::Array<std::complex<double>,1> m_buffer_2;
 };
@@ -224,4 +239,4 @@ class IDCT1DNumpy: public DCT1DNumpyAbstract
  */
 }}
 
-#endif /* BOB_SP_DCT1DNUMPY_H */
+#endif /* BOB_SP_DCT1D_H */

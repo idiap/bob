@@ -208,40 +208,6 @@ class Ceps: public Spectrogram
 
 //    friend class TestCeps;
 };
-/*
-class TestCeps
-{
-  public:
-    TestCeps(Ceps& ceps);
-    Ceps& m_ceps;
+}}
 
-    // Methods to test
-    double herzToMel(double f) { return m_ceps.herzToMel(f); }
-    double melToHerz(double f) { return m_ceps.melToHerz(f); }
-    blitz::TinyVector<int,2> getCepsShape(const size_t input_length) const
-    { return m_ceps.getCepsShape(input_length); }
-
-    blitz::TinyVector<int,2> getCepsShape(const blitz::Array<double,1>& input) const
-    { return m_ceps.getCepsShape(input); }
-    blitz::Array<double,1> getFilterOutput() { return m_ceps.m_cache_filters; }
-
-    void operator()(const blitz::Array<double,1>& input, blitz::Array<double,2>& ceps_2D)
-    { m_ceps(input, ceps_2D);}
-    void spectrogram(const blitz::Array<double,1>& input, blitz::Array<double,2>& spectrogram_matrix)
-    {m_ceps.spectrogram(input, spectrogram_matrix);}
-    void energyBands(const blitz::Array<double,1>& input,blitz::Array<double,2>& energy_matrix)
-    {m_ceps.energyBands(input, energy_matrix);}
-    void hammingWindow(blitz::Array<double,1>& data){ m_ceps.hammingWindow(data); }
-    void pre_emphasis(blitz::Array<double,1>& data){ m_ceps.pre_emphasis(data); }
-    void logFilterBank(blitz::Array<double,1>& x){ m_ceps.logFilterBank(x); }
-    void logTriangularFilterBank(blitz::Array<double,1>& data){ m_ceps.logTriangularFilterBank(data); }
-    void energyFilterBank(blitz::Array<double,1>& data) { m_ceps.energyFilterBank(data); }
-    double logEnergy(blitz::Array<double,1> &data){ return m_ceps.logEnergy(data); }
-    void applyDct(blitz::Array<double,1>& ceps_row) { m_ceps.applyDct(ceps_row); }
-    void energy(const blitz::Array<double,1>& input, blitz::Array<double,1>& energy_array) {m_ceps.energy(input, energy_array);}
-};
-*/
-}
-}
-
-#endif /* BOB_AP_CEPS2_H */
+#endif /* BOB_AP_CEPS_H */

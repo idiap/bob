@@ -23,7 +23,7 @@ bob::ip::DCTFeatures::operator=(const bob::ip::DCTFeatures& other)
     m_n_dct_coefs = other.m_n_dct_coefs;
     m_norm_block = other.m_norm_block;
     m_norm_dct = other.m_norm_dct;
-    m_dct2d.reset(m_block_h, m_block_w);
+    m_dct2d.setShape(m_block_h, m_block_w);
     m_square_pattern = other.m_square_pattern;
     m_norm_epsilon = other.m_norm_epsilon;
     setCheckSqrtNDctCoefs();

@@ -83,7 +83,6 @@ def version_table():
       if 'ffmpeg' in v: v = v['ffmpeg']
       else: v = ';'.join(['%s-%s' % (x, v[x]) for x in list(v.keys())])
     elif k.lower() == 'qt4': v = '%s (from %s)' % v
-    elif k.lower() == 'fftw': v = '%s (%s)' % v[:2]
     print(fmt % (k.ljust(packsize), v.ljust(descsize)))
   print(sep)
 

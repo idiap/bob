@@ -166,7 +166,7 @@ namespace bob {
         bob::sp::FFT2D m_fft;
         bob::sp::IFFT2D m_ifft;
 
-        blitz::Array<std::complex<double>,2> m_temp_array, m_frequency_image;
+        blitz::Array<std::complex<double>,2> m_temp_array, m_temp_array2, m_frequency_image;
 
         //! The number of scales (levels, frequencies) of this family
         unsigned m_number_of_scales;

@@ -51,8 +51,8 @@ Mathematical and signal processing
 
 Eigenvalue decomposition, matrix inversion and other linear algebra is
 available and implemented using `LAPACK`_ routines at the `C++`_ level. In
-addition, Fast Fourier Transform is made possible via a bridge to the `FFTW`_
-library.
+addition, Fast Fourier Transform is made possible relying on `NumPy`_'s 
+implementation.
 
 Image processing
 ----------------

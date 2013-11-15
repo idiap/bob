@@ -21,7 +21,6 @@
 .. _dvipng: http://savannah.nongnu.org/projects/dvipng/
 .. _ffmpeg: http://ffmpeg.org
 .. _libav: http://libav.org
-.. _fftw: http://www.fftw.org/
 .. _fink: http://www.finkproject.org
 .. _git: http://git-scm.com/
 .. _github: http://github.com/

@@ -1,5 +1,5 @@
 /**
- * @file bob/sp/FFT2DNumpy.h
+ * @file bob/sp/FFT2D.h
  * @date Fri Nov 15 10:13:37 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -21,12 +21,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BOB_SP_FFT2DNUMPY_H
-#define BOB_SP_FFT2DNUMPY_H
+#ifndef BOB_SP_FFT2D_H
+#define BOB_SP_FFT2D_H
 
 #include <complex>
 #include <blitz/array.h>
-#include <bob/sp/FFT1DNumpy.h>
+#include <bob/sp/FFT1D.h>
 
 
 namespace bob { namespace sp {
@@ -39,38 +39,28 @@ namespace bob { namespace sp {
  * @brief This class implements a 1D Discrete Fourier Transform using a
  * FFT1D implementation.
  */
-class FFT2DNumpyAbstract
+class FFT2DAbstract
 {
   public:
     /**
-     * @brief Constructor
-     */
-    FFT2DNumpyAbstract(const size_t height, const size_t width);
-
-    /**
-     * @brief Copy constructor
-     */
-    FFT2DNumpyAbstract(const FFT2DNumpyAbstract& other);
-
-    /**
      * @brief Destructor
      */
-    virtual ~FFT2DNumpyAbstract();
+    virtual ~FFT2DAbstract();
 
     /**
      * @brief Assignment operator
      */
-    FFT2DNumpyAbstract& operator=(const FFT2DNumpyAbstract& other);
+    FFT2DAbstract& operator=(const FFT2DAbstract& other);
 
     /**
      * @brief Equal operator
      */
-    bool operator==(const FFT2DNumpyAbstract& other) const;
+    bool operator==(const FFT2DAbstract& other) const;
 
     /**
      * @brief Not equal operator
      */
-    bool operator!=(const FFT2DNumpyAbstract& other) const;
+    bool operator!=(const FFT2DAbstract& other) const;
 
     /**
      * @brief process an array by applying the FFT
@@ -87,10 +77,26 @@ class FFT2DNumpyAbstract
     /**
      * @brief Setters
      */
-    void setHeight(const size_t height);
-    void setWidth(const size_t width);
+    virtual void setHeight(const size_t height);
+    virtual void setWidth(const size_t width);
+    virtual void setShape(const size_t height, const size_t width);
 
   protected:
+    /**
+     * @brief Constructor
+     */
+    FFT2DAbstract();
+
+    /**
+     * @brief Constructor
+     */
+    FFT2DAbstract(const size_t height, const size_t width);
+
+    /**
+     * @brief Copy constructor
+     */
+    FFT2DAbstract(const FFT2DAbstract& other);
+
     /**
      * @brief process an array assuming that all the 'check' are done
      */
@@ -112,34 +118,40 @@ class FFT2DNumpyAbstract
  * @brief This class implements a direct 2D Discrete Fourier Transform using
  * a FFT1D implementation.
  */
-class FFT2DNumpy: public FFT2DNumpyAbstract
+class FFT2D: public FFT2DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    FFT2DNumpy(const size_t height, const size_t width);
+    FFT2D();
+
+    /**
+     * @brief Constructor
+     */ 
+    FFT2D(const size_t height, const size_t width);
 
     /**
      * @brief Copy constructor
      */
-    FFT2DNumpy(const FFT2DNumpy& other);
+    FFT2D(const FFT2D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~FFT2DNumpy();
+    virtual ~FFT2D();
 
     /**
      * @brief Assignment operator
      */
-    FFT2DNumpy& operator=(const FFT2DNumpy& other);
+    FFT2D& operator=(const FFT2D& other);
 
     /**
      * @brief Setters
      */
     void setHeight(const size_t height);
     void setWidth(const size_t width);
+    void setShape(const size_t height, const size_t width);
 
   private:
     /**
@@ -151,8 +163,8 @@ class FFT2DNumpy: public FFT2DNumpyAbstract
     /**
      * @brief FFT1D instances
      */
-    bob::sp::FFT1DNumpy m_fft_h;
-    bob::sp::FFT1DNumpy m_fft_w;
+    bob::sp::FFT1D m_fft_h;
+    bob::sp::FFT1D m_fft_w;
 };
 
 
@@ -160,34 +172,40 @@ class FFT2DNumpy: public FFT2DNumpyAbstract
  * @brief This class implements a inverse 2D Discrete Fourier Transform using
  * a FFT1D implementation.
  */
-class IFFT2DNumpy: public FFT2DNumpyAbstract
+class IFFT2D: public FFT2DAbstract
 {
   public:
     /**
      * @brief Constructor
      */ 
-    IFFT2DNumpy(const size_t height, const size_t width);
+    IFFT2D();
+
+    /**
+     * @brief Constructor
+     */ 
+    IFFT2D(const size_t height, const size_t width);
 
     /**
      * @brief Copy constructor
      */
-    IFFT2DNumpy(const IFFT2DNumpy& other);
+    IFFT2D(const IFFT2D& other);
 
     /**
      * @brief Destructor
      */
-    virtual ~IFFT2DNumpy();
+    virtual ~IFFT2D();
 
     /**
      * @brief Assignment operator
      */
-    IFFT2DNumpy& operator=(const IFFT2DNumpy& other);
+    IFFT2D& operator=(const IFFT2D& other);
 
     /**
      * @brief Setters
      */
     void setHeight(const size_t height);
     void setWidth(const size_t width);
+    void setShape(const size_t height, const size_t width);
 
   private:
     /**
@@ -199,8 +217,8 @@ class IFFT2DNumpy: public FFT2DNumpyAbstract
     /**
      * @brief IFFT1D instances
      */
-    bob::sp::IFFT1DNumpy m_ifft_h;
-    bob::sp::IFFT1DNumpy m_ifft_w;
+    bob::sp::IFFT1D m_ifft_h;
+    bob::sp::IFFT1D m_ifft_w;
 };
 
 /**
@@ -208,4 +226,4 @@ class IFFT2DNumpy: public FFT2DNumpyAbstract
  */
 }}
 
-#endif /* BOB_SP_FFT2DNUMPY_H */
+#endif /* BOB_SP_FFT2D_H */
