@@ -1,5 +1,5 @@
 /**
- * @file sp/python/dct_numpy.cc
+ * @file sp/python/dct.cc
  * @date Fri Nov 15 10:27:11 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
