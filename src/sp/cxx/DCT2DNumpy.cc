@@ -7,18 +7,6 @@
  * a 1D DCT implementation.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <bob/sp/DCT2DNumpy.h>
@@ -44,7 +32,7 @@ bob::sp::DCT2DNumpyAbstract::~DCT2DNumpyAbstract()
 {
 }
 
-bob::sp::DCT2DNumpyAbstract& 
+bob::sp::DCT2DNumpyAbstract&
 bob::sp::DCT2DNumpyAbstract::operator=(const DCT2DNumpyAbstract& other)
 {
   if (this != &other) {
@@ -67,7 +55,7 @@ bool bob::sp::DCT2DNumpyAbstract::operator!=(const bob::sp::DCT2DNumpyAbstract& 
   return !(this->operator==(b));
 }
 
-void bob::sp::DCT2DNumpyAbstract::operator()(const blitz::Array<double,2>& src, 
+void bob::sp::DCT2DNumpyAbstract::operator()(const blitz::Array<double,2>& src,
   blitz::Array<double,2>& dst) const
 {
   // Check input, inclusive dimension
@@ -98,7 +86,7 @@ void bob::sp::DCT2DNumpyAbstract::setWidth(const size_t width)
   m_buffer_h.resize(m_height);
   m_buffer_h2.resize(m_height);
 }
- 
+
 
 bob::sp::DCT2DNumpy::DCT2DNumpy(const size_t height, const size_t width):
   bob::sp::DCT2DNumpyAbstract::DCT2DNumpyAbstract(height, width),
@@ -118,7 +106,7 @@ bob::sp::DCT2DNumpy::~DCT2DNumpy()
 {
 }
 
-bob::sp::DCT2DNumpy& 
+bob::sp::DCT2DNumpy&
 bob::sp::DCT2DNumpy::operator=(const DCT2DNumpy& other)
 {
   if (this != &other) {
@@ -140,8 +128,8 @@ void bob::sp::DCT2DNumpy::setWidth(const size_t width)
   bob::sp::DCT2DNumpyAbstract::setWidth(width);
   m_dct_w.setLength(width);
 }
- 
-void bob::sp::DCT2DNumpy::processNoCheck(const blitz::Array<double,2>& src, 
+
+void bob::sp::DCT2DNumpy::processNoCheck(const blitz::Array<double,2>& src,
   blitz::Array<double,2>& dst) const
 {
   blitz::Range rall = blitz::Range::all();
@@ -178,7 +166,7 @@ bob::sp::IDCT2DNumpy::~IDCT2DNumpy()
 {
 }
 
-bob::sp::IDCT2DNumpy& 
+bob::sp::IDCT2DNumpy&
 bob::sp::IDCT2DNumpy::operator=(const IDCT2DNumpy& other)
 {
   if (this != &other) {
@@ -201,7 +189,7 @@ void bob::sp::IDCT2DNumpy::setWidth(const size_t width)
   m_idct_w.setLength(width);
 }
 
-void bob::sp::IDCT2DNumpy::processNoCheck(const blitz::Array<double,2>& src, 
+void bob::sp::IDCT2DNumpy::processNoCheck(const blitz::Array<double,2>& src,
   blitz::Array<double,2>& dst) const
 {
   blitz::Range rall = blitz::Range::all();

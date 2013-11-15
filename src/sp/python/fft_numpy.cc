@@ -7,18 +7,6 @@
  * Transform to python.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <bob/python/ndarray.h>
@@ -35,7 +23,7 @@ static const char* FFT1DNumpy_DOC = "Objects of this class, after configuration,
 static const char* IFFT1DNumpy_DOC = "Objects of this class, after configuration, can compute the inverse FFT of a 1D array/signal.";
 static const char* FFT2DNumpy_DOC = "Objects of this class, after configuration, can compute the direct FFT of a 2D array/signal.";
 static const char* IFFT2DNumpy_DOC = "Objects of this class, after configuration, can compute the inverse FFT of a 2D array/signal.";
- 
+
 // free methods documentation
 /*
 static const char* FFT_DOC = "Compute the direct FFT of a 1 or 2D array/signal of type complex128.";
@@ -46,7 +34,7 @@ static const char* IFFTSHIFT_DOC = "This method undo what fftshift() does. Accep
 */
 
 static void py_fft1d_c(bob::sp::FFT1DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<std::complex<double>,1> dst_ = dst.bz<std::complex<double>,1>();
   op(src.bz<std::complex<double>,1>(), dst_);
@@ -61,7 +49,7 @@ static object py_fft1d_p(bob::sp::FFT1DNumpy& op, bob::python::const_ndarray src
 }
 
 static void py_ifft1d_c(bob::sp::IFFT1DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<std::complex<double>,1> dst_ = dst.bz<std::complex<double>,1>();
   op(src.bz<std::complex<double>,1>(), dst_);
@@ -77,7 +65,7 @@ static object py_ifft1d_p(bob::sp::IFFT1DNumpy& op, bob::python::const_ndarray s
 
 
 static void py_fft2d_c(bob::sp::FFT2DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<std::complex<double>,2> dst_ = dst.bz<std::complex<double>,2>();
   op(src.bz<std::complex<double>,2>(), dst_);
@@ -85,7 +73,7 @@ static void py_fft2d_c(bob::sp::FFT2DNumpy& op, bob::python::const_ndarray src,
 
 static object py_fft2d_p(bob::sp::FFT2DNumpy& op, bob::python::const_ndarray src)
 {
-  bob::python::ndarray dst(bob::core::array::t_complex128, op.getHeight(), 
+  bob::python::ndarray dst(bob::core::array::t_complex128, op.getHeight(),
     op.getWidth());
   blitz::Array<std::complex<double>,2> dst_ = dst.bz<std::complex<double>,2>();
   op(src.bz<std::complex<double>,2>(), dst_);
@@ -93,7 +81,7 @@ static object py_fft2d_p(bob::sp::FFT2DNumpy& op, bob::python::const_ndarray src
 }
 
 static void py_ifft2d_c(bob::sp::IFFT2DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<std::complex<double>,2> dst_ = dst.bz<std::complex<double>,2>();
   op(src.bz<std::complex<double>,2>(), dst_);
@@ -101,7 +89,7 @@ static void py_ifft2d_c(bob::sp::IFFT2DNumpy& op, bob::python::const_ndarray src
 
 static object py_ifft2d_p(bob::sp::IFFT2DNumpy& op, bob::python::const_ndarray src)
 {
-  bob::python::ndarray dst(bob::core::array::t_complex128, op.getHeight(), 
+  bob::python::ndarray dst(bob::core::array::t_complex128, op.getHeight(),
     op.getWidth());
   blitz::Array<std::complex<double>,2> dst_ = dst.bz<std::complex<double>,2>();
   op(src.bz<std::complex<double>,2>(), dst_);
@@ -109,7 +97,7 @@ static object py_ifft2d_p(bob::sp::IFFT2DNumpy& op, bob::python::const_ndarray s
 }
 
 /*
-static object script_fft(bob::python::const_ndarray ar) 
+static object script_fft(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
@@ -135,7 +123,7 @@ static object script_fft(bob::python::const_ndarray ar)
   return res.self();
 }
 
-static object script_ifft(bob::python::const_ndarray ar) 
+static object script_ifft(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
@@ -161,7 +149,7 @@ static object script_ifft(bob::python::const_ndarray ar)
   return res.self();
 }
 
-static object script_fftshift(bob::python::const_ndarray ar) 
+static object script_fftshift(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
@@ -185,7 +173,7 @@ static object script_fftshift(bob::python::const_ndarray ar)
   return res.self();
 }
 
-static object script_ifftshift(bob::python::const_ndarray ar) 
+static object script_ifftshift(bob::python::const_ndarray ar)
 {
   typedef std::complex<double> dcplx;
   const bob::core::array::typeinfo& info = ar.type();
@@ -209,7 +197,7 @@ static object script_ifftshift(bob::python::const_ndarray ar)
   return res.self();
 }
 
-static void py_fftshift(bob::python::const_ndarray ar, bob::python::ndarray t) 
+static void py_fftshift(bob::python::const_ndarray ar, bob::python::ndarray t)
 {
   const bob::core::array::typeinfo& info = ar.type();
   switch (info.nd) {
@@ -232,7 +220,7 @@ static void py_fftshift(bob::python::const_ndarray ar, bob::python::ndarray t)
   }
 }
 
-static void py_ifftshift(bob::python::const_ndarray ar, bob::python::ndarray t) 
+static void py_ifftshift(bob::python::const_ndarray ar, bob::python::ndarray t)
 {
   const bob::core::array::typeinfo& info = ar.type();
   switch (info.nd) {
@@ -300,7 +288,7 @@ void bind_sp_fft_numpy()
       .def("__call__", &py_ifft2d_p, (arg("self"), arg("input")), "Compute the inverse FFT of the input 2D array/signal. The output is allocated and returned.")
     ;
 /*
-  // fft function-like 
+  // fft function-like
   def("fft", &script_fft, (arg("array")), FFT_DOC);
   def("ifft", &script_ifft, (arg("array")), IFFT_DOC);
 

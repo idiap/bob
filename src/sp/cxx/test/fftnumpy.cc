@@ -7,18 +7,6 @@
  * implementations.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #define BOOST_TEST_DYN_LINK
@@ -47,7 +35,7 @@ struct T {
 };
 
 
-void test_fct1D( const blitz::Array<double,1> t, double eps) 
+void test_fct1D( const blitz::Array<double,1> t, double eps)
 {
   // process using FCT
   blitz::Array<double,1> t_fct(t.extent(0)), t_dct(t.extent(0));
@@ -61,7 +49,7 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
   // Compare
   for (int i=0; i < t_fct.extent(0); ++i)
     BOOST_CHECK_SMALL( fabs(t_fct(i)-t_dct(i)), eps);
-  
+
   // process using inverse FCT
   blitz::Array<double,1> t_fct_ifct(t.extent(0));
   bob::sp::IDCT1DNumpy ifct(t.extent(0));
@@ -83,10 +71,10 @@ void test_fct1D( const blitz::Array<double,1> t, double eps)
     BOOST_CHECK_SMALL( fabs(t_dct_idct(i)-t(i)), eps);
 }
 
-void test_fct2D( const blitz::Array<double,2> t, double eps) 
+void test_fct2D( const blitz::Array<double,2> t, double eps)
 {
   // process using FCT
-  blitz::Array<double,2> t_fct(t.extent(0), t.extent(1)), 
+  blitz::Array<double,2> t_fct(t.extent(0), t.extent(1)),
     t_dct(t.extent(0), t.extent(1));
   bob::sp::DCT2DNumpy fct(t.extent(0), t.extent(1));
   fct(t, t_fct);
@@ -127,7 +115,7 @@ void test_fct2D( const blitz::Array<double,2> t, double eps)
 }
 
 
-void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps) 
+void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps)
 {
   // process using FFT
   blitz::Array<std::complex<double>,1> t_fft(t.extent(0)), t_dft(t.extent(0));
@@ -153,7 +141,7 @@ void test_fft1D( const blitz::Array<std::complex<double>,1> t, double eps)
     BOOST_CHECK_SMALL( abs(t_fft_ifft(i)-t(i)), eps);
 }
 
-void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps) 
+void test_fft2D( const blitz::Array<std::complex<double>,2> t, double eps)
 {
   // process using FFT
   blitz::Array<std::complex<double>,2> t_fft(t.extent(0), t.extent(1)),
@@ -280,7 +268,7 @@ BOOST_AUTO_TEST_CASE( test_fft1D_range1to2048_random )
     // size of the data
     int N = (rand() % 2048 + 1);//random.randint(1,2048)
 
-    // set up simple 1D random tensor 
+    // set up simple 1D random tensor
     blitz::Array<std::complex<double>,1> t(N);
     for (int i=0; i<N; ++i)
       t(i) = (rand()/(double)RAND_MAX)*10.;
@@ -315,7 +303,7 @@ BOOST_AUTO_TEST_CASE( test_fft2D_range1x1to64x64_random )
     int M = (rand() % 64 + 1);
     int N = (rand() % 64 + 1);
 
-    // set up simple 1D random tensor 
+    // set up simple 1D random tensor
     blitz::Array<std::complex<double>,2> t(M,N);
     for (int i=0; i < M; ++i)
       for (int j=0; j < N; ++j)

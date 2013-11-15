@@ -6,18 +6,6 @@
  * @brief Implement a naive 2D Fast Fourier Transform
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <bob/sp/FFT2DNumpy.h>
@@ -43,7 +31,7 @@ bob::sp::FFT2DNumpyAbstract::~FFT2DNumpyAbstract()
 {
 }
 
-bob::sp::FFT2DNumpyAbstract& 
+bob::sp::FFT2DNumpyAbstract&
 bob::sp::FFT2DNumpyAbstract::operator=(const FFT2DNumpyAbstract& other)
 {
   if (this != &other) {
@@ -66,7 +54,7 @@ bool bob::sp::FFT2DNumpyAbstract::operator!=(const bob::sp::FFT2DNumpyAbstract& 
   return !(this->operator==(b));
 }
 
-void bob::sp::FFT2DNumpyAbstract::operator()(const blitz::Array<std::complex<double>,2>& src, 
+void bob::sp::FFT2DNumpyAbstract::operator()(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst) const
 {
   // Check input, inclusive dimension
@@ -97,7 +85,7 @@ void bob::sp::FFT2DNumpyAbstract::setWidth(const size_t width)
   m_buffer_h.resize(m_height);
   m_buffer_h2.resize(m_height);
 }
- 
+
 
 bob::sp::FFT2DNumpy::FFT2DNumpy(const size_t height, const size_t width):
   bob::sp::FFT2DNumpyAbstract::FFT2DNumpyAbstract(height, width),
@@ -117,7 +105,7 @@ bob::sp::FFT2DNumpy::~FFT2DNumpy()
 {
 }
 
-bob::sp::FFT2DNumpy& 
+bob::sp::FFT2DNumpy&
 bob::sp::FFT2DNumpy::operator=(const FFT2DNumpy& other)
 {
   if (this != &other) {
@@ -139,8 +127,8 @@ void bob::sp::FFT2DNumpy::setWidth(const size_t width)
   bob::sp::FFT2DNumpyAbstract::setWidth(width);
   m_fft_w.setLength(width);
 }
- 
-void bob::sp::FFT2DNumpy::processNoCheck(const blitz::Array<std::complex<double>,2>& src, 
+
+void bob::sp::FFT2DNumpy::processNoCheck(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst) const
 {
   blitz::Range rall = blitz::Range::all();
@@ -177,7 +165,7 @@ bob::sp::IFFT2DNumpy::~IFFT2DNumpy()
 {
 }
 
-bob::sp::IFFT2DNumpy& 
+bob::sp::IFFT2DNumpy&
 bob::sp::IFFT2DNumpy::operator=(const IFFT2DNumpy& other)
 {
   if (this != &other) {
@@ -200,7 +188,7 @@ void bob::sp::IFFT2DNumpy::setWidth(const size_t width)
   m_ifft_w.setLength(width);
 }
 
-void bob::sp::IFFT2DNumpy::processNoCheck(const blitz::Array<std::complex<double>,2>& src, 
+void bob::sp::IFFT2DNumpy::processNoCheck(const blitz::Array<std::complex<double>,2>& src,
   blitz::Array<std::complex<double>,2>& dst) const
 {
   blitz::Range rall = blitz::Range::all();

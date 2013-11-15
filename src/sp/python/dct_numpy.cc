@@ -6,18 +6,6 @@
  * @brief Binds the (fast) Discrete Cosine Transform to python.
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <bob/python/ndarray.h>
@@ -40,7 +28,7 @@ static const char* IDCT_DOC = "Compute the inverse DCT of a 1 or 2D array/signal
 
 
 static void py_dct1d_c(bob::sp::DCT1DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<double,1> dst_ = dst.bz<double,1>();
   op(src.bz<double,1>(), dst_);
@@ -55,7 +43,7 @@ static object py_dct1d_p(bob::sp::DCT1DNumpy& op, bob::python::const_ndarray src
 }
 
 static void py_idct1d_c(bob::sp::IDCT1DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<double,1> dst_ = dst.bz<double,1>();
   op(src.bz<double,1>(), dst_);
@@ -71,7 +59,7 @@ static object py_idct1d_p(bob::sp::IDCT1DNumpy& op, bob::python::const_ndarray s
 
 
 static void py_dct2d_c(bob::sp::DCT2DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<double,2> dst_ = dst.bz<double,2>();
   op(src.bz<double,2>(), dst_);
@@ -79,7 +67,7 @@ static void py_dct2d_c(bob::sp::DCT2DNumpy& op, bob::python::const_ndarray src,
 
 static object py_dct2d_p(bob::sp::DCT2DNumpy& op, bob::python::const_ndarray src)
 {
-  bob::python::ndarray dst(bob::core::array::t_float64, op.getHeight(), 
+  bob::python::ndarray dst(bob::core::array::t_float64, op.getHeight(),
     op.getWidth());
   blitz::Array<double,2> dst_ = dst.bz<double,2>();
   op(src.bz<double,2>(), dst_);
@@ -87,7 +75,7 @@ static object py_dct2d_p(bob::sp::DCT2DNumpy& op, bob::python::const_ndarray src
 }
 
 static void py_idct2d_c(bob::sp::IDCT2DNumpy& op, bob::python::const_ndarray src,
-  bob::python::ndarray dst) 
+  bob::python::ndarray dst)
 {
   blitz::Array<double,2> dst_ = dst.bz<double,2>();
   op(src.bz<double,2>(), dst_);
@@ -95,7 +83,7 @@ static void py_idct2d_c(bob::sp::IDCT2DNumpy& op, bob::python::const_ndarray src
 
 static object py_idct2d_p(bob::sp::IDCT2DNumpy& op, bob::python::const_ndarray src)
 {
-  bob::python::ndarray dst(bob::core::array::t_float64, op.getHeight(), 
+  bob::python::ndarray dst(bob::core::array::t_float64, op.getHeight(),
     op.getWidth());
   blitz::Array<double,2> dst_ = dst.bz<double,2>();
   op(src.bz<double,2>(), dst_);
@@ -103,7 +91,7 @@ static object py_idct2d_p(bob::sp::IDCT2DNumpy& op, bob::python::const_ndarray s
 }
 
 
-static object script_dct(bob::python::const_ndarray ar) 
+static object script_dct(bob::python::const_ndarray ar)
 {
   const bob::core::array::typeinfo& info = ar.type();
   bob::python::ndarray res(info);

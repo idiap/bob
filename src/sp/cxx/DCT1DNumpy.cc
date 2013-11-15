@@ -6,18 +6,6 @@
  * @brief 1D Discrete Cosine Transform using a 1D FFT
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <bob/sp/DCT1DNumpy.h>
@@ -46,7 +34,7 @@ bob::sp::DCT1DNumpyAbstract::~DCT1DNumpyAbstract()
 {
 }
 
-bob::sp::DCT1DNumpyAbstract& 
+bob::sp::DCT1DNumpyAbstract&
 bob::sp::DCT1DNumpyAbstract::operator=(const DCT1DNumpyAbstract& other)
 {
   if (this != &other) {
@@ -68,7 +56,7 @@ bool bob::sp::DCT1DNumpyAbstract::operator!=(const bob::sp::DCT1DNumpyAbstract& 
   return !(this->operator==(b));
 }
 
-void bob::sp::DCT1DNumpyAbstract::operator()(const blitz::Array<double,1>& src, 
+void bob::sp::DCT1DNumpyAbstract::operator()(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst) const
 {
   // Check input, inclusive dimension
@@ -122,7 +110,7 @@ bob::sp::DCT1DNumpy::~DCT1DNumpy()
 {
 }
 
-bob::sp::DCT1DNumpy& 
+bob::sp::DCT1DNumpy&
 bob::sp::DCT1DNumpy::operator=(const DCT1DNumpy& other)
 {
   if (this != &other) {
@@ -141,8 +129,8 @@ void bob::sp::DCT1DNumpy::setLength(const size_t length)
   m_buffer_1.resize(2*length);
   m_buffer_2.resize(2*length);
 }
-  
-void bob::sp::DCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src, 
+
+void bob::sp::DCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst) const
 {
   blitz::Range r1 = blitz::Range(0,m_length-1);
@@ -200,7 +188,7 @@ bob::sp::IDCT1DNumpy::~IDCT1DNumpy()
 {
 }
 
-bob::sp::IDCT1DNumpy& 
+bob::sp::IDCT1DNumpy&
 bob::sp::IDCT1DNumpy::operator=(const IDCT1DNumpy& other)
 {
   if (this != &other) {
@@ -220,8 +208,8 @@ void bob::sp::IDCT1DNumpy::setLength(const size_t length)
   m_buffer_1.resize(length);
   m_buffer_2.resize(length);
 }
-  
-void bob::sp::IDCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src, 
+
+void bob::sp::IDCT1DNumpy::processNoCheck(const blitz::Array<double,1>& src,
   blitz::Array<double,1>& dst) const
 {
   // Compute the DCT

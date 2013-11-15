@@ -6,18 +6,6 @@
  * @brief Implement a naive 1D Fast Fourier Transform
  *
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3 of the License.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <bob/sp/FFT1DNumpy.h>
@@ -41,7 +29,7 @@ bob::sp::FFT1DNumpyAbstract::~FFT1DNumpyAbstract()
 {
 }
 
-bob::sp::FFT1DNumpyAbstract& 
+bob::sp::FFT1DNumpyAbstract&
 bob::sp::FFT1DNumpyAbstract::operator=(const FFT1DNumpyAbstract& other)
 {
   if (this != &other) {
@@ -62,7 +50,7 @@ bool bob::sp::FFT1DNumpyAbstract::operator!=(const bob::sp::FFT1DNumpyAbstract& 
   return !(this->operator==(b));
 }
 
-void bob::sp::FFT1DNumpyAbstract::operator()(const blitz::Array<std::complex<double>,1>& src, 
+void bob::sp::FFT1DNumpyAbstract::operator()(const blitz::Array<std::complex<double>,1>& src,
   blitz::Array<std::complex<double>,1>& dst) const
 {
   // Check input, inclusive dimension
@@ -91,7 +79,7 @@ void bob::sp::FFT1DNumpyAbstract::initWorkingArray()
   double *wsave_ptr = m_wsave.data();
   cffti((int)m_length, wsave_ptr);
 }
-  
+
 
 bob::sp::FFT1DNumpy::FFT1DNumpy(const size_t length):
   bob::sp::FFT1DNumpyAbstract(length)
@@ -107,7 +95,7 @@ bob::sp::FFT1DNumpy::~FFT1DNumpy()
 {
 }
 
-bob::sp::FFT1DNumpy& 
+bob::sp::FFT1DNumpy&
 bob::sp::FFT1DNumpy::operator=(const FFT1DNumpy& other)
 {
   if (this != &other) {
@@ -120,8 +108,8 @@ void bob::sp::FFT1DNumpy::setLength(const size_t length)
 {
   bob::sp::FFT1DNumpyAbstract::setLength(length);
 }
-  
-void bob::sp::FFT1DNumpy::processNoCheck(const blitz::Array<std::complex<double>,1>& src, 
+
+void bob::sp::FFT1DNumpy::processNoCheck(const blitz::Array<std::complex<double>,1>& src,
   blitz::Array<std::complex<double>,1>& dst) const
 {
   // Compute the FFT
@@ -150,7 +138,7 @@ bob::sp::IFFT1DNumpy::~IFFT1DNumpy()
 {
 }
 
-bob::sp::IFFT1DNumpy& 
+bob::sp::IFFT1DNumpy&
 bob::sp::IFFT1DNumpy::operator=(const IFFT1DNumpy& other)
 {
   if (this != &other) {
@@ -164,8 +152,8 @@ void bob::sp::IFFT1DNumpy::setLength(const size_t length)
 {
   bob::sp::FFT1DNumpyAbstract::setLength(length);
 }
-  
-void bob::sp::IFFT1DNumpy::processNoCheck(const blitz::Array<std::complex<double>,1>& src, 
+
+void bob::sp::IFFT1DNumpy::processNoCheck(const blitz::Array<std::complex<double>,1>& src,
   blitz::Array<std::complex<double>,1>& dst) const
 {
   // Compute the FFT
