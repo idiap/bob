@@ -13,7 +13,8 @@
 #include <bob/core/assert.h>
 
 bob::sp::DCT2DAbstract::DCT2DAbstract():
-  bob::sp::DCT2DAbstract::DCT2DAbstract(1, 1)
+  m_height(1), m_width(1),
+  m_buffer_hw(1,1), m_buffer_h(1), m_buffer_h2(1)
 {
 }
 
@@ -113,12 +114,14 @@ void bob::sp::DCT2DAbstract::setShape(const size_t height, const size_t width)
 
 
 bob::sp::DCT2D::DCT2D():
-  bob::sp::DCT2D::DCT2D(1, 1)
+  bob::sp::DCT2DAbstract(1,1),
+  m_dct_h(1),
+  m_dct_w(1)
 {
 }
 
 bob::sp::DCT2D::DCT2D(const size_t height, const size_t width):
-  bob::sp::DCT2DAbstract::DCT2DAbstract(height, width),
+  bob::sp::DCT2DAbstract(height, width),
   m_dct_h(height),
   m_dct_w(width)
 {
@@ -185,12 +188,14 @@ void bob::sp::DCT2D::processNoCheck(const blitz::Array<double,2>& src,
 
 
 bob::sp::IDCT2D::IDCT2D():
-  bob::sp::IDCT2D::IDCT2D(1, 1)
+  bob::sp::DCT2DAbstract(1,1),
+  m_idct_h(1),
+  m_idct_w(1)
 {
 }
 
 bob::sp::IDCT2D::IDCT2D(const size_t height, const size_t width):
-  bob::sp::DCT2DAbstract::DCT2DAbstract(height, width),
+  bob::sp::DCT2DAbstract(height, width),
   m_idct_h(height),
   m_idct_w(width)
 {

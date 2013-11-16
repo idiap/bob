@@ -13,8 +13,9 @@
 #include <bob/core/array_copy.h>
 
 bob::sp::FFT1DAbstract::FFT1DAbstract():
-  bob::sp::FFT1DAbstract::FFT1DAbstract(1)
+  m_length(1), m_wsave(4*1+15), m_buffer(2)
 {
+  initWorkingArray();
 }
 
 bob::sp::FFT1DAbstract::FFT1DAbstract(const size_t length):
@@ -27,7 +28,8 @@ bob::sp::FFT1DAbstract::FFT1DAbstract(const size_t length):
 
 bob::sp::FFT1DAbstract::FFT1DAbstract(
     const bob::sp::FFT1DAbstract& other):
-  m_length(other.m_length), m_wsave(other.m_wsave.shape()), m_buffer(2*other.m_length)
+  m_length(other.m_length), m_wsave(other.m_wsave.shape()),
+  m_buffer(2*other.m_length)
 {
   m_wsave = bob::core::array::ccopy(other.m_wsave);
 }
@@ -92,7 +94,7 @@ void bob::sp::FFT1DAbstract::initWorkingArray()
 
 
 bob::sp::FFT1D::FFT1D():
-  bob::sp::FFT1D(1)
+  bob::sp::FFT1DAbstract(1)
 {
 }
 
@@ -140,7 +142,7 @@ void bob::sp::FFT1D::processNoCheck(const blitz::Array<std::complex<double>,1>& 
 
 
 bob::sp::IFFT1D::IFFT1D():
-  bob::sp::IFFT1D(1)
+  bob::sp::FFT1DAbstract(1)
 {
 }
 

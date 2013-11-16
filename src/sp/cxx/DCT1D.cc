@@ -16,8 +16,9 @@
 #include <boost/math/constants/constants.hpp>
 
 bob::sp::DCT1DAbstract::DCT1DAbstract():
-  bob::sp::DCT1DAbstract::DCT1DAbstract(1)
+  m_length(1), m_working_array(1)
 {
+  initNormFactors();
 }
 
 bob::sp::DCT1DAbstract::DCT1DAbstract(const size_t length):
@@ -98,8 +99,10 @@ void bob::sp::DCT1DAbstract::initNormFactors()
 
 
 bob::sp::DCT1D::DCT1D():
-  bob::sp::DCT1D(1)
+  bob::sp::DCT1DAbstract(1),
+  m_fft(2), m_buffer_1(2), m_buffer_2(2)
 {
+  initWorkingArray();
 }
 
 bob::sp::DCT1D::DCT1D(const size_t length):
@@ -181,8 +184,10 @@ void bob::sp::DCT1D::initWorkingArray()
 
 
 bob::sp::IDCT1D::IDCT1D():
-  bob::sp::IDCT1D(1)
+  bob::sp::DCT1DAbstract(1),
+  m_ifft(1), m_buffer_1(1), m_buffer_2(1)
 {
+  initWorkingArray();
 }
 
 bob::sp::IDCT1D::IDCT1D(const size_t length):

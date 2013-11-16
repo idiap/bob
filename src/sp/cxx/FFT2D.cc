@@ -12,7 +12,8 @@
 #include <bob/core/assert.h>
 
 bob::sp::FFT2DAbstract::FFT2DAbstract():
-  bob::sp::FFT2DAbstract::FFT2DAbstract(1,1)
+  m_height(1), m_width(1),
+  m_buffer_hw(1,1), m_buffer_h(1), m_buffer_h2(1)
 {
 }
 
@@ -112,12 +113,13 @@ void bob::sp::FFT2DAbstract::setShape(const size_t height, const size_t width)
 
 
 bob::sp::FFT2D::FFT2D():
-  bob::sp::FFT2D::FFT2D(1, 1)
+  bob::sp::FFT2DAbstract(1,1),
+  m_fft_h(1), m_fft_w(1)
 {
 }
 
 bob::sp::FFT2D::FFT2D(const size_t height, const size_t width):
-  bob::sp::FFT2DAbstract::FFT2DAbstract(height, width),
+  bob::sp::FFT2DAbstract(height, width),
   m_fft_h(height),
   m_fft_w(width)
 {
@@ -184,12 +186,13 @@ void bob::sp::FFT2D::processNoCheck(const blitz::Array<std::complex<double>,2>& 
 
 
 bob::sp::IFFT2D::IFFT2D():
-  bob::sp::IFFT2D::IFFT2D(1, 1)
+  bob::sp::FFT2DAbstract(1,1),
+  m_ifft_h(1), m_ifft_w(1)
 {
 }
 
 bob::sp::IFFT2D::IFFT2D(const size_t height, const size_t width):
-  bob::sp::FFT2DAbstract::FFT2DAbstract(height, width),
+  bob::sp::FFT2DAbstract(height, width),
   m_ifft_h(height),
   m_ifft_w(width)
 {
