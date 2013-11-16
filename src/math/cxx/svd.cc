@@ -40,7 +40,7 @@ static void svd_lapack( const char jobz, const int M, const int N,
     // A/ Queries the optimal size of the working array
     const int lwork_query = -1;
     double work_query;
-    dgesvd_( &jobz, &jobz, &N, &M, A, &lda, S, U, &ldu,
+    dgesvd_( &jobz, &jobz, &M, &N, A, &lda, S, U, &ldu,
       VT, &ldvt, &work_query, &lwork_query, &info );
     // Check info variable
     if (info != 0)
@@ -49,7 +49,7 @@ static void svd_lapack( const char jobz, const int M, const int N,
     // B/ Computes
     const int lwork = static_cast<int>(work_query);
     boost::shared_array<double> work(new double[lwork]);
-    dgesvd_( &jobz, &jobz, &N, &M, A, &lda, S, U, &ldu,
+    dgesvd_( &jobz, &jobz, &M, &N, A, &lda, S, U, &ldu,
       VT, &ldvt, work.get(), &lwork, &info );
     // Check info variable
     if (info != 0)
@@ -63,7 +63,7 @@ static void svd_lapack( const char jobz, const int M, const int N,
     // A/ Queries the optimal size of the working array
     const int lwork_query = -1;
     double work_query;
-    dgesdd_( &jobz, &N, &M, A, &lda, S, U, &ldu,
+    dgesdd_( &jobz, &M, &N, A, &lda, S, U, &ldu,
       VT, &ldvt, &work_query, &lwork_query, iwork.get(), &info );
     // Check info variable
     if (info != 0)
@@ -72,7 +72,7 @@ static void svd_lapack( const char jobz, const int M, const int N,
     // B/ Computes
     const int lwork = static_cast<int>(work_query);
     boost::shared_array<double> work(new double[lwork]);
-    dgesdd_( &jobz, &N, &M, A, &lda, S, U, &ldu,
+    dgesdd_( &jobz, &M, &N, A, &lda, S, U, &ldu,
       VT, &ldvt, work.get(), &lwork, iwork.get(), &info );
     // Check info variable
     if (info != 0)
@@ -212,7 +212,7 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,2>& U,
   boost::shared_array<double> VT_lapack(new double[nb_singular*N]);
 
   // Call the LAPACK function
-  svd_lapack(jobz, N, M, A_lapack, lda, S_lapack, U_lapack, ldu,
+  svd_lapack(jobz, M, N, A_lapack, lda, S_lapack, U_lapack, ldu,
     VT_lapack.get(), ldvt, safe);
 
   // Copy singular vectors back to U, V and sigma if required
@@ -267,7 +267,7 @@ void bob::math::svd_(const blitz::Array<double,2>& A, blitz::Array<double,1>& si
   double *VT_lapack = 0;
 
   // Call the LAPACK function
-  svd_lapack(jobz, N, M, A_lapack, lda, S_lapack, U_lapack, ldu,
+  svd_lapack(jobz, M, N, A_lapack, lda, S_lapack, U_lapack, ldu,
     VT_lapack, ldvt, safe);
 
   // Copy singular vectors back to U, V and sigma if required
