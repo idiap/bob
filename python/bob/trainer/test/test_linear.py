@@ -51,6 +51,13 @@ def test_pca_versus_matlab_princomp():
   assert numpy.allclose(abs(machine_svd.weights/eig_vec_correct), 1.0)
   assert numpy.allclose(eig_vals_svd, eig_val_correct)
   assert machine_svd.weights.shape == (2,2)
+
+  T.safe_svd = True
+  machine_safe_svd, eig_vals_safe_svd = T.train(data)
+
+  assert numpy.allclose(abs(machine_safe_svd.weights/eig_vec_correct), 1.0)
+  assert numpy.allclose(eig_vals_safe_svd, eig_val_correct)
+  assert machine_safe_svd.weights.shape == (2,2)
  
   T.use_svd = False #make it use the covariance method
   machine_cov, eig_vals_cov = T.train(data)
@@ -79,6 +86,11 @@ def test_pca_versus_matlab_princomp_2():
   assert numpy.allclose(eig_vals_svd, eig_val_correct)
   assert machine_svd.weights.shape == (5,3)
 
+  machine_safe_svd, eig_vals_safe_svd = T.train(data)
+  
+  assert numpy.allclose(eig_vals_safe_svd, eig_val_correct)
+  assert machine_safe_svd.weights.shape == (5,3)
+
   T.use_svd = False #make it use the covariance method
   machine_cov, eig_vals_cov = T.train(data)
 
@@ -105,6 +117,14 @@ def test_pca_trainer_comparisons():
   assert t5.is_similar_to(t6)
   assert t5 != t1
 
+  t7 = PCATrainer(t1)
+  assert t1 == t7
+  t7.safe_svd = True
+  assert t1 != t7
+  t7.safe_svd = False
+  assert t1 == t7
+  
+
 def test_pca_svd_vs_cov_random_1():
 
   # Tests our SVD/PCA extractor.
@@ -113,6 +133,8 @@ def test_pca_svd_vs_cov_random_1():
   # Train method 1
   T = PCATrainer()
   machine_svd, eig_vals_svd = T.train(data)
+  T.safe_svd = True
+  machine_safe_svd, eig_vals_safe_svd = T.train(data)
   T.use_svd = False #make it use the covariance method
   machine_cov, eig_vals_cov = T.train(data)
   
@@ -122,6 +144,12 @@ def test_pca_svd_vs_cov_random_1():
   assert numpy.allclose(machine_svd.input_divide, machine_cov.input_divide)
   assert numpy.allclose(abs(machine_svd.weights/machine_cov.weights), 1.0)
 
+  assert numpy.allclose(eig_vals_svd, eig_vals_safe_svd)
+  assert numpy.allclose(machine_svd.input_subtract, machine_safe_svd.input_subtract)
+  assert numpy.allclose(machine_svd.input_divide, machine_safe_svd.input_divide)
+  assert numpy.allclose(abs(machine_svd.weights/machine_safe_svd.weights), 1.0)
+
+
 def test_pca_svd_vs_cov_random_2():
 
   # Tests our SVD/PCA extractor.
@@ -130,6 +158,8 @@ def test_pca_svd_vs_cov_random_2():
   # Train method 1
   T = PCATrainer()
   machine_svd, eig_vals_svd = T.train(data)
+  T.safe_svd = True
+  machine_safe_svd, eig_vals_safe_svd = T.train(data)
   T.use_svd = False #make it use the covariance method
   machine_cov, eig_vals_cov = T.train(data)
   
@@ -138,6 +168,12 @@ def test_pca_svd_vs_cov_random_2():
   assert numpy.allclose(machine_svd.input_subtract, machine_cov.input_subtract)
   assert numpy.allclose(machine_svd.input_divide, machine_cov.input_divide)
   assert numpy.allclose(abs(machine_svd.weights/machine_cov.weights), 1.0)
+
+  assert numpy.allclose(eig_vals_svd, eig_vals_safe_svd)
+  assert numpy.allclose(machine_svd.input_subtract, machine_safe_svd.input_subtract)
+  assert numpy.allclose(machine_svd.input_divide, machine_safe_svd.input_divide)
+  assert numpy.allclose(abs(machine_svd.weights/machine_safe_svd.weights), 1.0)
+
 
 def test_fisher_lda_settings():
 

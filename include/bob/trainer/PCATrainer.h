@@ -89,6 +89,22 @@ namespace bob { namespace trainer {
       void setUseSVD (bool value) { m_use_svd = value; }
 
       /**
+       * @brief Gets the SVD LAPACK function used. <code>true</code> means
+       * use the LAPACK DGESVD method and false the DGESDD method.
+       * To be useful, the SVD method should be used by enabling the UseSVD 
+       * flag. 
+       */
+      bool getSafeSVD () const { return m_safe_svd; }
+
+      /**
+       * @brief Sets the SVD LAPACK function used. <code>true</code> means
+       * use the LAPACK DGESVD method and false the DGESDD method..
+       * To be useful, the SVD method should be used by enabling the UseSVD
+       * flag. 
+       */
+      void setSafeSVD (bool value) { m_safe_svd = value; }
+
+      /**
        * @brief Similar to
        */
       bool is_similar_to(const PCATrainer& other,
@@ -126,6 +142,8 @@ namespace bob { namespace trainer {
     private: //representation
 
       bool m_use_svd; ///< if this trainer should be using SVD or Covariance
+      bool m_safe_svd; ///< if svd is set, tells which LAPACK function to use
+                       ///  among dgesdd (false) and dgesvd (true)
 
   };
 

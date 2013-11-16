@@ -20,12 +20,12 @@
 #include <bob/trainer/PCATrainer.h>
 
 bob::trainer::PCATrainer::PCATrainer(bool use_svd)
-  : m_use_svd(use_svd)
+  : m_use_svd(use_svd), m_safe_svd(false)
 {
 }
 
 bob::trainer::PCATrainer::PCATrainer(const bob::trainer::PCATrainer& other)
-  : m_use_svd(other.m_use_svd)
+  : m_use_svd(other.m_use_svd), m_safe_svd(other.m_safe_svd)
 {
 }
 
@@ -34,14 +34,18 @@ bob::trainer::PCATrainer::~PCATrainer() {}
 bob::trainer::PCATrainer& bob::trainer::PCATrainer::operator=
 (const bob::trainer::PCATrainer& other)
 {
-  m_use_svd = other.m_use_svd;
+  if (this != &other) {
+    m_use_svd = other.m_use_svd;
+    m_safe_svd = other.m_safe_svd;
+  }
   return *this;
 }
 
 bool bob::trainer::PCATrainer::operator==
   (const bob::trainer::PCATrainer& other) const
 {
-  return m_use_svd == other.m_use_svd;
+  return m_use_svd == other.m_use_svd && 
+    m_safe_svd == other.m_safe_svd;
 }
 
 bool bob::trainer::PCATrainer::operator!=
@@ -105,7 +109,7 @@ static void pca_via_svd(
     bob::machine::LinearMachine& machine,
     blitz::Array<double,1>& eigen_values, 
     const blitz::Array<double,2>& X,
-    int rank
+    int rank, bool safe_svd
     ) {
 
   // removes the empirical mean from the training data
@@ -131,7 +135,7 @@ static void pca_via_svd(
   const int rank_1 = (rank == (int)X.extent(1))? X.extent(1) : X.extent(0);
   blitz::Array<double,2> U(X.extent(1), rank_1);
   blitz::Array<double,1> sigma(rank_1);
-  bob::math::svd_(data, U, sigma);
+  bob::math::svd_(data, U, sigma, safe_svd);
 
   /**
    * sets the linear machine with the results:
@@ -175,7 +179,7 @@ void bob::trainer::PCATrainer::train(bob::machine::LinearMachine& machine,
     throw std::runtime_error(m.str());
   }
 
-  if (m_use_svd) pca_via_svd(machine, eigen_values, X, rank);
+  if (m_use_svd) pca_via_svd(machine, eigen_values, X, rank, m_safe_svd);
   else pca_via_covmat(machine, eigen_values, X, rank);
 }
 

@@ -169,6 +169,10 @@ void bind_trainer_pca() {
     .add_property("use_svd", &bob::trainer::PCATrainer::getUseSVD,
         &bob::trainer::PCATrainer::setUseSVD,
         "This flag determines if this trainer will use the SVD method (set it to ``True``) to calculate the principal components or the Covariance method (set it to ``False``)")
+
+    .add_property("safe_svd", &bob::trainer::PCATrainer::getSafeSVD,
+        &bob::trainer::PCATrainer::setSafeSVD,
+        "If the use_svd flag is enabled, this flag will indicates which LAPACK svd function to use (dgesvd if set to true, dgesdd otherwise).")
     ;
 
 }
