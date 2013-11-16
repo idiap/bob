@@ -323,14 +323,14 @@ your shell prompt (for using Python 2.7 as the default interpreter):
 
 .. code-block:: sh
 
-  $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio jpeg netpbm libpng tiff giflib py27-ipython py27-matplotlib +webagg google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas vlfeat libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-pillow py27-setuptools
+  $ sudo port install cmake blitz ffmpeg python27 python_select py27-numpy -atlas matio jpeg netpbm libpng tiff giflib py27-ipython py27-matplotlib google-perftools doxygen py27-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 qt4-mac boost +python27 py27-scipy +no_atlas vlfeat libsvm +python27 +tools dvipng py27-sqlalchemy py27-nose py27-pillow py27-setuptools
   $ # go for a long coffee
 
 **Or**, for Python 2.6 as the default interpreter:
 
 .. code-block:: sh
 
-  $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio jpeg netpbm libpng tiff giflib py26-ipython py26-matplotlib +webagg google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas vlfeat libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-pillow py26-setuptools
+  $ sudo port install cmake blitz ffmpeg python26 python_select py26-numpy -atlas matio jpeg netpbm libpng tiff giflib py26-ipython py26-matplotlib google-perftools doxygen py26-sphinx texlive-latex-extra texlive-fonts-recommended hdf5-18 py26-argparse qt4-mac boost +python26 py26-scipy +no_atlas vlfeat libsvm +python26 +tools dvipng py26-sqlalchemy py26-nose py26-pillow py26-setuptools
 
 .. note::
 
