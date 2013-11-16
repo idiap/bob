@@ -106,6 +106,36 @@ BOOST_AUTO_TEST_CASE( test_svd_3x3 )
   bob::math::svd(A33_1, S);
   checkBlitzClose(S3_1, S, eps);
 }
+
+BOOST_AUTO_TEST_CASE( test_svd_safe_3x3 )
+{
+  blitz::Array<double,2> U(3,3);
+  blitz::Array<double,1> S(3);
+  blitz::Array<double,2> Vt(3,3);
+
+  // Full SVD function
+  bob::math::svd(A33_1, U, S, Vt, true);
+  checkBlitzClose(S3_1, S, eps);
+
+  // Check that A33_1 == U*S*V'
+  // Note that the singular vectors are not unique
+  blitz::Array<double,2> US(3,3);
+  blitz::Array<double,2> USVt(3,3);
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  US = U(i,j) * S(j);
+  bob::math::prod(US, Vt, USVt);
+  checkBlitzClose(A33_1, USVt, eps);
+
+  // Economic SVD function 
+  bob::math::svd(A33_1, U, S, true);
+  checkBlitzClose(S3_1, S, eps);
+
+  // Economic SVD function bis 
+  bob::math::svd(A33_1, S, true);
+  checkBlitzClose(S3_1, S, eps);
+}
+
   
 BOOST_AUTO_TEST_CASE( test_svd_2x4 )
 {
@@ -133,6 +163,35 @@ BOOST_AUTO_TEST_CASE( test_svd_2x4 )
 
   // Economic SVD function bis 
   bob::math::svd(A24_1, S);
+  checkBlitzClose(S2_1, S, eps);
+}
+
+BOOST_AUTO_TEST_CASE( test_svd_safe_2x4 )
+{
+  blitz::Array<double,2> U(2,2);
+  blitz::Array<double,1> S(2);
+  blitz::Array<double,2> Vt(4,4);
+
+  // Full SVD function
+  bob::math::svd(A24_1, U, S, Vt, true);
+  checkBlitzClose(S2_1, S, eps);
+  // Check that A24_1 == U*S*V'
+  // Note that the singular vectors are not unique
+  blitz::Array<double,2> US(2,4);
+  blitz::Array<double,2> USVt(2,4);
+  blitz::firstIndex i;
+  blitz::secondIndex j;
+  US = 0.;
+  US(blitz::Range::all(), blitz::Range(0,1)) = U(i,j) * S(j);
+  bob::math::prod(US, Vt, USVt);
+  checkBlitzClose(A24_1, USVt, eps);
+
+  // Economic SVD function 
+  bob::math::svd(A24_1, U, S, true);
+  checkBlitzClose(S2_1, S, eps);
+
+  // Economic SVD function bis 
+  bob::math::svd(A24_1, S, true);
   checkBlitzClose(S2_1, S, eps);
 }
 
