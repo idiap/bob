@@ -68,7 +68,8 @@ static int predict_class_and_scores_(const bob::machine::SupportVector& m,
 
 static tuple predict_class_and_scores2(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input) {
-  bob::python::ndarray scores(bob::core::array::t_float64, m.outputSize());
+  size_t size = m.outputSize() < 2 ? 1 : (m.outputSize()*(m.outputSize()-1))/2;
+  bob::python::ndarray scores(bob::core::array::t_float64, size);
   blitz::Array<double,1> scores_ = scores.bz<double,1>();
   int c = m.predictClassAndScores(input.bz<double,1>(), scores_);
   return make_tuple(c, scores.self());
@@ -80,11 +81,12 @@ static object predict_class_and_scores_n(const bob::machine::SupportVector& m,
   if ((size_t)i_.extent(1) < m.inputSize()) {
     PYTHON_ERROR(RuntimeError, "Input array should have **at least** " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
+  size_t size = m.outputSize() < 2 ? 1 : (m.outputSize()*(m.outputSize()-1))/2;
   blitz::Range all = blitz::Range::all();
   list classes, scores;
   for (int k=0; k<i_.extent(0); ++k) {
     blitz::Array<double,1> tmp = i_(k,all);
-    bob::python::ndarray s(bob::core::array::t_float64, m.outputSize());
+    bob::python::ndarray s(bob::core::array::t_float64, size);
     blitz::Array<double,1> s_ = s.bz<double,1>();
     classes.append(m.predictClassAndScores_(tmp, s_));
     scores.append(s.self());
@@ -268,10 +270,10 @@ void bind_machine_svm() {
     .def("predict_class_", &predict_class_, (arg("self"), arg("input")), "Returns the predicted class given a certain input. Does not check the input data and is, therefore, a little bit faster.")
     .def("predict_classes", &predict_class_n, (arg("self"), arg("input")), "Returns the predicted class given a certain input. Checks the input data for size conformity. If the size is wrong, an exception is raised. This variant accepts as input a 2D array with samples arranged in lines. The array can have as many lines as you want, but the number of columns should match the expected machine input size.")
     .def("__call__", &svm_call, (arg("self"), arg("input")), "Returns the predicted class(es) given a certain input. Checks the input data for size conformity. If the size is wrong, an exception is raised. The input may be either a 1D or a 2D numpy ndarray object of double-precision floating-point numbers. If the array is 1D, a single answer is returned (the class of the input vector). If the array is 2D, then the number of columns in such array must match the input size. In this case, the SupportVector object will return 1 prediction for every row at the input array.")
-    .def("predict_class_and_scores", &predict_class_and_scores2, (arg("self"), arg("input")), "Returns the predicted class and output scores as a tuple, in this order. Checks the input and output arrays for size conformity. If the size is wrong, an exception is raised.")
-    .def("predict_class_and_scores", &predict_class_and_scores, (arg("self"), arg("input"), arg("scores")), "Returns the predicted class given a certain input. Returns the scores for each class in the second argument. Checks the input and output arrays for size conformity. If the size is wrong, an exception is raised.")
+    .def("predict_class_and_scores", &predict_class_and_scores2, (arg("self"), arg("input")), "Returns the predicted class and output scores as a tuple, in this order. Checks the input and output arrays for size conformity. In particular, the size of the output array should be, if ``o`` is the number of classes the machine can treat, :math:`o*(o-1)/2`. The order, as the ``libsvm`` README points out, is label[0] vs label[1], ..., label[0] vs. label[o-1], label[1] vs. label[2], ... label[o-2] vs label[o-1]. Note that when :math:`o = 1`, this function does not give any decision value. If the size is wrong, an exception is raised.")
+    .def("predict_class_and_scores", &predict_class_and_scores, (arg("self"), arg("input"), arg("scores")), "Returns the predicted class given a certain input. Returns the scores for each class in the second argument. Checks the input and output arrays for size conformity. In particular, the size of the output array should be, if ``o`` is the number of classes the machine can treat, :math:`o*(o-1)/2`. The order, as the ``libsvm`` README points out, is label[0] vs label[1], ..., label[0] vs. label[o-1], label[1] vs. label[2], ... label[o-2] vs label[o-1]. Note that when :math:`o = 1`, this function does not give any decision value. If the size is wrong, an exception is raised.")
     .def("predict_class_and_scores_", &predict_class_and_scores_, (arg("self"), arg("input"), arg("scores")), "Returns the predicted class given a certain input. Returns the scores for each class in the second argument. Checks the input and output arrays for size conformity. Does not check the input data and is, therefore, a little bit faster.")
-    .def("predict_classes_and_scores", &predict_class_and_scores_n, (arg("self"), arg("input")), "Returns the predicted class and output scores as a tuple, in this order. Checks the input array for size conformity. If the size is wrong, an exception is raised. This variant takes a single 2D double array as input. The samples should be organized row-wise.")
+    .def("predict_classes_and_scores", &predict_class_and_scores_n, (arg("self"), arg("input")), "Returns the predicted class and output scores as a tuple, in this order. Checks the input array for size conformity. In particular, the size of the output array should be, if ``o`` is the number of classes the machine can treat, :math:`o*(o-1)/2`. The order, as the ``libsvm`` README points out, is label[0] vs label[1], ..., label[0] vs. label[o-1], label[1] vs. label[2], ... label[o-2] vs label[o-1]. Note that when :math:`o = 1`, this function does not give any decision value. If the size is wrong, an exception is raised. This variant takes a single 2D double array as input. The samples should be organized row-wise.")
     .def("predict_class_and_probabilities", &predict_class_and_probs2, (arg("self"), arg("input")), "Returns the predicted class and probabilities in a tuple (on that order) given a certain input. The current machine has to support probabilities, otherwise an exception is raised. Checks the input array for size conformity. If the size is wrong, an exception is raised.")
     .def("predict_class_and_probabilities", &predict_class_and_probs, (arg("self"), arg("input"), arg("probabilities")), "Returns the predicted class given a certain input. If the model supports it, returns the probabilities for each class in the second argument, otherwise raises an exception. Checks the input and output arrays for size conformity. If the size is wrong, an exception is raised.")
     .def("predict_class_and_probabilities_", &predict_class_and_probs_, (arg("self"), arg("input"), arg("probabilities")), "Returns the predicted class given a certain input. This version will not run any checks, so you must be sure to pass the correct input to the classifier.")
