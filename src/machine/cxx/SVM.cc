@@ -36,7 +36,7 @@ bob::machine::SVMFile::SVMFile (const std::string& filename):
     s % filename;
     throw std::runtime_error(s.str());
   }
-  
+
   //scan the whole file, gets the shape and total size
   while (m_file.good()) {
     //gets the next non-empty line
@@ -54,7 +54,7 @@ bob::machine::SVMFile::SVMFile (const std::string& filename):
     char separator;
     double value;
     size_t n_values = std::count_if(line.begin(), line.end(), is_colon);
-  
+
     std::istringstream iss(line);
     iss >> label;
 
@@ -91,7 +91,7 @@ bool bob::machine::SVMFile::read(int& label, blitz::Array<double,1>& values) {
 }
 
 bool bob::machine::SVMFile::read_(int& label, blitz::Array<double,1>& values) {
-  
+
   //if the file is at the end, just raise, you should have checked
   if (!m_file.good()) return false;
 
@@ -135,7 +135,7 @@ blitz::Array<uint8_t,1> bob::machine::svm_pickle
 (const boost::shared_ptr<svm_model> model)
 {
   //use a re-entrant version of tmpnam...
-  char tmp_filename[L_tmpnam]; 
+  char tmp_filename[L_tmpnam];
   char* v = std::tmpnam(tmp_filename);
   if (!v) throw std::runtime_error("std::tmpnam() call failed - unique name cannot be generated");
 
@@ -149,25 +149,25 @@ blitz::Array<uint8_t,1> bob::machine::svm_pickle
   //gets total size of file
   struct stat filestatus;
   stat(tmp_filename, &filestatus);
- 
+
   //reload the data from the file in binary format
   std::ifstream binfile(tmp_filename, std::ios::binary);
   blitz::Array<uint8_t,1> buffer(filestatus.st_size);
   binfile.read(reinterpret_cast<char*>(buffer.data()), filestatus.st_size);
 
   //unlink the temporary file
-  boost::filesystem::remove(tmp_filename); 
+  boost::filesystem::remove(tmp_filename);
 
   //finally, return the pickled data
   return buffer;
 }
 
 static boost::shared_ptr<svm_model> make_model(const char* filename) {
-  boost::shared_ptr<svm_model> retval(svm_load_model(filename), 
+  boost::shared_ptr<svm_model> retval(svm_load_model(filename),
       std::ptr_fun(svm_model_free));
 #if LIBSVM_VERSION > 315
   if (retval) retval->sv_indices = 0; ///< force initialization: see ticket #109
-#endif 
+#endif
   return retval;
 }
 
@@ -195,7 +195,7 @@ boost::shared_ptr<svm_model> bob::machine::svm_unpickle
   }
 
   //unlinks the temporary file
-  boost::filesystem::remove(tmp_filename); 
+  boost::filesystem::remove(tmp_filename);
 
   //finally, return the pickled data
   return retval;
@@ -309,8 +309,8 @@ double bob::machine::SupportVector::coefficient0() const {
 }
 
 void bob::machine::SupportVector::setInputSubtraction(const blitz::Array<double,1>& v) {
-  if (inputSize() != (size_t)v.extent(0)) {
-    boost::format m("mismatch on the input subtraction dimension: expected a vector with %d positions, but you input %d");
+  if (inputSize() > (size_t)v.extent(0)) {
+    boost::format m("mismatch on the input subtraction dimension: expected a vector with **at least** %d positions, but you input %d");
     m % inputSize() % v.extent(0);
     throw std::runtime_error(m.str());
   }
@@ -318,8 +318,8 @@ void bob::machine::SupportVector::setInputSubtraction(const blitz::Array<double,
 }
 
 void bob::machine::SupportVector::setInputDivision(const blitz::Array<double,1>& v) {
-  if (inputSize() != (size_t)v.extent(0)) {
-    boost::format m("mismatch on the input division dimension: expected a vector with %d positions, but you input %d");
+  if (inputSize() > (size_t)v.extent(0)) {
+    boost::format m("mismatch on the input division dimension: expected a vector with **at least** %d positions, but you input %d");
     m % inputSize() % v.extent(0);
     throw std::runtime_error(m.str());
   }
@@ -331,12 +331,12 @@ void bob::machine::SupportVector::setInputDivision(const blitz::Array<double,1>&
  * at the same occasion.
  */
 static inline void copy(const blitz::Array<double,1>& input,
-    boost::shared_array<svm_node>& cache, const blitz::Array<double,1>& sub,
-    const blitz::Array<double,1>& div) {
+    size_t cache_size, boost::shared_array<svm_node>& cache,
+    const blitz::Array<double,1>& sub, const blitz::Array<double,1>& div) {
 
   size_t cur = 0; ///< currently used index
 
-  for (size_t k=0; k<(size_t)input.extent(0); ++k) {
+  for (size_t k=0; k<cache_size; ++k) {
     double tmp = (input(k) - sub(k))/div(k);
     if (!tmp) continue;
     cache[cur].index = k+1;
@@ -349,7 +349,7 @@ static inline void copy(const blitz::Array<double,1>& input,
 
 int bob::machine::SupportVector::predictClass_
 (const blitz::Array<double,1>& input) const {
-  copy(input, m_input_cache, m_input_sub, m_input_div);
+  copy(input, m_input_size, m_input_cache, m_input_sub, m_input_div);
   int retval = round(svm_predict(m_model.get(), m_input_cache.get()));
   return retval;
 }
@@ -357,19 +357,19 @@ int bob::machine::SupportVector::predictClass_
 int bob::machine::SupportVector::predictClass
 (const blitz::Array<double,1>& input) const {
 
-  if ((size_t)input.extent(0) != inputSize()) {
-    boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
+  if ((size_t)input.extent(0) < inputSize()) {
+    boost::format s("input for this SVM should have **at least** %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
     throw std::runtime_error(s.str());
   }
 
-  return predictClass_(input); 
+  return predictClass_(input);
 }
 
 int bob::machine::SupportVector::predictClassAndScores_
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& scores) const {
-  copy(input, m_input_cache, m_input_sub, m_input_div);
+  copy(input, m_input_size, m_input_cache, m_input_sub, m_input_div);
 #if LIBSVM_VERSION > 290
   int retval = round(svm_predict_values(m_model.get(), m_input_cache.get(), scores.data()));
 #else
@@ -382,9 +382,9 @@ int bob::machine::SupportVector::predictClassAndScores_
 int bob::machine::SupportVector::predictClassAndScores
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& scores) const {
-   
-  if ((size_t)input.extent(0) != inputSize()) {
-    boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
+
+  if ((size_t)input.extent(0) < inputSize()) {
+    boost::format s("input for this SVM should have **at least** %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
     throw std::runtime_error(s.str());
   }
@@ -405,7 +405,7 @@ int bob::machine::SupportVector::predictClassAndScores
 int bob::machine::SupportVector::predictClassAndProbabilities_
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& probabilities) const {
-  copy(input, m_input_cache, m_input_sub, m_input_div);
+  copy(input, m_input_size, m_input_cache, m_input_sub, m_input_div);
   int retval = round(svm_predict_probability(m_model.get(), m_input_cache.get(), probabilities.data()));
   return retval;
 }
@@ -413,9 +413,9 @@ int bob::machine::SupportVector::predictClassAndProbabilities_
 int bob::machine::SupportVector::predictClassAndProbabilities
 (const blitz::Array<double,1>& input,
  blitz::Array<double,1>& probabilities) const {
-   
-  if ((size_t)input.extent(0) != inputSize()) {
-    boost::format s("input for this SVM should have %d components, but you provided an array with %d elements instead");
+
+  if ((size_t)input.extent(0) < inputSize()) {
+    boost::format s("input for this SVM should have **at least** %d components, but you provided an array with %d elements instead");
     s % inputSize() % input.extent(0);
     throw std::runtime_error(s.str());
   }

@@ -66,7 +66,7 @@ expected_heart_predictions = (1, -1, -1, 1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1,
     1, 1, 1, 1, -1, -1, 1, 1, -1, -1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, 1,
     -1, 1, -1, -1, 1, 1, -1, -1, 1, 1, -1, 1, 1, 1, -1, 1, -1, -1, 1, -1, -1,
     1, -1, 1, 1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1,
-    -1, -1, -1, -1, -1, -1, 1) 
+    -1, -1, -1, -1, -1, -1, 1)
 
 expected_iris_predictions = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -176,7 +176,7 @@ class SvmTest(unittest.TestCase):
 
     #makes sure the first 3 examples are correctly read
     ex = []
-    ex.append(numpy.array([0.708333 , 1, 1, -0.320755 , -0.105023 , -1, 1, 
+    ex.append(numpy.array([0.708333 , 1, 1, -0.320755 , -0.105023 , -1, 1,
       -0.419847 ,-1, -0.225806 ,0. ,1, -1], 'float64'))
     ex.append(numpy.array([0.583333, -1, 0.333333, -0.603774, 1, -1, 1,
       0.358779, -1, -0.483871, 0., -1, 1], 'float64'))
@@ -222,7 +222,7 @@ class SvmTest(unittest.TestCase):
     #probabilities, the labels change, but notice the note bellow:
 
     # Note from the libSVM FAQ:
-    # Q: Why using the -b option does not give me better accuracy? 
+    # Q: Why using the -b option does not give me better accuracy?
     # There is absolutely no reason the probability outputs guarantee you
     # better accuracy. The main purpose of this option is to provide you the
     # probability estimates, but not to boost prediction accuracy. From our
@@ -231,7 +231,7 @@ class SvmTest(unittest.TestCase):
     # differences. It is not recommended to compare the two under just a fixed
     # parameter set as more differences will be observed.
     all_labels, real_labels, real_probs = load_expected(HEART_EXPECTED)
-    
+
     pred_labels, pred_probs = machine.predict_classes_and_probabilities(data)
     self.assertEqual(pred_labels, real_labels)
     self.assertTrue( numpy.all(abs(numpy.vstack(pred_probs) -
@@ -262,8 +262,23 @@ class SvmTest(unittest.TestCase):
     #probabilities, the labels change, but notice the note bellow:
 
     all_labels, real_labels, real_probs = load_expected(IRIS_EXPECTED)
-    
+
     pred_labels, pred_probs = machine.predict_classes_and_probabilities(data)
     self.assertEqual(pred_labels, real_labels)
     self.assertTrue( numpy.all(abs(numpy.vstack(pred_probs) -
       numpy.vstack(real_probs)) < 1e-6) )
+
+  @utils.libsvm_available
+  def test07_correctness_inputsize_exceeds(self):
+
+    #same test as above, but test for excess input
+    machine = bob.machine.SupportVector(IRIS_MACHINE)
+    labels, data = bob.machine.SVMFile(IRIS_DATA).read_all()
+    data = numpy.vstack(data)
+
+    # add extra columns to the input data
+    data = numpy.hstack([data, numpy.ones((data.shape[0], 2), dtype=float)])
+
+    pred_label = machine.predict_classes(data)
+
+    self.assertEqual(pred_label, expected_iris_predictions)
