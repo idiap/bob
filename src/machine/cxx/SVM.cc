@@ -405,9 +405,11 @@ int bob::machine::SupportVector::predictClassAndScores
     throw std::runtime_error("scores output array should be C-style contiguous and what you provided is not");
   }
 
-  if ((size_t)scores.extent(0) != outputSize()) {
-    boost::format s("output scores for this SVM should have %d components, but you provided an array with %d elements instead");
-    s % outputSize() % scores.extent(0);
+  size_t N = outputSize();
+  size_t size = N < 2 ? 1 : (N*(N-1))/2;
+  if ((size_t)scores.extent(0) != size) {
+    boost::format s("output scores for this SVM (%d classes) should have %d components, but you provided an array with %d elements instead");
+    s % svm_get_nr_class(m_model.get()) % size % scores.extent(0);
     throw std::runtime_error(s.str());
   }
 
