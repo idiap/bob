@@ -42,8 +42,8 @@ static object predict_class_(const bob::machine::SupportVector& m,
 static object predict_class_n(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
-  if ((size_t)i_.extent(1) != m.inputSize()) {
-    PYTHON_ERROR(RuntimeError, "Input array should have " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
+  if ((size_t)i_.extent(1) < m.inputSize()) {
+    PYTHON_ERROR(RuntimeError, "Input array should have **at least** " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   blitz::Range all = blitz::Range::all();
   list retval;
@@ -66,19 +66,19 @@ static object svm_call(const bob::machine::SupportVector& m,
   }
 }
 
-static int predict_class_and_scores(const bob::machine::SupportVector& m, 
+static int predict_class_and_scores(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input, bob::python::ndarray scores) {
   blitz::Array<double,1> scores_ = scores.bz<double,1>();
   return m.predictClassAndScores(input.bz<double,1>(), scores_);
 }
 
-static int predict_class_and_scores_(const bob::machine::SupportVector& m, 
+static int predict_class_and_scores_(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input, bob::python::ndarray scores) {
   blitz::Array<double,1> scores_ = scores.bz<double,1>();
   return m.predictClassAndScores_(input.bz<double,1>(), scores_);
 }
 
-static tuple predict_class_and_scores2(const bob::machine::SupportVector& m, 
+static tuple predict_class_and_scores2(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input) {
   bob::python::ndarray scores(bob::core::array::t_float64, m.outputSize());
   blitz::Array<double,1> scores_ = scores.bz<double,1>();
@@ -89,8 +89,8 @@ static tuple predict_class_and_scores2(const bob::machine::SupportVector& m,
 static object predict_class_and_scores_n(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
-  if ((size_t)i_.extent(1) != m.inputSize()) {
-    PYTHON_ERROR(RuntimeError, "Input array should have " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
+  if ((size_t)i_.extent(1) < m.inputSize()) {
+    PYTHON_ERROR(RuntimeError, "Input array should have **at least** " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   blitz::Range all = blitz::Range::all();
   list classes, scores;
@@ -104,19 +104,19 @@ static object predict_class_and_scores_n(const bob::machine::SupportVector& m,
   return make_tuple(tuple(classes), tuple(scores));
 }
 
-static int predict_class_and_probs(const bob::machine::SupportVector& m, 
+static int predict_class_and_probs(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input, bob::python::ndarray probs) {
   blitz::Array<double,1> probs_ = probs.bz<double,1>();
   return m.predictClassAndProbabilities(input.bz<double,1>(), probs_);
 }
 
-static int predict_class_and_probs_(const bob::machine::SupportVector& m, 
+static int predict_class_and_probs_(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input, bob::python::ndarray probs) {
   blitz::Array<double,1> probs_ = probs.bz<double,1>();
   return m.predictClassAndProbabilities_(input.bz<double,1>(), probs_);
 }
 
-static tuple predict_class_and_probs2(const bob::machine::SupportVector& m, 
+static tuple predict_class_and_probs2(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input) {
   bob::python::ndarray probs(bob::core::array::t_float64, m.outputSize());
   blitz::Array<double,1> probs_ = probs.bz<double,1>();
@@ -127,8 +127,8 @@ static tuple predict_class_and_probs2(const bob::machine::SupportVector& m,
 static object predict_class_and_probs_n(const bob::machine::SupportVector& m,
     bob::python::const_ndarray input) {
   blitz::Array<double,2> i_ = input.bz<double,2>();
-  if ((size_t)i_.extent(1) != m.inputSize()) {
-    PYTHON_ERROR(RuntimeError, "Input array should have " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
+  if ((size_t)i_.extent(1) < m.inputSize()) {
+    PYTHON_ERROR(RuntimeError, "Input array should have **at least** " SIZE_T_FMT " columns, but you have given me one with %d instead", m.inputSize(), i_.extent(1));
   }
   if (!m.supportsProbability()) {
     PYTHON_ERROR(RuntimeError, "this SVM does not support probabilities");
@@ -268,7 +268,7 @@ void bind_machine_svm() {
     .def(init<bob::io::HDF5File&>((arg("self"), arg("config")), "Builds a new Support Vector Machine from an HDF5 file containing the configuration for this machine. Scaling parameters are also loaded from the file. Using this constructor assures a 100% state recovery from previous sessions."))
     .add_property("input_subtract", make_function(&bob::machine::SupportVector::getInputSubtraction, return_value_policy<copy_const_reference>()), &set_input_sub)
     .add_property("input_divide", make_function(&bob::machine::SupportVector::getInputDivision, return_value_policy<copy_const_reference>()), &set_input_div)
-    .add_property("shape", &get_shape, "Expected input and output sizes. Note the output size is always 1.") 
+    .add_property("shape", &get_shape, "Expected input and output sizes. Note the output size is always 1.")
     .add_property("labels", &labels, "The labels this machine will output.")
     .add_property("svm_type", &bob::machine::SupportVector::machineType, "The type of SVM machine contained")
     .add_property("kernel_type", &bob::machine::SupportVector::kernelType, "The type of kernel used by the support vectors in this machine")
