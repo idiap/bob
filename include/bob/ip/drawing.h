@@ -8,7 +8,7 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_IP_DRAWING_H 
+#ifndef BOB_IP_DRAWING_H
 #define BOB_IP_DRAWING_H
 
 #include <stdexcept>
@@ -89,8 +89,8 @@ namespace bob { namespace ip {
    * function is based on the Bresenham's line algorithm and is highly
    * optimized to be able to draw lines very quickly. There is no floating
    * point arithmetic nor multiplications and divisions involved. Only
-   * addition, subtraction and bit shifting are used. 
-   * 
+   * addition, subtraction and bit shifting are used.
+   *
    * The line may go out of the image bounds in which case such points (lying
    * outside the image boundary are ignored).
    *
@@ -188,7 +188,7 @@ namespace bob { namespace ip {
       }
     }
     else { // m < 0
-      
+
       // Case 3: -1 <= m < 0 (Mirror about x-axis, replace all dy by -dy)
       if (dx >= -dy) {
         F = -dy2 - dx; // initial F
@@ -208,7 +208,7 @@ namespace bob { namespace ip {
         }
       }
 
-      // Case 4: -INF < m < -1 (Mirror about x-axis and mirror 
+      // Case 4: -INF < m < -1 (Mirror about x-axis and mirror
       // about y=x line, replace all dx by -dy and dy by dx)
       else {
         F = dx2 + dy; // initial F
@@ -261,8 +261,8 @@ namespace bob { namespace ip {
    * Draws a box at the image using the draw_line() primitive above.
    */
   template <typename ImageType, typename ColorType>
-  void draw_box (ImageType& image, int y, int x, size_t width, 
-      size_t height, const ColorType& color) {
+  void draw_box (ImageType& image, int y, int x, size_t height,
+      size_t width, const ColorType& color) {
     draw_line(image, y, x, y, x + width, color);
     draw_line(image, y + height, x, y+ height, x + width, color);
     draw_line(image, y, x, y + height, x, color);
