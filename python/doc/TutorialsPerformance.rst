@@ -1,18 +1,18 @@
 .. vim: set fileencoding=utf-8 :
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Wed Apr 20 08:19:36 2011 +0200
-.. 
+..
 .. Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
-.. 
+..
 .. This program is free software: you can redistribute it and/or modify
 .. it under the terms of the GNU General Public License as published by
 .. the Free Software Foundation, version 3 of the License.
-.. 
+..
 .. This program is distributed in the hope that it will be useful,
 .. but WITHOUT ANY WARRANTY; without even the implied warranty of
 .. MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 .. GNU General Public License for more details.
-.. 
+..
 .. You should have received a copy of the GNU General Public License
 .. along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -22,14 +22,14 @@
  Performance Evaluation
 ========================
 
-Methods in the :py:mod:`bob.measure` module can help you to quickly and easily 
-evaluate error for multi-class or binary classification problems. If you are not yet 
+Methods in the :py:mod:`bob.measure` module can help you to quickly and easily
+evaluate error for multi-class or binary classification problems. If you are not yet
 familiarized with aspects of performance evaluation, we recommend the following papers
 for an overview of some of the methods implemented.
 
 * Bengio, S., Keller, M., Mariéthoz, J. (2004). `The Expected Performance
   Curve`_.  International Conference on Machine Learning ICML Workshop on ROC
-  Analysis in Machine Learning, 136(1), 1963–1966. 
+  Analysis in Machine Learning, 136(1), 1963–1966.
 * Martin, A., Doddington, G., Kamm, T., Ordowski, M., & Przybocki, M. (1997).
   `The DET curve in assessment of detection task performance`_. Fifth European
   Conference on Speech Communication and Technology (pp. 1895-1898).
@@ -45,16 +45,16 @@ the False Acceptance Rate (FAR) and is defined in the following formula:
 
 .. math::
 
-  HTER(\tau, \mathcal{D}) = \frac{FAR(\tau, \mathcal{D}) + FRR(\tau, \mathcal{D})}{2} \quad \textrm{[\%]} 
+  HTER(\tau, \mathcal{D}) = \frac{FAR(\tau, \mathcal{D}) + FRR(\tau, \mathcal{D})}{2} \quad \textrm{[\%]}
 
 where :math:`\mathcal{D}` denotes the dataset used. Since both the FAR and the
 FRR depends on the threshold :math:`\tau`, they are strongly related to each
 other: increasing the FAR will reduce the FRR and vice-versa. For this reason,
 results are often presented using either a Receiver Operating Characteristic
-(ROC) or a Detection-Error Tradeoff (DET) plot, these two plots basically 
-present the FAR versus the FRR for different values of the threshold. Another 
-widely used measure to summarise the performance of a system is the Equal Error 
-Rate (EER), defined as the point along the ROC or DET curve where the FAR equals 
+(ROC) or a Detection-Error Tradeoff (DET) plot, these two plots basically
+present the FAR versus the FRR for different values of the threshold. Another
+widely used measure to summarise the performance of a system is the Equal Error
+Rate (EER), defined as the point along the ROC or DET curve where the FAR equals
 the FRR.
 
 However, it was noted in by Bengio et al. (2004) that ROC and DET curves may be
@@ -86,15 +86,15 @@ defined in the first equation.
   :py:class:`numpy.ndarray` objects that contain the scores obtained by the
   classification system to be evaluated, without specific order. Most of the
   classes that are defined to deal with two-class problems. Therefore, in this
-  setting, and throughout this manual, we have defined that the **negatives** 
+  setting, and throughout this manual, we have defined that the **negatives**
   represents the impostor attacks or false class accesses (that is when a sample
-  of class A is given to the classifier of another class, such as class B) for 
-  of the classifier. The second set, refered as the **positives** represents the 
-  true class accesses or signal response of the classifier. The vectors are called 
-  this way because the procedures implemented in this module expects that the 
-  scores of **negatives** to be statistically distributed to the left of the signal 
-  scores (the **positives**). If that is not the case, one should either invert 
-  the input to the methods or multiply all scores available by -1, in order to have 
+  of class A is given to the classifier of another class, such as class B) for
+  of the classifier. The second set, refered as the **positives** represents the
+  true class accesses or signal response of the classifier. The vectors are called
+  this way because the procedures implemented in this module expects that the
+  scores of **negatives** to be statistically distributed to the left of the signal
+  scores (the **positives**). If that is not the case, one should either invert
+  the input to the methods or multiply all scores available by -1, in order to have
   them inverted.
 
   The input to create these two vectors is generated by experiments conducted
@@ -144,8 +144,8 @@ We do provide a method to calculate the FAR and FRR in a single shot:
 The threshold ``T`` is normally calculated by looking at the distribution of
 negatives and positives in a development (or validation) set, selecting a
 threshold that matches a certain criterion and applying this derived threshold to
-the test (or evaluation) set. This technique gives a better overview of the 
-generalization of a method. We implement different techniques for the calculation 
+the test (or evaluation) set. This technique gives a better overview of the
+generalization of a method. We implement different techniques for the calculation
 of the threshold:
 
 * Threshold for the EER
@@ -155,7 +155,7 @@ of the threshold:
     >>> T = bob.measure.eer_threshold(negatives, positives)
 
 * Threshold for the minimum HTER
-  
+
   .. doctest::
 
     >>> T = bob.measure.min_hter_threshold(negatives, positives)
@@ -193,8 +193,8 @@ town. To plot an ROC curve, in possession of your **negatives** and
   >>> # we assume you have your negatives and positives already split
   >>> npoints = 100
   >>> bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
-  >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
-  >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.xlabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.ylabel('FRR (%)') # doctest: +SKIP
   >>> pyplot.grid(True)
   >>> pyplot.show() # doctest: +SKIP
 
@@ -208,7 +208,7 @@ As can be observed, plotting methods live in the namespace
 itself, except that instead of receiving the x and y point coordinates as
 parameters, they receive the two :py:class:`numpy.ndarray` arrays with
 negatives and positives, as well as an indication of the number of points the
-curve must contain. 
+curve must contain.
 
 As in `Matplotlib`_'s `plot()`_ command, you can pass optional parameters for
 the line as shown in the example to setup its color, shape and even the label.
@@ -229,8 +229,8 @@ A DET curve can be drawn using similar commands such as the ones for the ROC cur
   >>> npoints = 100
   >>> bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test') # doctest: +SKIP
   >>> bob.measure.plot.det_axis([0.01, 40, 0.01, 40]) # doctest: +SKIP
-  >>> pyplot.xlabel('FRR (%)') # doctest: +SKIP
-  >>> pyplot.ylabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.xlabel('FAR (%)') # doctest: +SKIP
+  >>> pyplot.ylabel('FRR (%)') # doctest: +SKIP
   >>> pyplot.grid(True)
   >>> pyplot.show() # doctest: +SKIP
 
@@ -255,14 +255,14 @@ This will produce an image like the following one:
   We provide a convenient way for you to do the above in this module. So,
   optionally, you may use the ``bob.measure.plot.det_axis`` method like this:
 
-  .. doctest:: 
+  .. doctest::
 
     >>> bob.measure.plot.det_axis([1, 40, 1, 40]) # doctest: +SKIP
 
 EPC
 ===
 
-Drawing an EPC requires that both the development set negatives and positives are provided alognside 
+Drawing an EPC requires that both the development set negatives and positives are provided alognside
 the test (or evaluation) set ones. Because of this the API is slightly modified:
 
 .. doctest::
@@ -326,19 +326,19 @@ evaluation and plotting of development and test set data using our combined
 
 .. code-block:: sh
 
-  $ bob_compute_perf.py --devel=development-scores-4col.txt --test=test-scores-4col.txt 
+  $ bob_compute_perf.py --devel=development-scores-4col.txt --test=test-scores-4col.txt
   [Min. criterium: EER] Threshold on Development set: -4.787956e-03
-         | Development     | Test           
+         | Development     | Test
   -------+-----------------+------------------
     FAR  | 6.731% (35/520) | 2.500% (13/520)
     FRR  | 6.667% (26/390) | 6.154% (24/390)
-    HTER | 6.699%          | 4.327%         
+    HTER | 6.699%          | 4.327%
   [Min. criterium: Min. HTER] Threshold on Development set: 3.411070e-03
-         | Development     | Test           
+         | Development     | Test
   -------+-----------------+------------------
     FAR  | 4.231% (22/520) | 1.923% (10/520)
     FRR  | 7.949% (31/390) | 7.692% (30/390)
-    HTER | 6.090%          | 4.808%         
+    HTER | 6.090%          | 4.808%
   [Plots] Performance curves => 'curves.pdf'
 
 Inside that script we evaluate 2 different thresholds based on the EER and the

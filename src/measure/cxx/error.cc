@@ -198,9 +198,9 @@ blitz::Array<double,2> bob::measure::roc(const blitz::Array<double,1>& negatives
   for (int i=0; i<(int)points; ++i) {
     std::pair<double, double> ratios =
       bob::measure::farfrr(negatives, positives, min + i*step);
-    //note: inversion to preserve X x Y ordering (FRR x FAR)
-    retval(0,i) = ratios.second;
-    retval(1,i) = ratios.first;
+    // preserve X x Y ordering (FAR x FRR)
+    retval(0,i) = ratios.first;
+    retval(1,i) = ratios.second;
   }
   return retval;
 }
@@ -295,8 +295,8 @@ blitz::Array<double,2> bob::measure::rocch(const blitz::Array<double,1>& negativ
   size_t miss = 0;
   for(int i=0; i<nbins; ++i)
   {
-    retval(0,i) = miss / (double)Nt; // pmiss
-    retval(1,i) = fa / (double)Nn; // pfa
+    retval(0,i) = fa / (double)Nn; // pfa
+    retval(1,i) = miss / (double)Nt; // pmiss
     left += width(i);
     if(left >= 1)
       miss = blitz::sum(Pideal(blitz::Range(0,left-1)));
@@ -307,8 +307,8 @@ blitz::Array<double,2> bob::measure::rocch(const blitz::Array<double,1>& negativ
     else
       fa = 0;
   }
-  retval(0,nbins) = miss / (double)Nt; // pmiss
-  retval(1,nbins) = fa / (double)Nn; // pfa
+  retval(0,nbins) = fa / (double)Nn; // pfa
+  retval(1,nbins) = miss / (double)Nt; // pmiss
 
   return retval;
 }

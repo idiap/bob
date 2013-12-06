@@ -13,6 +13,6 @@ negatives = numpy.random.normal(-1,1,100)
 npoints = 100
 bob.measure.plot.roc(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test')
 pyplot.grid(True)
-pyplot.xlabel('FRR (%)')
-pyplot.ylabel('FAR (%)')
+pyplot.xlabel('FAR (%)')
+pyplot.ylabel('FRR (%)')
 pyplot.title('ROC')
