@@ -59,7 +59,7 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   if not CAR:
     return mpl.plot(100.0*out[0,:], 100.0*out[1,:], **kwargs)
   else:
-    return mpl.semilogx(100.0*out[0,:], 100.0*(1-out[1,:]), **kwargs)
+    return mpl.semilogx(100.0*out[1,:], 100.0*(1-out[0,:]), **kwargs)
 
 def precision_recall_curve(negatives, positives, npoints=100, **kwargs):
   """Plots Precision-Recall curve.

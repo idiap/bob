@@ -60,7 +60,7 @@ class ErrorTest(unittest.TestCase):
     prec, recall = bob.measure.precision_recall(negatives, positives, minimum-0.1)
     self.assertEqual(prec, 0.5)
     self.assertEqual(recall, 1.0)
-
+    
     # Similarly, if we take a threshold on the maximum, the FRR should be 1.0
     # while the FAR should be 0.0. Both precision and recall should be 0.0.
     far, frr = bob.measure.farfrr(negatives, positives, maximum+0.1)
@@ -78,23 +78,23 @@ class ErrorTest(unittest.TestCase):
     prec, recall = bob.measure.precision_recall(negatives, positives, 3.0)
     self.assertEqual(prec, 1.0)
     self.assertEqual(recall, 1.0)
-
+    
     # Testing the values of F-score depending on different choices of the threshold
     f_score = bob.measure.f_score(negatives, positives, minimum-0.1)
     self.assertAlmostEqual(f_score, 0.66666667)
     f_score = bob.measure.f_score(negatives, positives, minimum-0.1, 2)
     self.assertAlmostEqual(f_score, 0.83333333)
-
+    
     f_score = bob.measure.f_score(negatives, positives, maximum+0.1)
     self.assertEqual(f_score, 0.0)
     f_score = bob.measure.f_score(negatives, positives, maximum+0.1, 2)
     self.assertEqual(f_score, 0.0)
-
+    
     f_score = bob.measure.f_score(negatives, positives, 3.0)
     self.assertEqual(f_score, 1.0)
     f_score = bob.measure.f_score(negatives, positives, 3.0, 2)
     self.assertEqual(f_score, 1.0)
-
+    
 
 
   def test02_indexing(self):
@@ -193,14 +193,14 @@ class ErrorTest(unittest.TestCase):
     # save('nonsep-roc.hdf5', xy)
     xyref = bob.io.load(F('nonsep-roc.hdf5'))
     self.assertTrue( numpy.array_equal(xy, xyref) )
-
+    
     # This example will test the Precision-Recall plot calculation functionality.
     xy = bob.measure.precision_recall_curve(negatives, positives, 100)
     # uncomment the next line to save a reference value
     # save('nonsep-roc.hdf5', xy)
     xyref = bob.io.load(F('nonsep-precisionrecall.hdf5'))
     self.assertTrue( numpy.array_equal(xy, xyref) )
-
+    
     # This example will test the DET plot calculation functionality.
     det_xyzw = bob.measure.det(negatives, positives, 100)
     # uncomment the next line to save a reference value
@@ -232,7 +232,7 @@ class ErrorTest(unittest.TestCase):
     positives = bob.io.load(F('linsep-positives.hdf5'))
     negatives = bob.io.load(F('linsep-negatives.hdf5'))
     # References obtained using Bosaris 1.06
-    pmiss_pfa_ref = numpy.array([[1., 0., 0.], [0., 0., 1.]])
+    pmiss_pfa_ref = numpy.array([[0., 0, 1], [1, 0, 0]])
     eer_ref = 0.
     # Computes
     pmiss_pfa = bob.measure.rocch(negatives, positives)
@@ -246,7 +246,7 @@ class ErrorTest(unittest.TestCase):
     positives = bob.io.load(F('nonsep-positives.hdf5'))
     negatives = bob.io.load(F('nonsep-negatives.hdf5'))
     # References obtained using Bosaris 1.06
-    pmiss_pfa_ref = numpy.array([[1., 0.68, 0.28, 0.1, 0.06, 0., 0.], [0, 0, 0.08, 0.12, 0.22, 0.48, 1.]])
+    pmiss_pfa_ref = numpy.array([[0, 0, 0.08, 0.12, 0.22, 0.48, 1.], [1., 0.68, 0.28, 0.1, 0.06, 0., 0.]])
     eer_ref = 0.116363636363636
     # Computes
     pmiss_pfa = bob.measure.rocch(negatives, positives)

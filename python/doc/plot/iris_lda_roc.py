@@ -17,8 +17,8 @@ positives = output['virginica'][:,0]
 
 # Plot ROC curve
 bob.measure.plot.roc(negatives, positives)
-pyplot.xlabel("False Virginica Acceptance (%)")
-pyplot.ylabel("False Virginica Rejection (%)")
+pyplot.xlabel("False Virginica Rejection (%)")
+pyplot.ylabel("False Virginica Acceptance (%)")
 pyplot.title("ROC Curve for Virginica Classification")
 pyplot.grid()
-pyplot.axis([0, 5, 0, 15]) #xmin, xmax, ymin, ymax
+pyplot.axis([0, 15, 0, 5]) #xmin, xmax, ymin, ymax
