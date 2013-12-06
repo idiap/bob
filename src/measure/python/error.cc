@@ -114,7 +114,7 @@ void bind_measure_error() {
     (arg("negatives"), arg("positives"), arg("threshold")),
     "Calculates the FA ratio and the FR ratio given positive and negative scores and a threshold. 'positives' holds the score information for samples that are labelled to belong to a certain class (a.k.a., 'signal' or 'client'). 'negatives' holds the score information for samples that are labelled *not* to belong to the class (a.k.a., 'noise' or 'impostor').\n\nIt is expected that 'positive' scores are, at least by design, greater than 'negative' scores. So, every positive value that falls bellow the threshold is considered a false-rejection (FR). 'negative' samples that fall above the threshold are considered a false-accept (FA).\n\nPositives that fall on the threshold (exactly) are considered correctly classified. Negatives that fall on the threshold (exactly) are considered *incorrectly* classified. This equivalent to setting the comparision like this pseudo-code:\n\nforeach (positive as K) if K < threshold: falseRejectionCount += 1\nforeach (negative as K) if K >= threshold: falseAcceptCount += 1\n\nThe 'threshold' value does not necessarily have to fall in the range covered by the input scores (negatives and positives altogether), but if it does not, the output will be either (1.0, 0.0) or (0.0, 1.0) depending on the side the threshold falls.\n\nThe output is in form of a std::pair of two double-precision real numbers. The numbers range from 0 to 1. The first element of the pair is the false-accept ratio. The second element of the pair is the false-rejection ratio.\n\nIt is possible that scores are inverted in the negative/positive sense. In some setups the designer may have setup the system so 'positive' samples have a smaller score than the 'negative' ones. In this case, make sure you normalize the scores so positive samples have greater scores before feeding them into this method."
   );
-  
+
   def(
     "precision_recall",
     &precision_recall,
@@ -193,7 +193,7 @@ void bind_measure_error() {
     "roc",
     &bob_roc,
     (arg("negatives"), arg("positives"), arg("n_points")),
-    "Calculates the ROC curve given a set of positive and negative scores and a desired number of points. Returns a two-dimensional blitz::Array of doubles that express the X (FRR) and Y (FAR) coordinates in this order. The points in which the ROC curve are calculated are distributed uniformily in the range [min(negatives, positives), max(negatives, positives)]."
+    "Calculates the ROC curve given a set of positive and negative scores and a desired number of points. Returns a two-dimensional blitz::Array of doubles that express the X (FAR) and Y (FRR) coordinates in this order. The points in which the ROC curve are calculated are distributed uniformily in the range [min(negatives, positives), max(negatives, positives)]."
   );
 
   def(
@@ -207,7 +207,7 @@ void bind_measure_error() {
     "rocch",
     &bob_rocch,
     (arg("negatives"), arg("positives")),
-    "Calculates the ROC Convex Hull curve given a set of positive and negative scores. Returns a two-dimensional blitz::Array of doubles that express the X (FRR) and Y (FAR) coordinates in this order."
+    "Calculates the ROC Convex Hull curve given a set of positive and negative scores. Returns a two-dimensional blitz::Array of doubles that express the X (FAR) and Y (FRR) coordinates in this order."
   );
 
   def(
@@ -235,7 +235,7 @@ void bind_measure_error() {
     "det",
     &bob_det,
     (arg("negatives"), arg("positives"), arg("n_points")),
-    "Calculates the DET curve given a set of positive and negative scores and a desired number of points. Returns a two-dimensional blitz::Array of doubles that express on its rows:\n\n0. X axis values in the normal deviate scale for the false-rejections\n1. Y axis values in the normal deviate scale for the false-accepts\n\nYou can plot the results using your preferred tool to first create a plot using rows 0 and 1 from the returned value and then replace the X/Y axis annotation using a pre-determined set of tickmarks as recommended by NIST.\n\nThe algorithm that calculates the deviate scale is based on function ppndf() from the NIST package DETware version 2.1, freely available on the internet. Please consult it for more details.\n\nBy 20.04.2011, you could find such package here: http://www.itl.nist.gov/iad/mig/tools/"
+    "Calculates the DET curve given a set of positive and negative scores and a desired number of points. Returns a two-dimensional blitz::Array of doubles that express on its rows:\n\n0. X axis values in the normal deviate scale for the false-accepts\n1. Y axis values in the normal deviate scale for the false-rejections\n\nYou can plot the results using your preferred tool to first create a plot using rows 0 and 1 from the returned value and then replace the X/Y axis annotation using a pre-determined set of tickmarks as recommended by NIST.\n\nThe algorithm that calculates the deviate scale is based on function ppndf() from the NIST package DETware version 2.1, freely available on the internet. Please consult it for more details.\n\nBy 20.04.2011, you could find such package here: http://www.itl.nist.gov/iad/mig/tools/"
   );
 
   def(

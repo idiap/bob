@@ -15,6 +15,6 @@ npoints = 100
 bob.measure.plot.det(negatives, positives, npoints, color=(0,0,0), linestyle='-', label='test')
 bob.measure.plot.det_axis([0.1, 80, 0.1, 80])
 pyplot.grid(True)
-pyplot.xlabel('FRR (%)')
-pyplot.ylabel('FAR (%)')
+pyplot.xlabel('FAR (%)')
+pyplot.ylabel('FRR (%)')
 pyplot.title('DET')
