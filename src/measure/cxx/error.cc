@@ -300,10 +300,10 @@ blitz::Array<double,2> bob::measure::rocch(const blitz::Array<double,1>& negativ
   return retval;
 }
 
-double bob::measure::rocch2eer(const blitz::Array<double,2>& pmiss_pfa)
+double bob::measure::rocch2eer(const blitz::Array<double,2>& pfa_pmiss)
 {
-  bob::core::array::assertSameDimensionLength(2, pmiss_pfa.extent(0));
-  const int N = pmiss_pfa.extent(1);
+  bob::core::array::assertSameDimensionLength(2, pfa_pmiss.extent(0));
+  const int N = pfa_pmiss.extent(1);
 
   double eer = 0.;
   blitz::Array<double,2> XY(2,2);
@@ -319,10 +319,10 @@ double bob::measure::rocch2eer(const blitz::Array<double,2>& pmiss_pfa)
   for(int i=0; i<N-1; ++i)
   {
     // Define XY matrix
-    XY00 = pmiss_pfa(1,i); // pfa
-    XY10 = pmiss_pfa(1,i+1); // pfa
-    XY01 = pmiss_pfa(0,i); // pmiss
-    XY11 = pmiss_pfa(0,i+1); // pmiss
+    XY00 = pfa_pmiss(0,i); // pfa
+    XY10 = pfa_pmiss(0,i+1); // pfa
+    XY01 = pfa_pmiss(1,i); // pmiss
+    XY11 = pfa_pmiss(1,i+1); // pmiss
     // xx and yy should be sorted:
     assert(XY10 <= XY00 && XY01 <= XY11);
 

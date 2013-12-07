@@ -89,8 +89,8 @@ static blitz::Array<double,2> bob_rocch(bob::python::const_ndarray negatives, bo
   return bob::measure::rocch(negatives.cast<double,1>(), positives.cast<double,1>());
 }
 
-static double bob_rocch2eer(bob::python::const_ndarray pmiss_pfa){
-  return bob::measure::rocch2eer(pmiss_pfa.cast<double,2>());
+static double bob_rocch2eer(bob::python::const_ndarray pfa_pmiss){
+  return bob::measure::rocch2eer(pfa_pmiss.cast<double,2>());
 }
 
 
@@ -213,7 +213,7 @@ void bind_measure_error() {
   def(
     "rocch2eer",
     &bob_rocch2eer,
-    (arg("pmiss_pfa")),
+    (arg("pfa_pmiss")),
     "Calculates the threshold that is as close as possible to the equal-error-rate (EER) given the input data."
   );
 
