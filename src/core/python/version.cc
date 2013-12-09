@@ -100,6 +100,18 @@ static str perftools_version() {
 #endif
 }
 
+/**
+ * Bind, whether we have compiled Bob in DEBUG or in RELEASE mode
+ */
+
+static bool is_debug(){
+#ifndef NDEBUG
+  return true;
+#else
+  return false;
+#endif
+}
+
 void bind_core_version() {
   dict vdict;
   vdict["Blitz++"] = blitz_version();
@@ -109,4 +121,6 @@ void bind_core_version() {
   vdict["NumPy"] = numpy_version();
   vdict["Google Perftools"] = perftools_version();
   scope().attr("version") = vdict;
+
+  def("is_debug", &is_debug, "Returns True if Bob was compiled in DEBUG mode, or False otherwise");
 }
