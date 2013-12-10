@@ -45,6 +45,9 @@ namespace bob { namespace trainer {
        * @param max_iterations The maximum number of iterations of the
        *           iterative conjugate gradient algorithm (0 <-> infinity)
        * @param lambda The regularization factor
+       * @param mean_std_norm Compute mean and standard deviation in training
+       *           data and set the input_subtract and input_divide parameters
+       *           of the resulting machine
        */
       CGLogRegTrainer(const double prior=0.5,
         const double convergence_threshold=1e-5,
