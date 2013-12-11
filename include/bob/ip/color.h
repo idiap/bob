@@ -498,8 +498,8 @@ namespace bob { namespace ip {
     }
     bob::core::array::assertSameDimensionLength(to.extent(1), from.extent(0));
     bob::core::array::assertSameDimensionLength(to.extent(2), from.extent(1));
-    for (int j=0; j<from.extent(1); ++j)
-      for (int k=0; k<from.extent(2); ++k)
+    for (int j=0; j<to.extent(1); ++j)
+      for (int k=0; k<to.extent(2); ++k)
         gray_to_rgb_one(from(j,k), to(0,j,k), to(1,j,k), to(2,j,k));
   }
 
