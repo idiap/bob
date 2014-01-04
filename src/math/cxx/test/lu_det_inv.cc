@@ -21,19 +21,21 @@
 
 
 struct T {
-  blitz::Array<double,2> A33_1, A24_1, A33_2;
+  blitz::Array<double,2> A33_1, A24_1, A33_2, A33_3;
   blitz::Array<double,2> L33_1, L24_1, L33_2;
   blitz::Array<double,2> U33_1, U24_1;
   blitz::Array<double,2> P33_1, P24_1;
   blitz::Array<double,2> A33_1_inv, I33;
-  double det_A33_1, eps;
+  double det_A33_1, det_A33_2, det_A33_3, eps;
 
-  T(): A33_1(3,3), A24_1(2,4), A33_2(3,3), 
+  T(): A33_1(3,3), A24_1(2,4), A33_2(3,3), A33_3(3,3), 
     L33_1(3,3), L24_1(2,2), L33_2(3,3),
     U33_1(3,3), U24_1(2,4), 
     P33_1(3,3), P24_1(2,2), 
     A33_1_inv(3,3), I33(3,3), 
     det_A33_1(-0.2766), 
+    det_A33_2(4.), 
+    det_A33_3(0.), 
     eps(2e-4)
   {
     A33_1 = 0.8147, 0.9134, 0.2785, 0.9058, 0.6324, 0.5469, 0.1270, 0.0975, 
@@ -55,6 +57,8 @@ struct T {
     A33_2 = 2, -1, 0, -1, 2, -1, 0, -1, 2.;
     L33_2 = 1.414213562373095, 0, 0, -0.707106781186547, 1.224744871391589, 0, 
               0, -0.816496580927726, 1.154700538379251;
+
+    A33_3 = 0, 0, 0, 0, 0, 0, 0, 0, 0.;
   }
 
   ~T() {}
@@ -127,7 +131,32 @@ BOOST_AUTO_TEST_CASE( test_det_3x3 )
   blitz::Array<double,2> det(3,3);
 
   BOOST_CHECK_SMALL( fabs(bob::math::det(A33_1) - det_A33_1), eps);
+  BOOST_CHECK_SMALL( fabs(bob::math::det(A33_2) - det_A33_2), eps);
+  BOOST_CHECK_SMALL( fabs(bob::math::det(A33_3) - det_A33_3), eps);
 }
+
+BOOST_AUTO_TEST_CASE( test_slogdet_3x3 )
+{
+  blitz::Array<double,2> det(3,3);
+
+  int sign;
+  double det_A33_v = exp(bob::math::slogdet(A33_1, sign));
+  det_A33_v *= sign;
+  BOOST_CHECK(sign == -1);
+  BOOST_CHECK_SMALL( fabs(det_A33_v - det_A33_1), eps);
+
+  det_A33_v = exp(bob::math::slogdet(A33_2, sign));
+  det_A33_v *= sign;
+  BOOST_CHECK(sign == 1);
+  BOOST_CHECK_SMALL( fabs(det_A33_v - det_A33_2), eps);
+
+  det_A33_v = exp(bob::math::slogdet(A33_3, sign));
+  det_A33_v *= sign;
+  BOOST_CHECK(sign == 0);
+  BOOST_CHECK_SMALL( fabs(det_A33_v - det_A33_3), eps);
+}
+
+
 
 BOOST_AUTO_TEST_CASE( test_inv_3x3 )
 {

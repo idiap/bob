@@ -33,6 +33,22 @@ double det(const blitz::Array<double,2>& A);
 double det_(const blitz::Array<double,2>& A);
 
 /**
+ * @brief Function which computes the sign and (natural) logarithm of 
+ *   the determinant of a square matrix
+ * @param A The A matrix to consider (size NxN)
+ */
+double slogdet(const blitz::Array<double,2>& A, int& sign);
+/**
+ * @brief Function which computes the sign and (natural) logarithm of 
+ *   the determinant of a square matrix
+ * @param A The A matrix to consider (size NxN)
+ * @warning Does not check the input matrix
+ */
+double slogdet_(const blitz::Array<double,2>& A, int& sign);
+
+
+
+/**
  * @}
  */
 }}
