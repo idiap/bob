@@ -498,7 +498,8 @@ void bob::machine::PLDABase::computeGamma(const size_t a,
 
 void bob::machine::PLDABase::precomputeLogDetAlpha()
 {
-  m_cache_logdet_alpha = log(fabs(bob::math::det(m_cache_alpha)));
+  int sign;
+  m_cache_logdet_alpha = bob::math::slogdet(m_cache_alpha, sign);
 }
 
 void bob::machine::PLDABase::precomputeLogDetSigma()
@@ -511,7 +512,8 @@ double bob::machine::PLDABase::computeLogLikeConstTerm(const size_t a,
 {
   // loglike_constterm[a] = a/2 * 
   //  ( -D*log(2*pi) -log|sigma| +log|alpha| +log|gamma_a|)
-  double logdet_gamma_a = log(fabs(bob::math::det(gamma_a)));
+  int sign;
+  double logdet_gamma_a = bob::math::slogdet(gamma_a, sign);
   double ah = static_cast<double>(a)/2.;
   double res = ( -ah*((double)m_dim_d)*log(2*M_PI) - 
       ah*m_cache_logdet_sigma + ah*m_cache_logdet_alpha + logdet_gamma_a/2.);
