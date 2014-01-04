@@ -71,8 +71,9 @@ void bob::math::lu_(const blitz::Array<double,2>& A, blitz::Array<double,2>& L,
   dgetrf_( &M, &N, A_lapack, &lda, ipiv.get(), &info);
 
   // Checks info variable
-  if (info != 0)
-    throw std::runtime_error("The LAPACK dgetrf function returned a non-zero value.");
+  // If U is greater than zero, this means that the U matrix is equal to zero.
+  if (info < 0)
+    throw std::runtime_error("The LAPACK dgetrf function returned a negative value.");
 
   // Copy result back to L and U
   blitz::firstIndex bi;
