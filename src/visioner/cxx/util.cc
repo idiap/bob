@@ -25,8 +25,8 @@
 namespace bob { namespace visioner {
 
   // Resize the string to obtain the given size
-  //  (   if larger - characters will be removed from the end, 
-  //      if smaller - <app_char> will be inserted at the end)        
+  //  (   if larger - characters will be removed from the end,
+  //      if smaller - <app_char> will be inserted at the end)
   std::string resize(const std::string& str, uint64_t size, char app_char)
   {
     std::string result = str;
@@ -36,7 +36,7 @@ namespace bob { namespace visioner {
     }
     else if (result.size() > size)
     {
-      result.erase(result.begin() + size, result.end());  
+      result.erase(result.begin() + size, result.end());
     }
 
     return result;
@@ -46,7 +46,7 @@ namespace bob { namespace visioner {
   std::string round(double value, uint64_t digits)
   {
     return QObject::tr("%1").arg(value, 0, 'f', digits).toStdString();
-  }        
+  }
 
   // Load the content of a text file into a string
   bool load_file(const std::string& path, std::string& text)
@@ -95,7 +95,7 @@ namespace bob { namespace visioner {
       boost::split(tokens, buff, boost::is_any_of("#"));
       if (tokens.size() == 1)
       {
-        dir = boost::filesystem::path(path).parent_path().string() + boost::trim_copy(tokens[0]);
+        dir = boost::filesystem::path(path).parent_path().string() + "/" + boost::trim_copy(tokens[0]);
       }
       else if (tokens.size() == 2)
       {
@@ -115,7 +115,7 @@ namespace bob { namespace visioner {
     // OK
     is.close();
     return true;
-  }	
+  }
 
   // Parse a (sef of) list file(s)
   bool load_listfiles(const std::string& files, std::vector<std::string>& ifiles, std::vector<std::string>& gfiles)
@@ -126,19 +126,21 @@ namespace bob { namespace visioner {
     boost::split(tokens, files, boost::is_any_of(":\n\t\r"));
     for (std::vector<std::string>::const_iterator it = tokens.begin(); it != tokens.end(); ++ it)
     {
-      std::vector<std::string> ifiles_crt, gfiles_crt;
-      if (	load_listfile(*it, ifiles_crt, gfiles_crt) == false ||
-          ifiles_crt.empty() || ifiles_crt.size() != gfiles_crt.size())
-      {
-        return false;
-      }
+      if (not it->empty()){
+        std::vector<std::string> ifiles_crt, gfiles_crt;
+        if (	load_listfile(*it, ifiles_crt, gfiles_crt) == false ||
+            ifiles_crt.empty() || ifiles_crt.size() != gfiles_crt.size())
+        {
+          return false;
+        }
 
-      ifiles.insert(ifiles.end(), ifiles_crt.begin(), ifiles_crt.end());
-      gfiles.insert(gfiles.end(), gfiles_crt.begin(), gfiles_crt.end());
+        ifiles.insert(ifiles.end(), ifiles_crt.begin(), ifiles_crt.end());
+        gfiles.insert(gfiles.end(), gfiles_crt.begin(), gfiles_crt.end());
+      }
     }
 
     return !ifiles.empty() && ifiles.size() == gfiles.size();
-  }	
+  }
 
   std::string basename(const std::string& path) {
     return boost::filesystem::path(path).stem().c_str();

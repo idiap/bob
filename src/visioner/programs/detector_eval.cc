@@ -14,7 +14,7 @@
 
 #include "bob/visioner/cv/cv_detector.h"
 
-int main(int argc, char *argv[]) {	
+int main(int argc, char *argv[]) {
 
   bob::visioner::CVDetector detector;
 
@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
   po_desc.add_options()
     ("help,h", "help message");
   po_desc.add_options()
-    ("data", boost::program_options::value<std::string>(), 
+    ("data", boost::program_options::value<std::string>(),
      "test datasets")
     ("roc", boost::program_options::value<std::string>(),
      "file to save the ROC points");
@@ -37,13 +37,13 @@ int main(int argc, char *argv[]) {
   boost::program_options::notify(po_vm);
 
   // Check arguments and options
-  if (	po_vm.empty() || po_vm.count("help") || 
+  if (	po_vm.empty() || po_vm.count("help") ||
       !po_vm.count("data") ||
       !po_vm.count("roc") ||
       !detector.decode(po_desc, po_vm))
   {
     bob::core::error << po_desc << std::endl;
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
   }
 
   const std::string cmd_data = po_vm["data"].as<std::string>();
@@ -53,11 +53,12 @@ int main(int argc, char *argv[]) {
   std::vector<std::string> ifiles, gfiles;
   if (bob::visioner::load_listfiles(cmd_data, ifiles, gfiles) == false)
   {
+
     bob::core::error << "Failed to load the test datasets <" << cmd_data << ">!" << std::endl;
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
   }
 
-  // Build the ROC curve		
+  // Build the ROC curve
   std::vector<double> fas, tars;
   detector.evaluate(ifiles, gfiles, fas, tars);
 
@@ -65,11 +66,11 @@ int main(int argc, char *argv[]) {
   if (bob::visioner::save_roc(fas, tars, cmd_roc) == false)
   {
     bob::core::error << "Failed to save the ROC points!" << std::endl;
-    exit(EXIT_FAILURE);
+    return EXIT_FAILURE;
   }
 
   // OK
-  bob::core::info << "Program finished successfuly" << std::endl;
+  bob::core::info << "Program finished successfully" << std::endl;
   return EXIT_SUCCESS;
 
 }
