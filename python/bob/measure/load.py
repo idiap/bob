@@ -8,12 +8,41 @@
 
 import numpy
 
+import tarfile
+
+def open_file(filename):
+  """Opens the given score file for reading.
+  Score files might be raw text files, or a tar-file including a single score file inside.
+
+  Parameters:
+    filename  The name of the score file to open. This file might be a raw text file or a (compressed) tar file containing a raw text file.
+
+  Returns:
+    A read-only file-like object as it would be returned by open().
+  """
+  if not tarfile.is_tarfile(filename):
+    return open(filename, 'rt')
+
+  # open the tar file for reading
+  tar = tarfile.open(filename, 'r')
+  # get the first file in the tar file
+  tar_info = tar.next()
+  while tar_info is not None and not tar_info.isfile():
+    tar_info = tar.next()
+  # check that one file was found in the archive
+  if tar_info is None:
+    raise IOError("The given file is a .tar file, but it does not contain any file.")
+
+  # open the file for reading
+  return tar.extractfile(tar_info)
+
+
 def four_column(filename):
   """Loads a score set from a single file to memory.
 
   Verifies that all fields are correctly placed and contain valid fields.
 
-  Returns a python list of tuples containg the following fields:
+  Returns a python list of tuples containing the following fields:
 
     [0]
       claimed identity (string)
@@ -26,7 +55,7 @@ def four_column(filename):
   """
 
   retval = []
-  for i, l in enumerate(open(filename, 'rt')):
+  for i, l in enumerate(open_file(filename)):
     s = l.strip()
     if len(s) == 0 or s[0] == '#': continue #empty or comment
     field = [k.strip() for k in s.split()]
@@ -124,7 +153,7 @@ def five_column(filename):
 
   Verifies that all fields are correctly placed and contain valid fields.
 
-  Returns a python list of tuples containg the following fields:
+  Returns a python list of tuples containing the following fields:
 
     [0]
       claimed identity (string)
@@ -139,7 +168,7 @@ def five_column(filename):
   """
 
   retval = []
-  for i, l in enumerate(open(filename, 'rt')):
+  for i, l in enumerate(open_file(filename)):
     s = l.strip()
     if len(s) == 0 or s[0] == '#': continue #empty or comment
     field = [k.strip() for k in s.split()]

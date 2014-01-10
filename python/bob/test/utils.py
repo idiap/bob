@@ -22,7 +22,7 @@ def datafile(f, module=None, path='data'):
     This is the filename of the file you want to retrieve. Something like
     ``'movie.avi'``.
 
-  package: string, optional
+  module: string, optional
     This is the python-style package name of the module you want to retrieve
     the data from. This should be something like ``bob.io.test``, but you
     normally refer it using the ``__name__`` property of the module you want to
