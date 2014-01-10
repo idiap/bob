@@ -16,7 +16,7 @@
 
 #include <boost/math/constants/constants.hpp>
 
-bob::ip::LBP::LBP(const int P, const double R_y, const double R_x , const bool circular,
+bob::ip::LBP::LBP(const int P, const double R_y, const double R_x, const bool circular,
     const bool to_average, const bool add_average_bit, const bool uniform,
     const bool rotation_invariant, const bob::ip::ELBPType eLBP_type, const bob::ip::LBPBorderHandling border_handling):
   m_P(P),
@@ -212,7 +212,7 @@ void bob::ip::LBP::init()
   if (m_P == 16 && m_add_average_bit && m_to_average){
     throw std::runtime_error("LBP16 codes with average bit require 17 bits, but our representation is UINT16.");
   }
-  if (m_P == 16 && m_mb_y > 0 && m_mb_x > 0){
+  if (isMultiBlockLBP() && m_P == 16){
     throw std::runtime_error("LBP16 codes are not supported for multi-block LBP's.");
   }
   if (m_P > 16){
@@ -222,11 +222,11 @@ void bob::ip::LBP::init()
     throw std::runtime_error("LPB codes with negative radius or negative multi-block dimensions are not supported.");
   }
 
-  if ((m_mb_y > 0 && m_mb_x > 0) && m_border_handling != LBP_BORDER_SHRINK){
+  if (isMultiBlockLBP() && m_border_handling != LBP_BORDER_SHRINK){
     throw std::runtime_error("Multi-block LBP codes cannot handle other border handling than LBP_BORDER_SHRINK");
   }
 
-  if ((m_mb_y > 0 && m_mb_x > 0) && (m_ov_y < 0 || m_ov_y >= m_mb_y || m_ov_x < 0 || m_ov_x >= m_mb_x)){
+  if (isMultiBlockLBP() && (m_ov_y < 0 || m_ov_y >= m_mb_y || m_ov_x < 0 || m_ov_x >= m_mb_x)){
     throw std::runtime_error("Overlap of Multi-block LBP's must be positive and smaller than the multi-block size");
   }
 

@@ -179,7 +179,9 @@ void bind_ip_lbp() {
     .add_property("look_up_table", &bob::ip::LBP::getLookUpTable, &bob::ip::LBP::setLookUpTable, "How to extract the LBP code from the binary vector (interpreted as int)")
     .add_property("relative_positions", &bob::ip::LBP::getRelativePositions, "The vector of positions (relative), with which the central pixel (0,0) is compared.")
     .add_property("offset", &bob::ip::LBP::getOffset, "The first valid pixel in the __call__ function that takes the position.")
+    .add_property("is_multi_block_lbp", &bob::ip::LBP::isMultiBlockLBP, "Is this LBP extractor extracting multi-block LBP?")
 
+    .def("set_block_size_and_overlap", &bob::ip::LBP::setBlockSizeAndOverlap, (arg("self"), arg("block_size"), arg("block_overlap")), "Sets block size and block overlap at the same time.")
     .def("get_lbp_shape", &get_shape, (arg("self"), arg("input"), arg("is_integral_image")=false), "Get a tuple containing the expected size of the output when extracting LBP features.")
     .def("get_lbp_shape", &get_shape_2, (arg("self"), arg("shape"), arg("is_integral_image")=false), "Get a tuple containing the expected size of the output when extracting LBP features.")
     .def("__call__", &call_inout, (arg("self"), arg("input"), arg("output"), arg("is_integral_image")=false), "Call an object of this type to extract LBP features for the whole image.")

@@ -157,9 +157,14 @@ namespace bob { namespace ip {
       LBP& operator= (const bob::ip::LBP& other);
 
       /**
-       * Assignment
+       * Comparison
        */
       bool operator== (const bob::ip::LBP& other) const;
+
+      /**
+       * Is multi-block LBP or regular?
+       */
+      bool isMultiBlockLBP() const {return (m_mb_y > 0) && (m_mb_x > 0);}
 
       /**
        * Return the maximum number of labels for the current LBP variant
@@ -212,6 +217,8 @@ namespace bob { namespace ip {
       void set_eLBP(bob::ip::ELBPType eLBP_type){ m_eLBP_type = eLBP_type; if (eLBP_type == ELBP_DIRECTION_CODED && m_P%2) { throw std::runtime_error("direction coded LBP types require an even number of neighbors.");}}
       void setBorderHandling(bob::ip::LBPBorderHandling border_handling){ m_border_handling = border_handling; }
       void setLookUpTable(const blitz::Array<uint16_t,1>& new_lut){m_lut = new_lut;}
+
+      void setBlockSizeAndOverlap(blitz::TinyVector<int,2> mb, blitz::TinyVector<int,2> ov){ m_mb_y = mb[0]; m_mb_x = mb[1]; m_ov_y = ov[0]; m_ov_x = ov[1]; init(); }
 
       /**
        * Extract LBP features from a 2D blitz::Array, and save
@@ -361,7 +368,7 @@ namespace bob { namespace ip {
   template <typename T>
     inline void LBP::extract_(const blitz::Array<T,2>& src, blitz::Array<uint16_t,2>& dst, bool is_integral_image) const
     {
-      if (!is_integral_image && m_mb_y > 0 && m_mb_x > 0){
+      if (isMultiBlockLBP() && !is_integral_image){
         // apply integral image
         _integral_image.resize(src.extent(0)+1, src.extent(1)+1);
         bob::ip::integral(src, _integral_image, true);
@@ -407,7 +414,7 @@ namespace bob { namespace ip {
 
   template <typename T>
   inline uint16_t LBP::extract_(const blitz::Array<T,2>& src, int y, int x, bool is_integral_image) const{
-    if (!is_integral_image && m_mb_y > 0 && m_mb_x > 0){
+    if (isMultiBlockLBP() && !is_integral_image){
       // apply integral image
       _integral_image.resize(src.extent(0)+1, src.extent(1)+1);
       // compute integral image; adds one line of zeros in the front
@@ -425,7 +432,7 @@ namespace bob { namespace ip {
   template <typename T>
   inline uint16_t LBP::lbp_code(const blitz::Array<T,2>& src, int y, int x) const{
     double center;
-    if (m_mb_y > 0 && m_mb_x > 0){
+    if (isMultiBlockLBP()){
       // extract the pixels from the INTEGRAL image
       // only shrinking border handling is supported, so we don't need to care about borders here
       for (int p = 0; p < m_P; ++p){
