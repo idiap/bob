@@ -68,6 +68,8 @@ namespace bob { namespace machine {
     return m.str();
   }
 
+  HyperbolicTangentActivation::~HyperbolicTangentActivation() {}
+
   double HyperbolicTangentActivation::f (double z) const { return std::tanh(z); }
 
   double HyperbolicTangentActivation::f_prime (double z) const { return f_prime_from_f(f(z)); }
@@ -125,6 +127,8 @@ namespace bob { namespace machine {
     m % m_C % m_M;
     return m.str();
   }
+
+  LogisticActivation::~LogisticActivation() {}
 
   double LogisticActivation::f (double z) const
   { return 1. / ( 1. + std::exp(-z) ); }

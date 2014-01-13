@@ -136,6 +136,7 @@ namespace bob { namespace machine {
 
     public: // api
 
+      virtual ~HyperbolicTangentActivation();
       virtual double f (double z) const;
       virtual double f_prime (double z) const;
       virtual double f_prime_from_f (double a) const;
@@ -179,6 +180,7 @@ namespace bob { namespace machine {
 
     public: // api
 
+      virtual ~LogisticActivation();
       virtual double f (double z) const;
       virtual double f_prime (double z) const;
       virtual double f_prime_from_f (double a) const;
