@@ -7,7 +7,7 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_MACHINE_ACTIVATION_H 
+#ifndef BOB_MACHINE_ACTIVATION_H
 #define BOB_MACHINE_ACTIVATION_H
 
 #include <string>
@@ -94,6 +94,7 @@ namespace bob { namespace machine {
 
     public: // api
 
+      virtual ~IdentityActivation();
       virtual double f (double z) const;
       virtual double f_prime (double z) const;
       virtual double f_prime_from_f (double a) const;
@@ -135,6 +136,7 @@ namespace bob { namespace machine {
 
     public: // api
 
+      virtual ~HyperbolicTangentActivation();
       virtual double f (double z) const;
       virtual double f_prime (double z) const;
       virtual double f_prime_from_f (double a) const;
@@ -178,6 +180,7 @@ namespace bob { namespace machine {
 
     public: // api
 
+      virtual ~LogisticActivation();
       virtual double f (double z) const;
       virtual double f_prime (double z) const;
       virtual double f_prime_from_f (double a) const;
@@ -192,5 +195,5 @@ namespace bob { namespace machine {
    * @}
    */
 }}
-      
+
 #endif /* BOB_MACHINE_ACTIVATION_H */

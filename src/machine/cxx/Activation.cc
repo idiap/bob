@@ -14,10 +14,12 @@
 
 namespace bob { namespace machine {
 
+  IdentityActivation::~IdentityActivation() {}
+
   double IdentityActivation::f (double z) const { return z; }
 
   double IdentityActivation::f_prime (double) const { return 1.; }
-  
+
   double IdentityActivation::f_prime_from_f (double) const { return 1.; }
 
   void IdentityActivation::save(bob::io::HDF5File& f) const {
@@ -42,7 +44,7 @@ namespace bob { namespace machine {
   double LinearActivation::f (double z) const { return m_C * z; }
 
   double LinearActivation::f_prime (double z) const { return m_C; }
-  
+
   double LinearActivation::f_prime_from_f (double a) const { return m_C; }
 
   double LinearActivation::C() const { return m_C; }
@@ -65,6 +67,8 @@ namespace bob { namespace machine {
     m % m_C;
     return m.str();
   }
+
+  HyperbolicTangentActivation::~HyperbolicTangentActivation() {}
 
   double HyperbolicTangentActivation::f (double z) const { return std::tanh(z); }
 
@@ -124,7 +128,9 @@ namespace bob { namespace machine {
     return m.str();
   }
 
-  double LogisticActivation::f (double z) const 
+  LogisticActivation::~LogisticActivation() {}
+
+  double LogisticActivation::f (double z) const
   { return 1. / ( 1. + std::exp(-z) ); }
 
   double LogisticActivation::f_prime (double z) const { return f_prime_from_f(f(z)); }
@@ -173,8 +179,8 @@ namespace bob { namespace machine {
  * A generalized registration mechanism for all classes above
  */
 template <typename T> struct register_activation {
-  
-  static boost::shared_ptr<bob::machine::Activation> factory 
+
+  static boost::shared_ptr<bob::machine::Activation> factory
     (bob::io::HDF5File& f) {
       auto retval = boost::make_shared<T>();
       retval->load(f);
