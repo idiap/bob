@@ -56,6 +56,7 @@ def four_column(filename):
 
   retval = []
   for i, l in enumerate(open_file(filename)):
+    if isinstance(l, bytes): l = l.decode('utf-8')
     s = l.strip()
     if len(s) == 0 or s[0] == '#': continue #empty or comment
     field = [k.strip() for k in s.split()]
