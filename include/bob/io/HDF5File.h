@@ -88,7 +88,7 @@ namespace bob { namespace io {
       /**
        * Returns the name of the file currently opened
        */
-      const std::string& filename() const { return m_file->filename(); }
+      const std::string filename() const { return m_file->filename(); }
 
       /**
        * Returns the current working path, fully resolved. This is
