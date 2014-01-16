@@ -24,7 +24,7 @@ namespace bob {
   namespace ip {
 
     /**
-     * @brief A class to perform a geometric normalization of a face based 
+     * @brief A class to perform a geometric normalization of a face based
      * on the eye center locations.
      */
     class FaceEyesNorm
@@ -42,13 +42,13 @@ namespace bob {
           * @brief Constructor taking the requested two eye positions
           */
         FaceEyesNorm( const unsigned crop_height, const unsigned crop_width,
-          const unsigned re_y, const unsigned re_x,
-          const unsigned le_y, const unsigned le_x);
+          const double re_y, const double re_x,
+          const double le_y, const double le_x);
 
         /**
          * @brief Copy constructor
          */
-        FaceEyesNorm(const FaceEyesNorm& other); 
+        FaceEyesNorm(const FaceEyesNorm& other);
 
         /**
           * @brief Destructor
@@ -67,8 +67,8 @@ namespace bob {
         /**
          * @brief Not equal to
          */
-        bool operator!=(const FaceEyesNorm& b) const; 
- 
+        bool operator!=(const FaceEyesNorm& b) const;
+
         /**
           * @brief Accessors
           */
@@ -98,11 +98,11 @@ namespace bob {
           * @brief Process a 2D face image by applying the geometric
           * normalization
           */
-        template <typename T> void operator()(const blitz::Array<T,2>& src, 
+        template <typename T> void operator()(const blitz::Array<T,2>& src,
           blitz::Array<double,2>& dst, const double e1_y, const double e1_x,
           const double e2_y, const double e2_x) const;
-        template <typename T> void operator()(const blitz::Array<T,2>& src, 
-          const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
+        template <typename T> void operator()(const blitz::Array<T,2>& src,
+          const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
           blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
           const double e2_y, const double e2_x) const;
 
@@ -116,9 +116,9 @@ namespace bob {
         const boost::shared_ptr<GeomNorm> getGeomNorm(){return m_geom_norm;}
 
       private:
-        template <typename T, bool mask> 
-        void processNoCheck(const blitz::Array<T,2>& src, 
-          const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst, 
+        template <typename T, bool mask>
+        void processNoCheck(const blitz::Array<T,2>& src,
+          const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
           blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
           const double e2_y, const double e2_x) const;
 
@@ -138,11 +138,11 @@ namespace bob {
         mutable double m_cache_scale;
     };
 
-    template <typename T> 
-    inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+    template <typename T>
+    inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src,
       blitz::Array<double,2>& dst, const double e1_y, const double e1_x,
       const double e2_y, const double e2_x) const
-    { 
+    {
       // Check input
       bob::core::array::assertZeroBase(src);
 
@@ -152,16 +152,16 @@ namespace bob {
 
       // Process
       blitz::Array<bool,2> src_mask, dst_mask;
-      processNoCheck<T,false>(src, src_mask, dst, dst_mask, e1_y, e1_x, e2_y, 
-        e2_x); 
+      processNoCheck<T,false>(src, src_mask, dst, dst_mask, e1_y, e1_x, e2_y,
+        e2_x);
     }
 
-    template <typename T> 
-    inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src, 
+    template <typename T>
+    inline void bob::ip::FaceEyesNorm::operator()(const blitz::Array<T,2>& src,
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
       blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
       const double e2_y, const double e2_x) const
-    { 
+    {
       // Check input
       bob::core::array::assertZeroBase(src);
       bob::core::array::assertZeroBase(src_mask);
@@ -174,16 +174,16 @@ namespace bob {
       bob::core::array::assertSameShape(dst, m_out_shape);
 
       // Process
-      processNoCheck<T,true>(src, src_mask, dst, dst_mask, e1_y, e1_x, e2_y, 
-        e2_x); 
+      processNoCheck<T,true>(src, src_mask, dst, dst_mask, e1_y, e1_x, e2_y,
+        e2_x);
     }
 
-    template <typename T, bool mask> 
-    inline void bob::ip::FaceEyesNorm::processNoCheck(const blitz::Array<T,2>& src, 
+    template <typename T, bool mask>
+    inline void bob::ip::FaceEyesNorm::processNoCheck(const blitz::Array<T,2>& src,
       const blitz::Array<bool,2>& src_mask, blitz::Array<double,2>& dst,
       blitz::Array<bool,2>& dst_mask, const double e1_y, const double e1_x,
       const double e2_y, const double e2_x) const
-    { 
+    {
       // Get angle to horizontal
       m_cache_angle = getAngleToHorizontal(e1_y, e1_x, e2_y, e2_x) - m_eyes_angle;
       m_geom_norm->setRotationAngle(m_cache_angle);

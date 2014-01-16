@@ -24,15 +24,15 @@ bob::ip::FaceEyesNorm::FaceEyesNorm( const double eyes_distance,
 
 bob::ip::FaceEyesNorm::FaceEyesNorm(
     const unsigned crop_height, const unsigned crop_width,
-    const unsigned re_y, const unsigned re_x,
-    const unsigned le_y, const unsigned le_x)
+    const double re_y, const double re_x,
+    const double le_y, const double le_x)
 :
   m_crop_height(crop_height),
   m_crop_width(crop_width),
   m_out_shape(crop_height, crop_width),
   m_cache_angle(0.), m_cache_scale(0.)
 {
-  double dy = (double)re_y - (double)le_y, dx = (double)re_x - (double)le_x;
+  double dy = re_y - le_y, dx = re_x - le_x;
   m_eyes_distance = std::sqrt(dx * dx + dy * dy);
   m_eyes_angle = getAngleToHorizontal(re_y, re_x, le_y, le_x);
   m_crop_offset_h = (re_y + le_y) / 2.;
@@ -51,7 +51,7 @@ bob::ip::FaceEyesNorm::FaceEyesNorm( const FaceEyesNorm& other):
 {
 }
 
-bob::ip::FaceEyesNorm& 
+bob::ip::FaceEyesNorm&
 bob::ip::FaceEyesNorm::operator=(const bob::ip::FaceEyesNorm& other)
 {
   if (this != &other)
@@ -64,7 +64,7 @@ bob::ip::FaceEyesNorm::operator=(const bob::ip::FaceEyesNorm& other)
     m_crop_offset_w = other.m_crop_offset_w;
     m_out_shape(0) = m_crop_height;
     m_out_shape(1) = m_crop_width;
-    m_geom_norm.reset(new GeomNorm(0., 0, m_crop_height, m_crop_width, 
+    m_geom_norm.reset(new GeomNorm(0., 0, m_crop_height, m_crop_width,
       m_crop_offset_h, m_crop_offset_w) );
     m_cache_angle = other.m_cache_angle;
     m_cache_scale = other.m_cache_scale;
@@ -72,15 +72,15 @@ bob::ip::FaceEyesNorm::operator=(const bob::ip::FaceEyesNorm& other)
   return *this;
 }
 
-bool 
+bool
 bob::ip::FaceEyesNorm::operator==(const bob::ip::FaceEyesNorm& b) const
 {
-  return (this->m_eyes_distance == b.m_eyes_distance && this->m_crop_height == b.m_crop_height && 
-          this->m_crop_width == b.m_crop_width && this->m_crop_offset_h == b.m_crop_offset_h && 
+  return (this->m_eyes_distance == b.m_eyes_distance && this->m_crop_height == b.m_crop_height &&
+          this->m_crop_width == b.m_crop_width && this->m_crop_offset_h == b.m_crop_offset_h &&
           this->m_crop_offset_w == b.m_crop_offset_w);
 }
 
-bool 
+bool
 bob::ip::FaceEyesNorm::operator!=(const bob::ip::FaceEyesNorm& b) const
 {
   return !(this->operator==(b));

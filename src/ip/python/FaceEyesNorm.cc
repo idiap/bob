@@ -15,8 +15,8 @@ using namespace boost::python;
 
 static const char* faceeyesnorm_doc = "Objects of this class, after configuration, can extract and normalize faces, given their eye center coordinates.";
 
-template <typename T> 
-static void inner_call1(bob::ip::FaceEyesNorm& obj, 
+template <typename T>
+static void inner_call1(bob::ip::FaceEyesNorm& obj,
   bob::python::const_ndarray input, bob::python::ndarray output,
   double e1y, double e1x, double e2y, double e2x)
 {
@@ -25,25 +25,25 @@ static void inner_call1(bob::ip::FaceEyesNorm& obj,
 }
 
 static void call1(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
-    bob::python::ndarray output, double e1y, double e1x, double e2y, double e2x) 
+    bob::python::ndarray output, double e1y, double e1x, double e2y, double e2x)
 {
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) {
-    case bob::core::array::t_uint8: 
+    case bob::core::array::t_uint8:
       return inner_call1<uint8_t>(obj, input, output, e1y, e1x, e2y, e2x);
     case bob::core::array::t_uint16:
       return inner_call1<uint16_t>(obj, input, output, e1y, e1x, e2y, e2x);
-    case bob::core::array::t_float64: 
+    case bob::core::array::t_float64:
       return inner_call1<double>(obj, input, output, e1y, e1x, e2y, e2x);
     default: PYTHON_ERROR(TypeError, "FaceEyesNorm __call__ does not support array of type '%s'.", info.str().c_str());
   }
 }
 
-template <typename T> 
-static object inner_call1b(bob::ip::FaceEyesNorm& op, 
+template <typename T>
+static object inner_call1b(bob::ip::FaceEyesNorm& op,
   bob::python::const_ndarray src, double e1y, double e1x, double e2y, double e2x)
 {
-  bob::python::ndarray dst(bob::core::array::t_float64, op.getCropHeight(), 
+  bob::python::ndarray dst(bob::core::array::t_float64, op.getCropHeight(),
     op.getCropWidth());
   blitz::Array<double,2> dst_ = dst.bz<double,2>();
   op(src.bz<T,2>(), dst_, e1y, e1x, e2y, e2x);
@@ -55,17 +55,17 @@ static object call1b(bob::ip::FaceEyesNorm& op, bob::python::const_ndarray src,
 {
   const bob::core::array::typeinfo& info = src.type();
   switch (info.dtype) {
-    case bob::core::array::t_uint8: 
+    case bob::core::array::t_uint8:
       return inner_call1b<uint8_t>(op, src, e1y, e1x, e2y, e2x);
     case bob::core::array::t_uint16:
       return inner_call1b<uint16_t>(op, src, e1y, e1x, e2y, e2x);
-    case bob::core::array::t_float64: 
+    case bob::core::array::t_float64:
       return inner_call1b<double>(op, src, e1y, e1x, e2y, e2x);
     default: PYTHON_ERROR(TypeError, "FaceEyesNorm __call__ does not support array of type '%s'.", info.str().c_str());
   }
 }
 
-template <typename T> static void inner_call2(bob::ip::FaceEyesNorm& obj, 
+template <typename T> static void inner_call2(bob::ip::FaceEyesNorm& obj,
   bob::python::const_ndarray input, bob::python::const_ndarray input_mask,
   bob::python::ndarray output, bob::python::ndarray output_mask,
   double e1y, double e1x, double e2y, double e2x)
@@ -77,16 +77,16 @@ template <typename T> static void inner_call2(bob::ip::FaceEyesNorm& obj,
 }
 
 static void call2(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
-  bob::python::const_ndarray input_mask, bob::python::ndarray output, 
-  bob::python::ndarray output_mask, double e1y, double e1x, double e2y, double e2x) 
+  bob::python::const_ndarray input_mask, bob::python::ndarray output,
+  bob::python::ndarray output_mask, double e1y, double e1x, double e2y, double e2x)
 {
   const bob::core::array::typeinfo& info = input.type();
   switch (info.dtype) {
-    case bob::core::array::t_uint8: 
+    case bob::core::array::t_uint8:
       return inner_call2<uint8_t>(obj, input, input_mask, output, output_mask, e1y, e1x, e2y, e2x);
     case bob::core::array::t_uint16:
       return inner_call2<uint16_t>(obj, input, input_mask, output, output_mask, e1y, e1x, e2y, e2x);
-    case bob::core::array::t_float64: 
+    case bob::core::array::t_float64:
       return inner_call2<double>(obj, input, input_mask, output, output_mask, e1y, e1x, e2y, e2x);
     default: PYTHON_ERROR(TypeError, "FaceEyesNorm __call__ does not support array of type '%s'.", info.str().c_str());
   }
@@ -94,7 +94,7 @@ static void call2(bob::ip::FaceEyesNorm& obj, bob::python::const_ndarray input,
 
 void bind_ip_faceeyesnorm() {
   class_<bob::ip::FaceEyesNorm, boost::shared_ptr<bob::ip::FaceEyesNorm> >("FaceEyesNorm", faceeyesnorm_doc, init<const double, const size_t, const size_t, const double, const double>((arg("self"), arg("eyes_distance"), arg("crop_height"), arg("crop_width"), arg("crop_eyecenter_offset_h"), arg("crop_eyecenter_offset_w")), "Constructs a FaceEyeNorm object."))
-      .def(init<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>(args("self", "crop_height", "crop_width", "re_y", "re_x", "le_y", "le_x"), "Creates a FaceEyesNorm class that will put the eyes to the given locations and crop the image to the desired size."))
+      .def(init<unsigned, unsigned, double, double, double, double>(args("self", "crop_height", "crop_width", "re_y", "re_x", "le_y", "le_x"), "Creates a FaceEyesNorm class that will put the eyes to the given locations and crop the image to the desired size."))
       .def(init<bob::ip::FaceEyesNorm&>((arg("self"), arg("other"))))
       .def(self == self)
       .def(self != self)
