@@ -192,5 +192,5 @@ void bob::trainer::FisherLDATrainer::train(bob::machine::LinearMachine& machine,
 }
 
 size_t bob::trainer::FisherLDATrainer::output_size(const std::vector<blitz::Array<double,2> >& data) const {
-  return m_strip_to_rank? (data.size()-1) : data[0].extent(1);
+  return m_strip_to_rank ? std::min(data.size()-1, (size_t)data[0].extent(1)) : data[0].extent(1);
 }
