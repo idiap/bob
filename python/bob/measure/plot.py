@@ -11,14 +11,14 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
   This method will call matplotlib to plot the ROC curve for a system which
   contains a particular set of negatives (impostors) and positives (clients)
   scores. We use the standard matplotlib.pyplot.plot() command. All parameters
-  passed with exeception of the three first parameters of this method will be
+  passed with exception of the three first parameters of this method will be
   directly passed to the plot command. If you wish to understand your options,
   look here:
 
   http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot
 
-  The plot will represent the false-alarm on the vertical axis and the
-  false-rejection on the horizontal axis.
+  The plot will represent the false-alarm on the horizontal axis and the
+  false-rejection on the vertical axis.
 
   Input arguments:
 
@@ -32,7 +32,7 @@ def roc(negatives, positives, npoints=100, CAR=False, **kwargs):
     number of points to use when drawing the ROC curve
 
   CAR
-    plot CAR over FAR in semilogx (CAR=True) or FAR over FRR linearly (CAR=False, the default)
+    plot CAR over FAR in semilogx (CAR=True) or FRR over FAR linearly (CAR=False, the default)
 
   kwargs
     a dictionary of extra plotting parameters, that is passed directly to
@@ -67,7 +67,7 @@ def precision_recall_curve(negatives, positives, npoints=100, **kwargs):
   This method will call matplotlib to plot the precision-recall curve for a system which
   contains a particular set of negatives (impostors) and positives (clients)
   scores. We use the standard matplotlib.pyplot.plot() command. All parameters
-  passed with exeception of the three first parameters of this method will be
+  passed with exception of the three first parameters of this method will be
   directly passed to the plot command. If you wish to understand your options,
   look here:
 
@@ -195,8 +195,8 @@ def det(negatives, positives, npoints=100, axisfontsize='x-small', **kwargs):
 
   http://matplotlib.sourceforge.net/api/pyplot_api.html#matplotlib.pyplot.plot
 
-  The plot will represent the false-alarm on the vertical axis and the
-  false-rejection on the horizontal axis.
+  The plot will represent the false-alarm on the horizontal axis and the
+  false-rejection on the vertical axis.
 
   This method is strongly inspired by the NIST implementation for Matlab,
   called DETware, version 2.1 and available for download at the NIST website:
