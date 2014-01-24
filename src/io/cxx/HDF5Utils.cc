@@ -57,16 +57,16 @@ static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
   if (boost::filesystem::exists(path) && flags != H5F_ACC_TRUNC) { //open
     *retval = H5Fopen(path.string().c_str(), flags, H5P_DEFAULT);
     if (*retval < 0) {
-      boost::format m("call to HDF5 C-function H5Fopen() returned error %d. HDF5 error statck follows:\n%s");
-      m % *retval % bob::io::format_hdf5_error();
+      boost::format m("call to HDF5 C-function H5Fopen() returned error %d on file '%s'. HDF5 error statck follows:\n%s");
+      m % *retval % path.c_str() % bob::io::format_hdf5_error();
       throw std::runtime_error(m.str());
     }
     //replaces the file create list properties with the one from the file
     fcpl = boost::shared_ptr<hid_t>(new hid_t(-1), std::ptr_fun(delete_h5p));
     *fcpl = H5Fget_create_plist(*retval);
     if (*fcpl < 0) {
-      boost::format m("call to HDF5 C-function H5Fget_create_list() returned error %d. HDF5 error statck follows:\n%s");
-      m % *fcpl % bob::io::format_hdf5_error();
+      boost::format m("call to HDF5 C-function H5Fget_create_list() returned error %d on file '%s'. HDF5 error statck follows:\n%s");
+      m % *fcpl % path.c_str() % bob::io::format_hdf5_error();
       throw std::runtime_error(m.str());
     }
   }
@@ -74,8 +74,8 @@ static boost::shared_ptr<hid_t> open_file(const boost::filesystem::path& path,
     *retval = H5Fcreate(path.string().c_str(), H5F_ACC_TRUNC,
         *fcpl, H5P_DEFAULT);
     if (*retval < 0) {
-      boost::format m("call to HDF5 C-function H5Fcreate() returned error %d. HDF5 error statck follows:\n%s");
-      m % *retval % bob::io::format_hdf5_error();
+      boost::format m("call to HDF5 C-function H5Fcreate() returned error %d on file '%s'. HDF5 error statck follows:\n%s");
+      m % *retval % path.c_str() % bob::io::format_hdf5_error();
       throw std::runtime_error(m.str());
     }
   }
