@@ -14,7 +14,7 @@ import sys
 import numpy
 import nose.tools
 
-from .. import load, write, File
+from .. import load, write, File, read_matlab_varnames, read_matlab_matrix
 from ...test import utils as testutils
 
 def transcode(filename):
@@ -184,6 +184,20 @@ def test_mat_file_io():
   transcode(testutils.datafile('test_3d_cplx.mat', __name__))
   transcode(testutils.datafile('test_4d_cplx.mat', __name__))
   transcode(testutils.datafile('test.mat', __name__)) #3D complex, large
+
+
+  # test that we can read the 'x' variable in the test file
+  cell_file = testutils.datafile('test_2d.mat', __name__)
+  sorted(['x', 'y']) == sorted(read_matlab_varnames(cell_file))
+  # read x matrix
+  x = read_matlab_matrix(cell_file, 'x')
+  assert x.shape == (2,3)
+  y = read_matlab_matrix(cell_file, 'y')
+  assert y.shape == (3,2)
+  for i in range(2):
+    for j in range(3):
+      assert x[i,j] == float(j*2+i+1)
+      assert y[j,i] == float(j*2+i+1)
 
 @nose.tools.nottest
 @testutils.extension_available('.mat')

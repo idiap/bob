@@ -12,9 +12,10 @@ set(src
    "hdf5_extras.cc"
    "hdf5.cc"
    "datetime.cc"
+   "matfile.cc"
    "main.cc"
    )
- 
+
 # If we have matio installed, enable the compilation of relevant modules
 if(WITH_MATIO)
   list(APPEND incdir "${matio_INCLUDE_DIRS}")

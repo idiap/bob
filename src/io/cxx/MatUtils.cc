@@ -296,7 +296,7 @@ static void get_var_info(boost::shared_ptr<const matvar_t> matvar,
 #     endif
 }
 
-void bob::io::detail::mat_peek(const std::string& filename, bob::core::array::typeinfo& info) {
+void bob::io::detail::mat_peek(const std::string& filename, bob::core::array::typeinfo& info, const std::string& varname) {
 
   boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) {
@@ -304,19 +304,41 @@ void bob::io::detail::mat_peek(const std::string& filename, bob::core::array::ty
     m % filename;
     throw std::runtime_error(m.str());
   }
-  boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
+  boost::shared_ptr<matvar_t> matvar = varname.size() ? make_matvar(mat,varname) : make_matvar(mat); //gets the given variable name
+  if (!matvar) {
+    if (varname.size()){
+      boost::format m("Cannot find `%s' in file '%s'");
+      m % varname % filename;
+      throw std::runtime_error(m.str());
+    }else{
+      boost::format m("Cannot find any variable in file '%s'");
+      m % filename;
+      throw std::runtime_error(m.str());
+    }
+  }
   get_var_info(matvar, info);
 
 }
 
-void bob::io::detail::mat_peek_set(const std::string& filename, bob::core::array::typeinfo& info) {
+void bob::io::detail::mat_peek_set(const std::string& filename, bob::core::array::typeinfo& info, const std::string& varname) {
   boost::shared_ptr<mat_t> mat = bob::io::detail::make_matfile(filename, MAT_ACC_RDONLY);
   if (!mat) {
     boost::format m("cannot open file `%s'");
     m % filename;
     throw std::runtime_error(m.str());
   }
-  boost::shared_ptr<matvar_t> matvar = make_matvar(mat); //gets the first var.
+  boost::shared_ptr<matvar_t> matvar = varname.size() ? make_matvar(mat,varname) : make_matvar(mat); //gets the first var.
+  if (!matvar) {
+    if (varname.size()){
+      boost::format m("Cannot find `%s' in file '%s'");
+      m % varname % filename;
+      throw std::runtime_error(m.str());
+    }else{
+      boost::format m("Cannot find any variable in file '%s'");
+      m % filename;
+      throw std::runtime_error(m.str());
+    }
+  }
   get_var_info(matvar, info);
 }
 
