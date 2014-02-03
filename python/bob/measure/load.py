@@ -7,8 +7,8 @@
 """
 
 import numpy
-
 import tarfile
+import os
 
 def open_file(filename):
   """Opens the given score file for reading.
@@ -20,6 +20,8 @@ def open_file(filename):
   Returns:
     A read-only file-like object as it would be returned by open().
   """
+  if not os.path.isfile(filename):
+    raise IOError("Score file '%s' does not exist." % filename)
   if not tarfile.is_tarfile(filename):
     return open(filename, 'rt')
 
