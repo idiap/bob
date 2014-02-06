@@ -20,6 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <bob/config.h>
 #include <bob/python/ndarray.h>
 
 using namespace boost::python;
