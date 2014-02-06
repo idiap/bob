@@ -8,6 +8,7 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
+#include <bob/config.h>
 #include <bob/python/ndarray.h>
 
 using namespace boost::python;
