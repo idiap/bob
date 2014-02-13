@@ -1,4 +1,4 @@
-# Configures and builds bob
+# Configures, builds and tests bob
 # Andre Anjos <andre.anjos@idiap.ch>
 # Sat  1 Sep 20:36:15 2012 CEST
 
