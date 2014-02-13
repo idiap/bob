@@ -11,9 +11,9 @@ else()
   include(src/BobGNUInstallDirs.cmake)
 endif()
 
-# -----------------
-# START of options.
-# -----------------
+# ----------------
+# START of options
+# ----------------
 
 if (NOT CMAKE_BUILD_TYPE)
   message(FATAL_ERROR "error: choose either Release or Debug as build type by specifying -DCMAKE_BUILD_TYPE=Release or -DCMAKE_BUILD_TYPE=Debug on your cmake command line.")
