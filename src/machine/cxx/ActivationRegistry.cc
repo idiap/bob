@@ -13,7 +13,7 @@ boost::shared_ptr<bob::machine::ActivationRegistry> bob::machine::ActivationRegi
   static boost::shared_ptr<bob::machine::ActivationRegistry> s_instance(new ActivationRegistry());
   return s_instance;
 }
-    
+
 void bob::machine::ActivationRegistry::deregisterFactory(const std::string& id) {
   s_id2factory.erase(id);
 }
@@ -28,6 +28,7 @@ void bob::machine::ActivationRegistry::registerActivation(const std::string& id,
   }
   else {
     boost::format m("factory for activation function %s is being registered twice");
+    m % id;
     throw std::runtime_error(m.str());
   }
 
