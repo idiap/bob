@@ -27,9 +27,13 @@ void bob::machine::ActivationRegistry::registerActivation(const std::string& id,
     s_id2factory[id] = factory;
   }
   else {
-    boost::format m("factory for activation function %s is being registered twice");
-    m % id;
-    throw std::runtime_error(m.str());
+    if (s_id2factory[id] != factory) {
+      boost::format m("replacing factory for activation functor `%s' with a different one is not allowed at this point");
+      m % id;
+      throw std::runtime_error(m.str());
+    }
+    //replacing with the same factory may be the result of multiple python
+    //modules being loaded.
   }
 
 }
