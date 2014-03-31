@@ -178,7 +178,7 @@ void extrapolateNearest(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   if (offset_x>0) rx_left = blitz::Range(0,offset_x-1);
   blitz::Range rx_middle(offset_x,offset_x+src.extent(1)-1);
   blitz::Range rx_right;
-  if (offset_x>0) rx_right = blitz::Range(offset_x+src.extent(1),dst.extent(1)-1);
+  if (offset_x+src.extent(1)<dst.extent(1)) rx_right = blitz::Range(offset_x+src.extent(1),dst.extent(1)-1);
 
   // Performs the extrapolation considering the 9 blocks around
   // the middle region which is set equal to src
