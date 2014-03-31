@@ -92,6 +92,11 @@ A1111_mirror = numpy.array([1,2,2,1,1,2,2,1,1,2,2,
                             3,4,4,3,3,4,4,3,3,4,4,
                             3,4,4,3,3,4,4,3,3,4,4], 'float64').reshape(11,11)
 
+
+A33_bug         = numpy.array([[0., 1, 2], [3, 4, 5], [6, 7, 8]])
+A33_bug_nearest = numpy.array([[0., 1, 2, 2], [3, 4, 5, 5], [6, 7, 8, 8], [6, 7, 8, 8]])
+
+
 #############################################################################
 
 
@@ -188,6 +193,10 @@ class ExtrapolationTest(unittest.TestCase):
     B = numpy.zeros((11,11), numpy.float64)
     extrapolate_nearest(A22,B)
     _extrapolate_2D(B,A1111_nearest,self)
+
+    B = numpy.zeros((4,4), numpy.float64)
+    extrapolate_nearest(A33_bug,B)
+    _extrapolate_2D(B,A33_bug_nearest,self)
   
   def test_extrapolation_2D_circular(self):
     B = numpy.zeros((4,4), numpy.float64)
