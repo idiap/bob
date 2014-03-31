@@ -13,7 +13,7 @@ boost::shared_ptr<bob::machine::ActivationRegistry> bob::machine::ActivationRegi
   static boost::shared_ptr<bob::machine::ActivationRegistry> s_instance(new ActivationRegistry());
   return s_instance;
 }
-    
+
 void bob::machine::ActivationRegistry::deregisterFactory(const std::string& id) {
   s_id2factory.erase(id);
 }
@@ -27,8 +27,13 @@ void bob::machine::ActivationRegistry::registerActivation(const std::string& id,
     s_id2factory[id] = factory;
   }
   else {
-    boost::format m("factory for activation function %s is being registered twice");
-    throw std::runtime_error(m.str());
+    if (s_id2factory[id] != factory) {
+      boost::format m("replacing factory for activation functor `%s' with a different one is not allowed at this point");
+      m % id;
+      throw std::runtime_error(m.str());
+    }
+    //replacing with the same factory may be the result of multiple python
+    //modules being loaded.
   }
 
 }

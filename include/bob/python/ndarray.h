@@ -427,6 +427,11 @@ namespace bob { namespace python {
       virtual boost::python::object pyobject();
 
       /**
+       * @brief type cast operator converting this object into a boost::python::object
+       */
+      operator boost::python::object(){return pyobject();}
+
+      /**
        * @brief Tells if the buffer is writeable
        */
       virtual bool is_writeable() const; ///< PyArray_ISWRITEABLE
@@ -506,6 +511,11 @@ namespace bob { namespace python {
        * @brief Returns the underlying python representation.
        */
       virtual boost::python::object self();
+
+      /**
+       * @brief type cast operator converting this object into a boost::python::object
+       */
+      operator boost::python::object(){return self();}
 
       /**
        * @brief Returns a temporary blitz::Array<> skin over this ndarray.

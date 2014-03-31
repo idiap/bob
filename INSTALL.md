@@ -82,6 +82,8 @@ Some variables that may be handy:
    listed above
  * WITH_PYTHON: if you would like to force a specific version of python, you
    can define it with this variable
+ * WITH_IPYTHON: if you would like to force a specific version of ipython, you
+   can define it with this variable
  * BOB_INSTALL_PYTHON_INTERPRETER: installs a shell wrapper for both python and
    ipython (if you have it) that prefixes the build or installation egg
    locations

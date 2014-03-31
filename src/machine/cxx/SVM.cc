@@ -134,13 +134,10 @@ static void svm_model_free(svm_model*& m) {
 blitz::Array<uint8_t,1> bob::machine::svm_pickle
 (const boost::shared_ptr<svm_model> model)
 {
-  //use a re-entrant version of tmpnam...
-  char tmp_filename[L_tmpnam];
-  char* v = std::tmpnam(tmp_filename);
-  if (!v) throw std::runtime_error("std::tmpnam() call failed - unique name cannot be generated");
+  std::string tmp_filename = bob::core::tmpfile(".svm");
 
   //save it to a temporary file
-  if (svm_save_model(tmp_filename, model.get())) {
+  if (svm_save_model(tmp_filename.c_str(), model.get())) {
     boost::format s("cannot save SVM to file `%s' while copying model");
     s % tmp_filename;
     throw std::runtime_error(s.str());
@@ -148,10 +145,10 @@ blitz::Array<uint8_t,1> bob::machine::svm_pickle
 
   //gets total size of file
   struct stat filestatus;
-  stat(tmp_filename, &filestatus);
+  stat(tmp_filename.c_str(), &filestatus);
 
   //reload the data from the file in binary format
-  std::ifstream binfile(tmp_filename, std::ios::binary);
+  std::ifstream binfile(tmp_filename.c_str(), std::ios::binary);
   blitz::Array<uint8_t,1> buffer(filestatus.st_size);
   binfile.read(reinterpret_cast<char*>(buffer.data()), filestatus.st_size);
 
@@ -176,17 +173,15 @@ static boost::shared_ptr<svm_model> make_model(const char* filename) {
  */
 boost::shared_ptr<svm_model> bob::machine::svm_unpickle
 (const blitz::Array<uint8_t,1>& buffer) {
-  //use a re-entrant version of tmpnam...
-  char tmp_filename[L_tmpnam];
-  char* v = std::tmpnam(tmp_filename);
-  if (!v) throw std::runtime_error("std::tmpnam() call failed - unique name cannot be generated");
 
-  std::ofstream binfile(tmp_filename, std::ios::binary);
+  std::string tmp_filename = bob::core::tmpfile(".svm");
+
+  std::ofstream binfile(tmp_filename.c_str(), std::ios::binary);
   binfile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
   binfile.close();
 
   //reload the file using the appropriate libsvm loading method
-  boost::shared_ptr<svm_model> retval = make_model(tmp_filename);
+  boost::shared_ptr<svm_model> retval = make_model(tmp_filename.c_str());
 
   if (!retval) {
     boost::format s("cannot open model file '%s'");
