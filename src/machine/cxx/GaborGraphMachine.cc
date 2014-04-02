@@ -179,7 +179,7 @@ void bob::machine::GaborGraphMachine::average(
   blitz::Array<double,3>& averaged_graph_jets
 ) const {
 
-  m_averages.resize(many_graph_jets.extent(1));
+  m_averages.resize(many_graph_jets.extent(3));
 
   // iterate over the Gabor jets
   for (int i = 0; i < many_graph_jets.extent(1); ++i){
