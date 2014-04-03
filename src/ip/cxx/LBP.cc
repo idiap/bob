@@ -204,16 +204,16 @@ uint16_t bob::ip::LBP::right_shift_circular(uint16_t pattern, int spaces)
 void bob::ip::LBP::init()
 {
   if (m_P < 4)
-    throw std::runtime_error("LBP16 codes with less than 4 bits are not supported.");
+    throw std::runtime_error("LBP codes with less than 4 bits are not supported.");
   // check that the parameters are something useful, what we can handle
   if (m_P != 4 && m_P != 8 && m_P != 16 &&
       (m_uniform || m_rotation_invariant || (m_add_average_bit && m_to_average)))
     throw std::runtime_error("Special LBP types are only implemented for 4, 8, or 16 neighbors.");
   if (m_P == 16 && m_add_average_bit && m_to_average){
-    throw std::runtime_error("LBP16 codes with average bit require 17 bits, but our representation is UINT16.");
+    throw std::runtime_error("LBP codes with average bit require 17 bits, but our representation is UINT16.");
   }
   if (isMultiBlockLBP() && m_P == 16){
-    throw std::runtime_error("LBP16 codes are not supported for multi-block LBP's.");
+    throw std::runtime_error("LBP codes are not supported for multi-block LBP's.");
   }
   if (m_P > 16){
     throw std::runtime_error("LBP codes with more than 16 neighbors are not supported since our representation is UINT16.");
