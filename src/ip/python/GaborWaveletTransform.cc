@@ -216,6 +216,7 @@ void bind_ip_gabor_wavelet_transform() {
   )
 
   .def(boost::python::init<bob::ip::GaborWaveletTransform&>((boost::python::arg("self"), boost::python::arg("other"))))
+  .def(boost::python::init<bob::io::HDF5File&>((boost::python::arg("self"), boost::python::arg("config"))))
   .def(boost::python::self == boost::python::self)
   .def(boost::python::self != boost::python::self)
 

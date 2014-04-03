@@ -234,6 +234,14 @@ bob::ip::GaborWaveletTransform::GaborWaveletTransform(
   computeKernelFrequencies();
 }
 
+bob::ip::GaborWaveletTransform::GaborWaveletTransform(
+  bob::io::HDF5File& file
+)
+{
+  load(file);
+}
+
+
 bob::ip::GaborWaveletTransform&
 bob::ip::GaborWaveletTransform::operator =
 (
@@ -251,7 +259,7 @@ bob::ip::GaborWaveletTransform::operator =
   m_number_of_directions = other.m_number_of_directions;
 
   computeKernelFrequencies();
-  
+
   return *this;
 }
 

@@ -92,6 +92,9 @@ namespace bob {
         //! Copy constructor
         GaborWaveletTransform(const GaborWaveletTransform& other);
 
+        //! Constructor from HDF5File
+        GaborWaveletTransform(bob::io::HDF5File& file);
+
         //! Assignment operator
         GaborWaveletTransform& operator=(const GaborWaveletTransform& other);
         //! Equality operator
