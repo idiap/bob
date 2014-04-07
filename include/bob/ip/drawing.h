@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <blitz/array.h>
+#include <boost/tuple/tuple.hpp>
 
 namespace bob { namespace ip {
 
