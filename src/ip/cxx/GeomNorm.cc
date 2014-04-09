@@ -20,7 +20,7 @@ bob::ip::GeomNorm::GeomNorm( const double rotation_angle, const double scaling_f
 }
 
 bob::ip::GeomNorm::GeomNorm(const bob::ip::GeomNorm& other):
-  m_rotation_angle(other.m_rotation_angle), 
+  m_rotation_angle(other.m_rotation_angle),
   m_scaling_factor(other.m_scaling_factor),
   m_crop_height(other.m_crop_height), m_crop_width(other.m_crop_width),
   m_crop_offset_h(other.m_crop_offset_h), m_crop_offset_w(other.m_crop_offset_w)
@@ -31,7 +31,7 @@ bob::ip::GeomNorm::~GeomNorm()
 {
 }
 
-bob::ip::GeomNorm& 
+bob::ip::GeomNorm&
 bob::ip::GeomNorm::operator=(const bob::ip::GeomNorm& other)
 {
   if (this != &other)
@@ -46,15 +46,15 @@ bob::ip::GeomNorm::operator=(const bob::ip::GeomNorm& other)
   return *this;
 }
 
-bool 
+bool
 bob::ip::GeomNorm::operator==(const bob::ip::GeomNorm& b) const
 {
-  return (this->m_rotation_angle == b.m_rotation_angle && this->m_scaling_factor == b.m_scaling_factor && 
-          this->m_crop_height == b.m_crop_height && this->m_crop_width == b.m_crop_width && 
+  return (this->m_rotation_angle == b.m_rotation_angle && this->m_scaling_factor == b.m_scaling_factor &&
+          this->m_crop_height == b.m_crop_height && this->m_crop_width == b.m_crop_width &&
           this->m_crop_offset_h == b.m_crop_offset_w);
 }
 
-bool 
+bool
 bob::ip::GeomNorm::operator!=(const bob::ip::GeomNorm& b) const
 {
   return !(this->operator==(b));
@@ -72,8 +72,8 @@ bob::ip::GeomNorm::operator()(const blitz::TinyVector<double,2>& position,
                centered_x = position(1) - rot_c_x;
 
   return blitz::TinyVector<double,2> (
-    centered_x * sin_angle - centered_y * cos_angle + m_crop_offset_h,
-    centered_x * cos_angle + centered_y * sin_angle + m_crop_offset_w
+    centered_y * cos_angle - centered_x * sin_angle + m_crop_offset_h,
+    centered_y * sin_angle + centered_x * cos_angle + m_crop_offset_w
   );
 
 }
