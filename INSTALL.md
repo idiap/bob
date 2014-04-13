@@ -17,24 +17,12 @@ Bob depends on:
  * libpng
  * libtiff
  * HDF5
- * Python and the following packages:
-   * Setuptools
-   * NumPy
-   * SciPy
-   * argparse
-   * Sphinx
-   * Nose
-   * SqlAlchemy
-   * Matplotlib
 
 There are also optional dependencies we strongly recommend:
 
  * FFMpeg/LibAV
  * MatIO
- * Qt4
  * VLFeat
- * OpenCV
- * LIBSVM
 
 Building and documentation generation depends on the following packages:
 
@@ -42,6 +30,7 @@ Building and documentation generation depends on the following packages:
  * Doxygen
  * Dvipng
  * LaTeX
+ * Python (>=2.4)
 
 ## Building
 
@@ -61,8 +50,6 @@ Tests can be executed with:
 
 ```sh
 $ make test #run C++ tests
-$ make nosetests #run Python tests
-$ make sphinx-doctest #run Documentation tests
 ```
 
 ## Installing
@@ -80,10 +67,3 @@ Some variables that may be handy:
  * CMAKE_BUILD_TYPE: options `Release` or `Debug` are supported
  * CMAKE_PREFIX_PATH: places to look-up for externals such as the dependencies
    listed above
- * WITH_PYTHON: if you would like to force a specific version of python, you
-   can define it with this variable
- * WITH_IPYTHON: if you would like to force a specific version of ipython, you
-   can define it with this variable
- * BOB_INSTALL_PYTHON_INTERPRETER: installs a shell wrapper for both python and
-   ipython (if you have it) that prefixes the build or installation egg
-   locations

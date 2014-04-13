@@ -42,17 +42,12 @@ macro(resolve_library library dirs l)
   unset(newlib CACHE)
 endmacro()
 
-add_subdirectory(lbfgs)
-
 # Required externals
-include(python.cmake)
 include(blitz.cmake)
 include(boost.cmake)
 set(cxx_incdir ${Blitz_INCLUDE_DIR};${boost_INCLUDE_DIRS})
-set(py_incdir ${cxx_incdir};${python_INCLUDE_DIRS})
 
 add_subdirectory(core)
-add_subdirectory(python)
 
 add_subdirectory(io)
 add_subdirectory(measure)
@@ -61,23 +56,7 @@ add_subdirectory(math)
 add_subdirectory(ip)
 add_subdirectory(ap)
 
-if(WITH_LIBSVM)
-  include(libsvm.cmake)
-  if(NOT LIBSVM_FOUND)
-    message(FATAL_ERROR "LibSVM has not been found. use '-DWITH_LIBSVM=OFF' to disable this check.")
-  endif()
-else()
-  message(STATUS "LibSVM modules DISABLED by user request")
-endif()
-
 add_subdirectory(machine)
 add_subdirectory(trainer)
-
-if(WITH_QT4)
-  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-  add_subdirectory(visioner)
-else()
-  message(STATUS "Qt4 modules DISABLED by user request")
-endif()
 
 set(ENABLED_PACKAGES "${ENABLED_PACKAGES}" PARENT_SCOPE)

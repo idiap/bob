@@ -34,10 +34,6 @@
 
 #cmakedefine01 WITH_VLFEAT
 
-#cmakedefine01 WITH_LIBSVM
-
-#cmakedefine01 WITH_QT4
-
 #cmakedefine01 WITH_PERFTOOLS
 
 #endif /* BOB_CONFIG_H */

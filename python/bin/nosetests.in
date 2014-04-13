@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-export NOSE_EXCLUDE="@BOB_NOSE_EXCLUDE@";
-export PYTHONPATH="@BOB_PYTHONPATH@:${PYTHONPATH}";
-@NOSETESTS_EXECUTABLE@ "${@}"
