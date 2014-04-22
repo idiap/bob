@@ -42,7 +42,7 @@ void gradient_(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
     m % 0 % M;
     throw std::runtime_error(m.str());
   }
-  if (!dx>0.) {
+  if (!(dx>0.)) {
     boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
     m % dx % 0;
     throw std::runtime_error(m.str());
@@ -114,12 +114,12 @@ void gradient_(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
     m % 1 % N;
     throw std::runtime_error(m.str());
   }
-  if (!dy>0.) {
+  if (!(dy>0.)) {
     boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
     m % dy % 0;
     throw std::runtime_error(m.str());
   }
-  if (!dx>0.) {
+  if (!(dx>0.)) {
     boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
     m % dx % 1;
     throw std::runtime_error(m.str());
@@ -216,17 +216,17 @@ void gradient_(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
     m % 2 % P;
     throw std::runtime_error(m.str());
   }
-  if (!dz>0.) {
+  if (!(dz>0.)) {
     boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
     m % dz % 0;
     throw std::runtime_error(m.str());
   }
-  if (!dy>0.) {
+  if (!(dy>0.)) {
     boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
     m % dy % 1;
     throw std::runtime_error(m.str());
   }
-  if (!dx>0.) {
+  if (!(dx>0.)) {
     boost::format m("the sample distance %f for dimension %d is NOT strictly positive - no gradient can be computed");
     m % dx % 2;
     throw std::runtime_error(m.str());

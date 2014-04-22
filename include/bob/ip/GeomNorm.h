@@ -14,7 +14,7 @@
  */
 
 #ifndef BOB_IP_GEOM_NORM_H
-#define BOB_IP_GROM_NORM_H
+#define BOB_IP_GEOM_NORM_H
 
 #include <boost/shared_ptr.hpp>
 #include "bob/core/assert.h"
