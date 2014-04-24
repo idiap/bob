@@ -120,7 +120,7 @@ void bob::ip::VLDSIFT::operator()(const blitz::Array<float,2>& src,
   float const *descrs = vl_dsift_get_descriptors(m_filt);
   if(bob::core::array::isCZeroBaseContiguous(dst)) 
     // fast copy
-    std::memcpy(dst.data(), descrs, num_frames*descr_size);
+    std::memcpy(dst.data(), descrs, num_frames*descr_size*sizeof(float));
   else
   {
     // Iterate (slow...)
