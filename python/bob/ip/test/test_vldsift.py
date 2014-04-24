@@ -66,13 +66,17 @@ class VLDSiftTest(unittest.TestCase):
   def test01_VLDSiftPython(self):
     # Dense SIFT reference using VLFeat 0.9.13 
     # (First 3 descriptors, Gaussian window)
-    filename = F(os.path.join("sift", "vldsift_gref.hdf5"))
-    ref_vl = bob.io.load(filename)
+    filename_beg = F(os.path.join("sift", "vldsift_gref_beg.hdf5"))
+    ref_vl_beg = bob.io.load(filename_beg)
+    filename_end = F(os.path.join("sift", "vldsift_gref_end.hdf5"))
+    ref_vl_end = bob.io.load(filename_end)
 
     # Computes dense SIFT feature using VLFeat binding
     img = load_image('vlimg_ref.pgm')
     mydsift1 = bob.ip.VLDSIFT(img.shape[0],img.shape[1])
     out_vl = mydsift1(img)
     # Compare to reference (first 200 descriptors)
+    offset = out_vl.shape[0]-200
     for i in range(200):
-      self.assertTrue(equals(out_vl[i,:], ref_vl[i,:], 2e-6))
+      self.assertTrue(equals(out_vl[i,:], ref_vl_beg[i,:], 2e-6))
+      self.assertTrue(equals(out_vl[offset+i,:], ref_vl_end[i,:], 2e-6))
