@@ -22,7 +22,6 @@ set(incdir ${cxx_incdir})
 set(src
    "block.cc"
    "color.cc"
-   "HornAndSchunckFlow.cc"
    "crop.cc"
    "shift.cc"
    "TanTriggs.cc"
@@ -41,7 +40,6 @@ set(src
    "WeightedGaussian.cc"
    "MultiscaleRetinex.cc"
    "SelfQuotientImage.cc"
-   "SpatioTemporalGradient.cc"
    "DCTFeatures.cc"
    "GaussianScaleSpace.cc"
    "SIFT.cc"
