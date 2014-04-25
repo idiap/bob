@@ -9,6 +9,7 @@
  */
 
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
 
 #include <bob/config.h>
 #include <bob/io/MatUtils.h>
@@ -16,6 +17,9 @@
 
 boost::shared_ptr<mat_t> bob::io::detail::make_matfile(const std::string& filename,
     int flags) {
+  if ((flags == MAT_ACC_RDWR) && !boost::filesystem::exists(filename.c_str())) {
+    return boost::shared_ptr<mat_t>(Mat_Create(filename.c_str(), 0), std::ptr_fun(Mat_Close));
+  }
   return boost::shared_ptr<mat_t>(Mat_Open(filename.c_str(), flags), std::ptr_fun(Mat_Close));
 }
 
