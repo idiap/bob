@@ -18,8 +18,8 @@ import subprocess
 from distutils.version import StrictVersion
 
 BRANCH_RE = re.compile(r'^\d+\.\d+$')
-TAG_RE = re.compile(r'^v\d+\.\d+\.\d+$')
-VERSION_RE = re.compile(r'^\d+\.\d+\.\d+$')
+TAG_RE = re.compile(r'^v\d+\.\d+\.\d+([abc]\d+)?$')
+VERSION_RE = re.compile(r'^\d+\.\d+\.\d+([abc]\d+)?$')
 BOB_REPOSITORY = 'https://github.com/idiap/bob.git'
 
 def git_remote_version_branches(verbose):
@@ -108,10 +108,15 @@ def git_next_minor_version(branch, verbose):
 
     if not candidates: raise RuntimeError
 
-    next_version = list(candidates[-1].version)
-    next_version[2] += 1
-
-    return '.'.join([str(k) for k in next_version])
+    candidate = candidates[-1]
+    if candidate.prerelease:
+      next_version = list(candidate.version)
+      return '.'.join([str(k) for k in next_version]) + \
+              candidate.prerelease[0] + str(candidate.prerelease[1] + 1)
+    else:
+      next_version = list(candidate.version)
+      next_version[2] += 1
+      return '.'.join([str(k) for k in next_version])
 
   except:
     if verbose:
@@ -202,7 +207,7 @@ if __name__ == '__main__':
 
   if options.version:
     if not VERSION_RE.match(options.version):
-      parser.error("input version has to conform to the format M.m.p (where M, m and p are non-negative integers")
+      parser.error("input version has to conform to the format M.m.p[ld] (where M, m, p, d are non-negative integers, l may be a, b or c")
 
   if options.count is not None and options.count < 0:
     parser.error("count has to be greater or equal zero")
@@ -231,7 +236,7 @@ if __name__ == '__main__':
 
   if not options.version:
     print('unknown')
-  elif options.letter:
+  elif options.letter and not StrictVersion(options.version).prerelease:
     final = options.version + options.letter + str(options.count)
     StrictVersion(final) #double-checks all is good
     print(final)
