@@ -97,23 +97,23 @@ def test_format_codecs():
   # distortion patterns for specific codecs
   distortions = dict(
       # we require high standards by default
-      default    = dict(frameskip=0.1,  color=8.5,  noise=45.),
+      default    = dict(frameskip=0.1,  color=9.0,  noise=45.),
 
       # high-quality encoders
       zlib       = dict(frameskip=0.0,  color=0.0, noise=0.0),
       ffv1       = dict(frameskip=0.05, color=9.,  noise=46.),
       vp8        = dict(frameskip=0.3,  color=9.0, noise=65.),
       libvpx     = dict(frameskip=0.3,  color=9.0, noise=65.),
-      h264       = dict(frameskip=0.4,  color=8.5, noise=50.),
-      libx264    = dict(frameskip=0.4,  color=8.5, noise=50.),
+      h264       = dict(frameskip=0.4,  color=9.0, noise=50.),
+      libx264    = dict(frameskip=0.4,  color=9.0, noise=50.),
       theora     = dict(frameskip=0.5,  color=9.0, noise=70.),
       libtheora  = dict(frameskip=0.5,  color=9.0, noise=70.),
       mpeg4      = dict(frameskip=1.0,  color=9.0, noise=55.),
 
       # older, but still good quality encoders
-      mjpeg      = dict(frameskip=1.2,  color=8.5, noise=50.),
-      mpegvideo  = dict(frameskip=1.3,  color=8.5, noise=55.),
-      mpeg2video = dict(frameskip=1.3,  color=8.5, noise=55.),
+      mjpeg      = dict(frameskip=1.2,  color=9.0, noise=50.),
+      mpegvideo  = dict(frameskip=1.3,  color=9.0, noise=55.),
+      mpeg2video = dict(frameskip=1.3,  color=9.0, noise=55.),
       mpeg1video = dict(frameskip=1.4,  color=9.0, noise=50.),
 
       # low quality encoders - avoid using - available for compatibility
