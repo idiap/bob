@@ -26,7 +26,7 @@ struct T {
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
+template<typename T, typename U, int d>
 void check_dimensions(const blitz::Array<T,d>& t1, const blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
@@ -34,7 +34,7 @@ void check_dimensions(const blitz::Array<T,d>& t1, const blitz::Array<U,d>& t2)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T, typename U>  
+template<typename T, typename U>
 void checkBlitzClose(const blitz::Array<T,3>& t1, const blitz::Array<U,3>& t2,
   const double eps )
 {
@@ -50,8 +50,8 @@ void checkBlitzClose(const blitz::Array<T,3>& t1, const blitz::Array<U,3>& t2,
 static const double MAGNIF=3.;
 static const int NOCTAVES=1;
 static const int NINTERVALS=3;
-static const int OCTAVE_MIN=0; // 
-static const int OCTAVE_CUR=0; // 
+static const int OCTAVE_MIN=0; //
+static const int OCTAVE_CUR=0; //
 static const int HEIGHT=200;
 static const int WIDTH=200;
 static const int OCTAVE_HEIGHT=HEIGHT/(1<<OCTAVE_CUR);
@@ -61,7 +61,6 @@ static const int NBO=8;
 static const float VL_EPSILON_F=1.19209290E-07F;
 static const double VL_EPSILON_D=2.220446049250313e-16;
 static const double WINDOW_SIZE=NBP / 2 ;
-static const double SIGMA0=1.6;
 static bob::ip::GSSKeypoint kp(2., 50, 70);
 
 // 2. Friend class for testing bob SIFT implementation (final part of descriptor computation)
@@ -101,13 +100,13 @@ void bob::ip::SIFTtest::run(const blitz::Array<double,2>& src, blitz::Array<doub
 }
 
 // 3. Code extracted from VLFeat for testing purposes and updated for our
-// particular comparison. This extracted code was originally distributed 
+// particular comparison. This extracted code was originally distributed
 // under a BSD license.
 float vl_mod_2pi_f(float x)
 {
   while(x > (float)(2 * M_PI)) x -= (float) (2 * M_PI);
   while(x < 0.0F) x += (float) (2 * M_PI);
-  return x; 
+  return x;
 }
 
 float vl_abs_f(float x)
@@ -142,7 +141,7 @@ void vl_update_gradient(const blitz::Array<double,2>& src_, blitz::Array<float,3
 #define SAVE_BACK                                           \
     *grad++ = sqrt (gx*gx + gy*gy) ;                        \
     *grad++ = vl_mod_2pi_f   (atan2 (gy, gx) + 2*M_PI) ;    \
-    ++src ;                                                 
+    ++src ;
 
     src = src_c;
     grad = grad_c + 2 * so * (s - s_min -1) ;
@@ -205,7 +204,7 @@ void vl_update_gradient(const blitz::Array<double,2>& src_, blitz::Array<float,3
     SAVE_BACK ;
   }
 }
- 
+
 float vl_normalize_histogram(float *begin, float *end)
 {
   float* iter ;
@@ -324,7 +323,7 @@ void vl_sift(const blitz::Array<double,2>& A,
       // Get the Gaussian weight of the sample. The Gaussian window
       // has a standard deviation equal to NBP/2. Note that dx and dy
       // are in the normalized frame, so that -NBP/2 <= dx <=
-      // NBP/2. 
+      // NBP/2.
       float const wsigma = WINDOW_SIZE;
       float win = exp(-(nx*nx + ny*ny)/(2.0 * wsigma * wsigma)) ;
 
@@ -371,7 +370,7 @@ void vl_sift(const blitz::Array<double,2>& A,
     for(bin = 0; bin < NBO*NBP*NBP ; ++ bin) {
       if (descr [bin] > 0.2) descr [bin] = 0.2;
     }
-    // normalize again. 
+    // normalize again.
     vl_normalize_histogram (descr, descr + NBO*NBP*NBP) ;
   }
 }
@@ -398,7 +397,7 @@ BOOST_AUTO_TEST_CASE( test_sift_vlfeat_comparison )
   vl_sift(A, vl_grad, vl_descr);
 
   // 3. Compare
-  checkBlitzClose( bob_descr, vl_descr, eps); 
+  checkBlitzClose( bob_descr, vl_descr, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
