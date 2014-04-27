@@ -61,7 +61,6 @@ static const int NBO=8;
 static const float VL_EPSILON_F=1.19209290E-07F;
 static const double VL_EPSILON_D=2.220446049250313e-16;
 static const double WINDOW_SIZE=NBP / 2 ;
-//static const double SIGMA0=1.6;
 static bob::ip::GSSKeypoint kp(2., 50, 70);
 
 // 2. Friend class for testing bob SIFT implementation (final part of descriptor computation)
