@@ -77,7 +77,7 @@ if (WITH_FFMPEG)
   pkg_check_modules(FFMPEG libavformat>=52.31.0 libavcodec>=52.20.0 libavutil>=49.15.0 libswscale>=0.7.1)
 
   if(FFMPEG_FOUND)
-    find_program(FFMPEG_BINARY ffmpeg)
+    find_program(FFMPEG_BINARY NAMES ffmpeg avconv)
 
     if(FFMPEG_BINARY)
       # Setup the FFMPEG "official version"
