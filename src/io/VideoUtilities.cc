@@ -757,12 +757,21 @@ bob::io::detail::ffmpeg::make_frame(const std::string& filename,
     boost::shared_ptr<AVCodecContext> codec, PixelFormat pixfmt) {
 
   /* allocate and init a re-usable frame */
+#if LIBAVCODEC_VERSION_INT < 0x373466 //55.52.102 @ ffmpeg-2.2
   AVFrame* retval = avcodec_alloc_frame();
   if (!retval) {
     boost::format m("bob::io::detail::ffmpeg::avcodec_alloc_frame() failed: cannot allocate frame to start encoding video file `%s'");
     m % filename;
     throw std::runtime_error(m.str());
   }
+#else
+  AVFrame* retval = av_frame_alloc();
+  if (!retval) {
+    boost::format m("bob::io::detail::ffmpeg::av_frame_alloc() failed: cannot allocate frame to start encoding video file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
+#endif
 
 #if LIBAVCODEC_VERSION_INT < 0x363b64 //54.59.100 @ ffmpeg-1.0
 
@@ -823,12 +832,24 @@ static void deallocate_empty_frame(AVFrame* f) {
 }
 
 boost::shared_ptr<AVFrame> bob::io::detail::ffmpeg::make_empty_frame(const std::string& filename) {
+
+  /* allocate and init a re-usable frame */
+#if LIBAVCODEC_VERSION_INT < 0x373466 //55.52.102 @ ffmpeg-2.2
   AVFrame* retval = avcodec_alloc_frame();
   if (!retval) {
-    boost::format m("bob::io::detail::ffmpeg::avcodec_alloc_frame() failed: cannot allocate (empty) frame to start reading video file `%s'");
+    boost::format m("bob::io::detail::ffmpeg::avcodec_alloc_frame() failed: cannot allocate frame to start encoding video file `%s'");
     m % filename;
     throw std::runtime_error(m.str());
   }
+#else
+  AVFrame* retval = av_frame_alloc();
+  if (!retval) {
+    boost::format m("bob::io::detail::ffmpeg::av_frame_alloc() failed: cannot allocate frame to start encoding video file `%s'");
+    m % filename;
+    throw std::runtime_error(m.str());
+  }
+#endif
+
   return boost::shared_ptr<AVFrame>(retval, std::ptr_fun(deallocate_empty_frame));
 }
 
