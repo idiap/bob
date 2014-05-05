@@ -29,14 +29,6 @@ void bob::machine::GaborJetSimilarity::init(){
   std::fill(m_confidences.begin(), m_confidences.end(), 0.);
   m_phase_differences.resize(m_gwt.numberOfKernels());
   std::fill(m_phase_differences.begin(), m_phase_differences.end(), 0.);
-
-  // used for disparity-like similarity functions only...
-  m_wavelet_extends.reserve(m_gwt.numberOfScales());
-  for (unsigned level = 0; level < m_gwt.numberOfScales(); ++level){
-    blitz::TinyVector<double,2> k = m_gwt.kernelFrequencies()[level * m_gwt.numberOfDirections()];
-    double k_abs = sqrt(sqr(k[0]) + sqr(k[1]));
-    m_wavelet_extends.push_back(M_PI / k_abs);
-  }
 }
 
 
@@ -71,15 +63,8 @@ double bob::machine::GaborJetSimilarity::operator()(const blitz::Array<double,2>
   }
 
   // Here, only the disparity based similarity functions are executed
-  bob::core::array::assertCZeroBaseContiguous(jet1);
-  bob::core::array::assertCZeroBaseContiguous(jet2);
-  bob::core::array::assertSameShape(jet1,jet2);
-
-  // compute confidence vectors
-  compute_confidences(jet1, jet2);
-
-  // now, compute the disparity
-  compute_disparity();
+  // compute the disparity
+  disparity(jet1, jet2);
 
   const std::vector<blitz::TinyVector<double,2> >& kernels = m_gwt.kernelFrequencies();
 
@@ -124,8 +109,44 @@ double bob::machine::GaborJetSimilarity::operator()(const blitz::Array<double,2>
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////  Disparity estimation  /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+blitz::TinyVector<double,2> bob::machine::GaborJetSimilarity::disparity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
+  if (m_type == SCALAR_PRODUCT || m_type == CANBERRA){
+    // call the function without phases
+    return operator()(jet1(0,blitz::Range::all()), jet2(0,blitz::Range::all()));
+  }
+
+  // Here, only the disparity based similarity functions are executed
+  bob::core::array::assertCZeroBaseContiguous(jet1);
+  bob::core::array::assertCZeroBaseContiguous(jet2);
+  bob::core::array::assertSameShape(jet1,jet2);
+
+  // compute confidence vectors
+  compute_confidences(jet1, jet2);
+
+  // now, compute the disparity
+  compute_disparity();
+
+  // return the disparity
+  return m_disparity;
+}
+
 static double adjustPhase(double phase){
   return phase - (2.*M_PI)*round(phase / (2.*M_PI));
+}
+
+void bob::machine::GaborJetSimilarity::shift_phase(const blitz::Array<double,2>& jet, const blitz::Array<double,2>& reference, blitz::Array<double,2>& shifted) const{
+  bob::core::array::assertSameShape(jet,reference);
+  bob::core::array::assertSameShape(jet,shifted);
+
+  // compute disparity between jet and reference jet
+  disparity(jet, reference);
+
+  // compute phase shift for each jet entry based on disparity vector
+  const std::vector<blitz::TinyVector<double,2> >& kernels = m_gwt.kernelFrequencies();
+  shifted = jet;
+  for (int j = m_phase_differences.size(); j--;){
+    shifted(1,j) = adjustPhase(shifted(1,j) - m_disparity[0] * kernels[j][0] - m_disparity[1] * kernels[j][1]);
+  }
 }
 
 void bob::machine::GaborJetSimilarity::compute_confidences(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const{
@@ -169,7 +190,6 @@ void bob::machine::GaborJetSimilarity::compute_disparity() const{
     double gamma_det = gamma_x_x * gamma_y_y - sqr(gamma_x_y);
     m_disparity[1] = (gamma_y_y * phi_x - gamma_x_y * phi_y) / gamma_det;
     m_disparity[0] = (gamma_x_x * phi_y - gamma_x_y * phi_x) / gamma_det;
-
   } // for level
 }
 

@@ -99,6 +99,16 @@ static double bob_jet_sim(const bob::machine::GaborJetSimilarity& self, bob::pyt
   }
 }
 
+static blitz::Array<double,2> bob_jet_shift_phase(const bob::machine::GaborJetSimilarity& self, const blitz::Array<double,2>& jet, const blitz::Array<double,2>& reference){
+  blitz::Array<double,2> shifted(reference.shape());
+  self.shift_phase(jet, reference, shifted);
+  return shifted;
+}
+
+// re-definition of function so that they can be distinguished
+static blitz::TinyVector<double,2> (bob::machine::GaborJetSimilarity::*disparity1)() const = &bob::machine::GaborJetSimilarity::disparity;
+static blitz::TinyVector<double,2> (bob::machine::GaborJetSimilarity::*disparity2)(const blitz::Array<double,2>&, const blitz::Array<double,2>&) const = &bob::machine::GaborJetSimilarity::disparity;
+
 void bind_machine_gabor(){
   /////////////////////////////////////////////////////////////////////////////////////////
   //////////////// Gabor jet similarities
@@ -135,9 +145,23 @@ void bind_machine_gabor(){
 
     .def(
       "disparity",
-      &bob::machine::GaborJetSimilarity::disparity,
+      disparity1,
       (boost::python::arg("self")),
       "Returns the disparity computed by the latest call. Only valid for disparity-like similarity function types."
+    )
+
+    .def(
+      "disparity",
+      disparity2,
+      (boost::python::arg("self"), boost::python::arg("jet1"), boost::python::arg("jet2")),
+      "Computes the disparity vector between the two Gabor jets. Assure that the correct GaborWaveletTransform class have been specified in the constructor."
+    )
+
+    .def(
+      "shift_phase",
+      bob_jet_shift_phase,
+      (boost::python::arg("self"), boost::python::arg("jet"), boost::python::arg("reference")),
+      "Returns a copy of jet, where the phases are shifted towards the reference Gabor jet."
     )
 
     .def(

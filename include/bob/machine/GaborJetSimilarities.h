@@ -48,7 +48,13 @@ namespace bob { namespace machine {
       double operator()(const blitz::Array<double,1>& jet1, const blitz::Array<double,1>& jet2) const;
 
       //! returns the disparity vector estimated during the last call of similarity; only valid for disparity types
+      blitz::TinyVector<double,2> disparity(const blitz::Array<double,2>& jet1, const blitz::Array<double,2>& jet2) const;
+
+      //! returns the disparity vector estimated during the last call of similarity; only valid for disparity types
       blitz::TinyVector<double,2> disparity() const {return m_disparity;}
+
+      //! returns the disparity vector estimated during the last call of similarity; only valid for disparity types
+      void shift_phase(const blitz::Array<double,2>& jet, const blitz::Array<double,2>& reference, blitz::Array<double,2>& shifted) const;
 
       //! \brief saves the parameters of this Gabor jet similarity to file
       void save(bob::io::HDF5File& file) const;
@@ -74,7 +80,6 @@ namespace bob { namespace machine {
 
       mutable std::vector<double> m_confidences;
       mutable std::vector<double> m_phase_differences;
-      std::vector<double> m_wavelet_extends;
 
   }; // class GaborJetSimilarity
 
