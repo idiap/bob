@@ -110,3 +110,39 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
     BOOST_CHECK_CLOSE(similarity, 1., epsilon);
   }
 }
+
+BOOST_AUTO_TEST_CASE( test_disparity ){
+  // generate Gabor jet
+  bob::ip::GaborWaveletTransform gwt;
+  blitz::Array<double,2> test_jet(2, gwt.numberOfKernels());
+  test_jet(0, blitz::Range::all()) = 0.;
+  for (unsigned i = 0; i < gwt.numberOfKernels() ; i += 4)
+    test_jet(0,(int)i) = 1.;
+  test_jet(1, blitz::Range::all()) = M_PI/4.;
+
+  blitz::Array<double,2> shifted_jet(test_jet.shape());
+  shifted_jet = test_jet;
+
+  // generate shifted jet that should have an exact disparity
+  shifted_jet(1,0) += M_PI/2.;
+  shifted_jet(1,8) += M_PI/(2.*sqrt(2.));
+  shifted_jet(1,16) += M_PI/4.;
+  shifted_jet(1,24) += M_PI/(4*sqrt(2.));
+  shifted_jet(1,32) += M_PI/8.;
+
+  // shift jet towards reference jet
+  bob::machine::GaborJetSimilarity sim(bob::machine::GaborJetSimilarity::DISPARITY, gwt);
+  blitz::Array<double,2> normalized_jet(test_jet.shape());
+  sim.shift_phase(shifted_jet, test_jet, normalized_jet);
+
+  // get disparity vector
+  blitz::TinyVector<double,2> disp = sim.disparity();
+  BOOST_CHECK_SMALL(disp[0], epsilon);
+  BOOST_CHECK_CLOSE(disp[1], 1., epsilon);
+
+  // check that the directions that we have set are correct
+  // (the other directions are modified as well, but computing those values is more difficult)
+  for (unsigned i = 0; i < gwt.numberOfKernels(); i += 4)
+    BOOST_CHECK_SMALL(normalized_jet(1,(int)i) - test_jet(1,(int)i), epsilon);
+}
+
