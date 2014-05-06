@@ -11,13 +11,10 @@ find_package(Boost 1.40.0 REQUIRED
   COMPONENTS
     unit_test_framework
     iostreams
-    serialization
+    date_time
     thread
     filesystem
-    date_time
-    program_options
     system
-    regex
   )
 
 # Renaming so all works automagically
