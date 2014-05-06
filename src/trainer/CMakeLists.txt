@@ -13,10 +13,6 @@ set(src
   "GMMTrainer.cc"
   "MAP_GMMTrainer.cc"
   "ML_GMMTrainer.cc"
-  "DataShuffler.cc"
-  "MLPBaseTrainer.cc"
-  "MLPRPropTrainer.cc"
-  "MLPBackPropTrainer.cc"
   "JFATrainer.cc"
   "IVectorTrainer.cc"
   "WienerTrainer.cc"
@@ -26,8 +22,6 @@ set(src
   "CGLogRegTrainer.cc"
   "WhiteningTrainer.cc"
   "WCCNTrainer.cc"
-  "SquareError.cc"
-  "CrossEntropyLoss.cc"
   )
 
 # Define the library, compilation and linkage options

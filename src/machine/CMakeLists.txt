@@ -12,7 +12,6 @@ set(src
   "GMMMachine.cc"
   "GMMStats.cc"
   "LinearMachine.cc"
-  "MLP.cc"
   "Activation.cc"
   "ActivationRegistry.cc"
   "LinearScoring.cc"
