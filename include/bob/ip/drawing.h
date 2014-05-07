@@ -70,7 +70,7 @@ namespace bob { namespace ip {
    */
   template <typename T>
   void try_draw_point (blitz::Array<T,2>& image, int y, int x, T color) {
-    if (x >= image.extent(1) || y >= image.extent(0)) return;
+    if (x < 0 || y < 0 || x >= image.extent(1) || y >= image.extent(0)) return;
     draw_point_(image, y, x, color);
   }
 
@@ -81,7 +81,7 @@ namespace bob { namespace ip {
   template <typename T>
   void try_draw_point (blitz::Array<T,3>& image, int y, int x,
       const boost::tuple<T,T,T>& color) {
-    if (x >= image.extent(2) || y >= image.extent(1)) return;
+    if (x < 0 || y < 0 || x >= image.extent(2) || y >= image.extent(1)) return;
     draw_point_(image, y, x, color);
   }
 
