@@ -75,13 +75,13 @@ class CSVFile: public bob::io::File {
       m_array_type.update_strides();
     }
 
-    CSVFile(const std::string& path, char mode):
+    CSVFile(const char* path, char mode):
       m_filename(path),
       m_newfile(false) {
 
         if (mode == 'r' || (mode == 'a' && boost::filesystem::exists(path))) { //try peeking
-          
-          if (mode == 'r') 
+
+          if (mode == 'r')
             m_file.open(m_filename.c_str(), std::ios::in);
           else if (mode == 'a')
             m_file.open(m_filename.c_str(), std::ios::app|std::ios::in|std::ios::out);
@@ -95,7 +95,7 @@ class CSVFile: public bob::io::File {
         }
         else {
           m_file.open(m_filename.c_str(), std::ios::trunc|std::ios::in|std::ios::out);
-          
+
           if (!m_file.is_open()) {
             boost::format m("cannot open file '%s' for writing");
             m % path;
@@ -113,8 +113,8 @@ class CSVFile: public bob::io::File {
 
     virtual ~CSVFile() { }
 
-    virtual const std::string& filename() const {
-      return m_filename;
+    virtual const char* filename() const {
+      return m_filename.c_str();
     }
 
     virtual const bob::core::array::typeinfo& type() const {
@@ -129,8 +129,8 @@ class CSVFile: public bob::io::File {
       return m_pos.size();
     }
 
-    virtual const std::string& name() const {
-      return s_codecname;
+    virtual const char* name() const {
+      return s_codecname.c_str();
     }
 
     virtual void read_all(bob::core::array::interface& buffer) {
@@ -157,7 +157,7 @@ class CSVFile: public bob::io::File {
       if (m_newfile)
         throw std::runtime_error("uninitialized CSV file cannot be read");
 
-      if (!buffer.type().is_compatible(m_arrayset_type)) 
+      if (!buffer.type().is_compatible(m_arrayset_type))
         buffer.set(m_arrayset_type);
 
       if (index >= m_pos.size()) {
@@ -275,7 +275,7 @@ std::string CSVFile::s_codecname = "bob.csv";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -283,8 +283,8 @@ std::string CSVFile::s_codecname = "bob.csv";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -293,10 +293,8 @@ std::string CSVFile::s_codecname = "bob.csv";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File> 
-make_file (const std::string& path, char mode) {
+static boost::shared_ptr<bob::io::File> make_file (const char* path, char mode) {
   return boost::make_shared<CSVFile>(path, mode);
-
 }
 
 /**
@@ -306,7 +304,7 @@ static bool register_codec() {
 
   boost::shared_ptr<bob::io::CodecRegistry> instance =
     bob::io::CodecRegistry::instance();
-  
+
   instance->registerExtension(".csv", "Comma-Separated Values", &make_file);
   instance->registerExtension(".txt", "Comma-Separated Values", &make_file);
 

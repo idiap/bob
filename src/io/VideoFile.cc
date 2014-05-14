@@ -25,7 +25,7 @@ class VideoFile: public bob::io::File {
 
   public: //api
 
-    VideoFile(const std::string& path, char mode):
+    VideoFile(const char* path, char mode):
       m_filename(path),
       m_newfile(true) {
 
@@ -54,8 +54,8 @@ class VideoFile: public bob::io::File {
 
     virtual ~VideoFile() { }
 
-    virtual const std::string& filename() const {
-      return m_filename;
+    virtual const char* filename() const {
+      return m_filename.c_str();
     }
 
     virtual const bob::core::array::typeinfo& type_all() const {
@@ -70,8 +70,8 @@ class VideoFile: public bob::io::File {
       return (m_reader)? 1:(!m_newfile);
     }
 
-    virtual const std::string& name() const {
-      return s_codecname;
+    virtual const char* name() const {
+      return s_codecname.c_str();
     }
 
     virtual void read_all(bob::core::array::interface& buffer) {
@@ -80,13 +80,13 @@ class VideoFile: public bob::io::File {
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
 
-      if (index != 0) 
+      if (index != 0)
         throw std::runtime_error("can only read all frames at once in video codecs");
 
       if (!m_reader)
         throw std::runtime_error("can only read if opened video in 'r' mode");
 
-      if(!buffer.type().is_compatible(m_reader->video_type())) 
+      if(!buffer.type().is_compatible(m_reader->video_type()))
         buffer.set(m_reader->video_type());
 
       m_reader->load(buffer);
@@ -95,7 +95,7 @@ class VideoFile: public bob::io::File {
     virtual size_t append (const bob::core::array::interface& buffer) {
 
       const bob::core::array::typeinfo& type = buffer.type();
-  
+
       if (type.nd != 3 and type.nd != 4)
         throw std::runtime_error("input buffer for videos must have 3 or 4 dimensions");
 
@@ -138,7 +138,7 @@ std::string VideoFile::s_codecname = "bob.video";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -146,8 +146,8 @@ std::string VideoFile::s_codecname = "bob.video";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -156,11 +156,8 @@ std::string VideoFile::s_codecname = "bob.video";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File> 
-make_file (const std::string& path, char mode) {
-
+static boost::shared_ptr<bob::io::File> make_file (const char* path, char mode) {
   return boost::make_shared<VideoFile>(path, mode);
-
 }
 
 /**
@@ -199,8 +196,8 @@ static bool register_codec() {
   std::map<std::string, std::string> formats;
   list_formats(formats);
   for (auto k=formats.begin(); k!=formats.end(); ++k) {
-    if (!instance->isRegistered(k->first)) {
-      instance->registerExtension(k->first, k->second, &make_file);
+    if (!instance->isRegistered(k->first.c_str())) {
+      instance->registerExtension(k->first.c_str(), k->second.c_str(), &make_file);
     }
   }
 

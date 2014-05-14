@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  blitz::Array<uint8_t,2> img = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   blitz::Array<double,2> img_processed;
 
   // 5 degrees
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 5., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r5.pgm";
-  blitz::Array<uint8_t,2> img_ref_r5 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_r5 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
 
   // 10 degrees
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 10., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10.pgm";
-  blitz::Array<uint8_t,2> img_ref_r10 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_r10 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_r10, img_processed, eps);
 
   // 15 degrees
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 15., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r15.pgm";
-  blitz::Array<uint8_t,2> img_ref_r15 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_r15 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_r15, img_processed, eps);
 
   // 30 degrees
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 30., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r30.pgm";
-  blitz::Array<uint8_t,2> img_ref_r30 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_r30 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_r30, img_processed, eps);
 
   // 45 degrees
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 45., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r45.pgm";
-  blitz::Array<uint8_t,2> img_ref_r45 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_r45 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_r45, img_processed, eps);
 
   // 70 degrees
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 70., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r70.pgm";
-  blitz::Array<uint8_t,2> img_ref_r70 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_r70 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_r70, img_processed, eps);
 
   // 237 degrees
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 237., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r237.pgm";
-  blitz::Array<uint8_t,2> img_ref_r237 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_r237 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_r237, img_processed, eps);
 
   // -25 degrees
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_2d_generic_uint32 )
   bob::ip::rotate( img, img_processed, -25., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_rn25.pgm";
-  blitz::Array<uint8_t,2> img_ref_rn25 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref_rn25 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_rn25, img_processed, eps);
 }
 
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "imageColor.ppm";
-  blitz::Array<uint8_t,3> img = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,3>();
+  blitz::Array<uint8_t,3> img = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,3>();
   blitz::Array<double,3> img_processed;
 
   // 5 degrees
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE( test_rotate_3d_generic_uint32 )
   bob::ip::rotate( img, img_processed, 5., bob::ip::Rotate::Shearing);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "imageColor_r5.ppm";
-  blitz::Array<uint8_t,3> img_ref_r5 = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,3>();
+  blitz::Array<uint8_t,3> img_ref_r5 = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,3>();
   checkBlitzClose( img_ref_r5, img_processed, eps);
 }
 

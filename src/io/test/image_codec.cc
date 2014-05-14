@@ -53,8 +53,8 @@ struct T {
 };
 
 
-template<typename T, typename U> 
-void check_equal(blitz::Array<T,2> a, blitz::Array<U,2> b) 
+template<typename T, typename U>
+void check_equal(blitz::Array<T,2> a, blitz::Array<U,2> b)
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -65,8 +65,8 @@ void check_equal(blitz::Array<T,2> a, blitz::Array<U,2> b)
   }
 }
 
-template<typename T, typename U> 
-void check_equal(blitz::Array<T,3> a, blitz::Array<U,3> b) 
+template<typename T, typename U>
+void check_equal(blitz::Array<T,3> a, blitz::Array<U,3> b)
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -82,11 +82,11 @@ void check_equal(blitz::Array<T,3> a, blitz::Array<U,3> b)
 
 BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 
-BOOST_AUTO_TEST_CASE( image_gif ) 
+BOOST_AUTO_TEST_CASE( image_gif )
 {
   std::string filename = bob::core::tmpfile(".gif");
-  bob::io::save(filename, e);
-  check_equal( bob::io::load<uint8_t,3>(filename), e );
+  bob::io::save(filename.c_str(), e);
+  check_equal( bob::io::load<uint8_t,3>(filename.c_str()), e );
   boost::filesystem::remove(filename);
 }
 
@@ -94,9 +94,9 @@ BOOST_AUTO_TEST_CASE( image_bmp )
 {
   std::string filename = bob::core::tmpfile(".bmp");
   std::cout << "saved = " << bob::core::array::cast<uint32_t>(b) << std::endl;
-  bob::io::save(filename, b);
-  std::cout << "loaded = " << bob::core::array::cast<uint32_t>(bob::io::load<uint8_t,3>(filename)) << std::endl;
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
+  bob::io::save(filename.c_str(), b);
+  std::cout << "loaded = " << bob::core::array::cast<uint32_t>(bob::io::load<uint8_t,3>(filename.c_str())) << std::endl;
+  check_equal( bob::io::load<uint8_t,3>(filename.c_str()), b );
   boost::filesystem::remove(filename);
 }
 
@@ -105,51 +105,51 @@ BOOST_AUTO_TEST_CASE( image_png )
   // Grayscale 8 bits
   {
     std::string filename = bob::core::tmpfile(".png");
-    bob::io::save(filename, a);
-    check_equal( bob::io::load<uint8_t,2>(filename), a);
+    bob::io::save(filename.c_str(), a);
+    check_equal( bob::io::load<uint8_t,2>(filename.c_str()), a);
     boost::filesystem::remove(filename);
   }
 
   // Color 8 bits
   {
     std::string filename = bob::core::tmpfile(".png");
-    bob::io::save(filename, b);
-    check_equal( bob::io::load<uint8_t,3>(filename), b);
+    bob::io::save(filename.c_str(), b);
+    check_equal( bob::io::load<uint8_t,3>(filename.c_str()), b);
     boost::filesystem::remove(filename);
   }
 
   // Color 16 bits
   {
     std::string filename = bob::core::tmpfile(".png");
-    bob::io::save(filename, c);
-    check_equal( bob::io::load<uint16_t,3>(filename), c);
+    bob::io::save(filename.c_str(), c);
+    check_equal( bob::io::load<uint16_t,3>(filename.c_str()), c);
     boost::filesystem::remove(filename);
   }
 }
 
-BOOST_AUTO_TEST_CASE( image_tiff ) 
+BOOST_AUTO_TEST_CASE( image_tiff )
 {
   // Grayscale 8 bits
   {
     std::string filename = bob::core::tmpfile(".tiff");
-    bob::io::save(filename, a);
-    check_equal( bob::io::load<uint8_t,2>(filename), a);
+    bob::io::save(filename.c_str(), a);
+    check_equal( bob::io::load<uint8_t,2>(filename.c_str()), a);
     boost::filesystem::remove(filename);
   }
 
   // Color 8 bits
   {
     std::string filename = bob::core::tmpfile(".tiff");
-    bob::io::save(filename, b);
-    check_equal( bob::io::load<uint8_t,3>(filename), b);
+    bob::io::save(filename.c_str(), b);
+    check_equal( bob::io::load<uint8_t,3>(filename.c_str()), b);
     boost::filesystem::remove(filename);
   }
 
   // Color 16 bits
   {
     std::string filename = bob::core::tmpfile(".tiff");
-    bob::io::save(filename, c);
-    check_equal( bob::io::load<uint16_t,3>(filename), c);
+    bob::io::save(filename.c_str(), c);
+    check_equal( bob::io::load<uint16_t,3>(filename.c_str()), c);
     boost::filesystem::remove(filename);
   }
 }
@@ -158,8 +158,8 @@ BOOST_AUTO_TEST_CASE( image_tiff )
 BOOST_AUTO_TEST_CASE( image_jpg )
 {
   std::string filename = bob::core::tmpfile(".jpg");
-  bob::io::save(filename, b);
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
+  bob::io::save(filename.c_str(), b);
+  check_equal( bob::io::load<uint8_t,3>(filename.c_str()), b );
   boost::filesystem::remove(filename);
 }
 */
@@ -167,24 +167,24 @@ BOOST_AUTO_TEST_CASE( image_jpg )
 BOOST_AUTO_TEST_CASE( image_pbm )
 {
   std::string filename = bob::core::tmpfile(".pbm");
-  bob::io::save(filename, d);
-  check_equal( bob::io::load<uint8_t,2>(filename), d );
+  bob::io::save(filename.c_str(), d);
+  check_equal( bob::io::load<uint8_t,2>(filename.c_str()), d );
   boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_pgm )
 {
   std::string filename = bob::core::tmpfile(".pgm");
-  bob::io::save(filename, a);
-  check_equal( bob::io::load<uint8_t,2>(filename), a );
+  bob::io::save(filename.c_str(), a);
+  check_equal( bob::io::load<uint8_t,2>(filename.c_str()), a );
   boost::filesystem::remove(filename);
 }
 
 BOOST_AUTO_TEST_CASE( image_ppm )
 {
   std::string filename = bob::core::tmpfile(".ppm");
-  bob::io::save(filename, b);
-  check_equal( bob::io::load<uint8_t,3>(filename), b );
+  bob::io::save(filename.c_str(), b);
+  check_equal( bob::io::load<uint8_t,3>(filename.c_str()), b );
   boost::filesystem::remove(filename);
 }
 

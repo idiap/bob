@@ -67,15 +67,15 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
   // check node positions
   boost::filesystem::path node_position_file = boost::filesystem::path(data_dir) / "grid_positions.hdf5";
 #ifdef GENERATE_NEW_REFERENCE_FILES
-  bob::io::save(node_position_file.string(), machine.nodes());
+  bob::io::save(node_position_file.string().c_str(), machine.nodes());
 #else // GENERATE_NEW_REFERENCE_FILES
-  blitz::Array<int,2> node_positions = bob::io::load<int,2>(node_position_file.string());
+  blitz::Array<int,2> node_positions = bob::io::load<int,2>(node_position_file.string().c_str());
   test_identical(machine.nodes(), node_positions);
 #endif // GENERATE_NEW_REFERENCE_FILES
 
   // Load original image
   boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.pgm";
-  blitz::Array<uint8_t,2> uint8_image = bob::io::load<uint8_t,2>(image_file.string());
+  blitz::Array<uint8_t,2> uint8_image = bob::io::load<uint8_t,2>(image_file.string().c_str());
   blitz::Array<std::complex<double>,2> image = bob::core::array::cast<std::complex<double> >(uint8_image);
 
   // perform Gabor wavelet transform
@@ -90,10 +90,10 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
   // check if the jets are still the same
   boost::filesystem::path graph_jets_file = boost::filesystem::path(data_dir) / "graph_jets.hdf5";
 #ifdef GENERATE_NEW_REFERENCE_FILES
-  bob::io::save(graph_jets_file.string(), graph);
+  bob::io::save(graph_jets_file.string().c_str(), graph);
   blitz::Array<double,3> graph_jets = graph;
 #else // GENERATE_NEW_REFERENCE_FILES
-  blitz::Array<double,3> graph_jets = bob::io::load<double,3>(graph_jets_file.string());
+  blitz::Array<double,3> graph_jets = bob::io::load<double,3>(graph_jets_file.string().c_str());
   test_close(graph, graph_jets);
 #endif // GENERATE_NEW_REFERENCE_FILES
 

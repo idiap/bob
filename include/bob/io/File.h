@@ -9,22 +9,18 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_IO_FILE_H 
+#ifndef BOB_IO_FILE_H
 #define BOB_IO_FILE_H
 
-#include <vector>
-#include <string>
-
 #include <boost/shared_ptr.hpp>
-
 #include <bob/core/array.h>
 #include <bob/core/blitz_array.h>
 
 /**
- * @addtogroup IO io 
+ * @addtogroup IO io
  * @brief I/O module API
  */
-namespace bob { 
+namespace bob {
 /**
  * @ingroup IO
  */
@@ -33,7 +29,7 @@ namespace io {
    * @ingroup IO
    * @{
    */
-      
+
   /**
    * @brief Files deal with reading and writing multiple (homogeneous) array
    * data to and from files.
@@ -47,7 +43,7 @@ namespace io {
       /**
        * The filename this array codec current points to
        */
-      virtual const std::string& filename() const =0;
+      virtual const char* filename() const =0;
 
       /**
        * The typeinfo of data within this file, if it is supposed to be read as
@@ -70,7 +66,7 @@ namespace io {
       /**
        * Returns the name of the codec, for compatibility reasons.
        */
-      virtual const std::string& name() const =0;
+      virtual const char* name() const =0;
 
       /**
        * Loads the data of the array into memory. If an index is specified
@@ -135,7 +131,7 @@ namespace io {
         return tmp.cast<T,N>();
       }
 
-      template <typename T, int N> void read(blitz::Array<T,N>& io, 
+      template <typename T, int N> void read(blitz::Array<T,N>& io,
           size_t index) {
         bob::core::array::blitz_array use_this(io);
         use_this.set(type());
@@ -175,8 +171,8 @@ namespace io {
   };
 
   /**
-   * @brief This defines the factory method F that can create codecs. Your 
-   * task, as a codec developer is to create one of such methods for each of 
+   * @brief This defines the factory method F that can create codecs. Your
+   * task, as a codec developer is to create one of such methods for each of
    * your codecs and statically register them to the codec registry.
    *
    * Here are the meanings of the mode flag that should be respected by your
@@ -186,16 +182,15 @@ namespace io {
    *      error to open a file that does not exist for read-only operations.
    * 'w': opens for reading and writing, but truncates the file if it
    *      exists; it is not an error to open files that do not exist with
-   *      this flag. 
-   * 'a': opens for reading and writing - any type of modification can 
+   *      this flag.
+   * 'a': opens for reading and writing - any type of modification can
    *      occur. If the file does not exist, this flag is effectively like
    *      'w'.
    *
    * Returns a newly allocated File object that can read and write data to the
    * file using a specific backend.
    */
-  typedef boost::shared_ptr<File> (*file_factory_t)
-    (const std::string& filename, char mode);
+  typedef boost::shared_ptr<File> (*file_factory_t) (const char* filename, char mode);
 
   /**
    * @}

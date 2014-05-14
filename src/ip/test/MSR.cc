@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( test_multiscaleRetinex_2d )
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
   testdata_path_img /= "image.pgm";
-  blitz::Array<uint8_t,2> img = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   blitz::Array<double,2> img_d = bob::core::array::cast<double>(img);
   blitz::Array<double,2> img_processed_d(img.extent(0),img.extent(1));
   bob::ip::MultiscaleRetinex msr_filter(3);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( test_multiscaleRetinex_2d )
   // Compare to reference image
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_msr_3scales.pgm";
-  blitz::Array<uint8_t,2> img_ref = bob::io::open(testdata_path_img.string(), 'r')->read_all<uint8_t,2>();
+  blitz::Array<uint8_t,2> img_ref = bob::io::open(testdata_path_img.string().c_str(), 'r')->read_all<uint8_t,2>();
   checkBlitzClose( img_processed, img_ref, eps);
 }
 

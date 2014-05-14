@@ -37,8 +37,8 @@ struct T {
 
 };
 
-template<typename T, typename U> 
-void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b) 
+template<typename T, typename U>
+void check_equal(const blitz::Array<T,2>& a, const blitz::Array<U,2>& b)
 {
   BOOST_REQUIRE_EQUAL(a.extent(0), b.extent(0));
   BOOST_REQUIRE_EQUAL(a.extent(1), b.extent(1));
@@ -54,8 +54,8 @@ BOOST_FIXTURE_TEST_SUITE( test_setup, T )
 BOOST_AUTO_TEST_CASE( tensor_2d )
 {
   std::string filename = bob::core::tmpfile(".tensor");
-  bob::io::save(filename, a);
-  check_equal( bob::io::load<int8_t,2>(filename), a );
+  bob::io::save(filename.c_str(), a);
+  check_equal( bob::io::load<int8_t,2>(filename.c_str()), a );
   boost::filesystem::remove(filename);
 }
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE( tensor_2d_read_T5alpha )
   boost::filesystem::path testdata_path( testdata_cpath);
   testdata_path /= "tensor_char.tensor";
 
-  check_equal( bob::io::load<int8_t,2>(testdata_path.string()), b );
+  check_equal( bob::io::load<int8_t,2>(testdata_path.string().c_str()), b );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

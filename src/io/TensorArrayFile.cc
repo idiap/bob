@@ -15,7 +15,7 @@ class TensorArrayFile: public bob::io::File {
 
   public: //api
 
-    TensorArrayFile(const std::string& path, bob::io::TensorFile::openmode mode):
+    TensorArrayFile(const char* path, bob::io::TensorFile::openmode mode):
       m_file(path, mode),
       m_filename(path) {
         if (m_file.size()) m_file.peek(m_type);
@@ -23,8 +23,8 @@ class TensorArrayFile: public bob::io::File {
 
     virtual ~TensorArrayFile() { }
 
-    virtual const std::string& filename() const {
-      return m_filename;
+    virtual const char* filename() const {
+      return m_filename.c_str();
     }
 
     virtual const bob::core::array::typeinfo& type_all () const {
@@ -39,13 +39,13 @@ class TensorArrayFile: public bob::io::File {
       return m_file.size();
     }
 
-    virtual const std::string& name() const {
-      return s_codecname;
+    virtual const char* name() const {
+      return s_codecname.c_str();
     }
 
     virtual void read_all(bob::core::array::interface& buffer) {
 
-      if(!m_file) 
+      if(!m_file)
         throw std::runtime_error("uninitialized binary file cannot be read");
 
       m_file.read(0, buffer);
@@ -54,7 +54,7 @@ class TensorArrayFile: public bob::io::File {
 
     virtual void read(bob::core::array::interface& buffer, size_t index) {
 
-      if(!m_file) 
+      if(!m_file)
         throw std::runtime_error("uninitialized binary file cannot be read");
 
       m_file.read(index, buffer);
@@ -70,7 +70,7 @@ class TensorArrayFile: public bob::io::File {
       return size() - 1;
 
     }
-    
+
     virtual void write (const bob::core::array::interface& buffer) {
 
       //we don't have a special way to treat write()'s like in HDF5.
@@ -98,7 +98,7 @@ std::string TensorArrayFile::s_codecname = "bob.tensor";
 
 /**
  * This defines the factory method F that can create codecs of this type.
- * 
+ *
  * Here are the meanings of the mode flag that should be respected by your
  * factory implementation:
  *
@@ -106,8 +106,8 @@ std::string TensorArrayFile::s_codecname = "bob.tensor";
  *      error to open a file that does not exist for read-only operations.
  * 'w': opens for reading and writing, but truncates the file if it
  *      exists; it is not an error to open files that do not exist with
- *      this flag. 
- * 'a': opens for reading and writing - any type of modification can 
+ *      this flag.
+ * 'a': opens for reading and writing - any type of modification can
  *      occur. If the file does not exist, this flag is effectively like
  *      'w'.
  *
@@ -116,8 +116,7 @@ std::string TensorArrayFile::s_codecname = "bob.tensor";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File> 
-make_file (const std::string& path, char mode) {
+static boost::shared_ptr<bob::io::File> make_file (const char* path, char mode) {
 
   bob::io::TensorFile::openmode _mode;
   if (mode == 'r') _mode = bob::io::TensorFile::in;
@@ -136,7 +135,7 @@ static bool register_codec() {
 
   boost::shared_ptr<bob::io::CodecRegistry> instance =
     bob::io::CodecRegistry::instance();
-  
+
   instance->registerExtension(".tensor", "torch3vision v2.1 tensor files", &make_file);
 
   return true;

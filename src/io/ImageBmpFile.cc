@@ -935,7 +935,7 @@ class ImageBmpFile: public bob::io::File {
 
   public: //api
 
-    ImageBmpFile(const std::string& path, char mode):
+    ImageBmpFile(const char* path, char mode):
       m_filename(path),
       m_newfile(true) {
 
@@ -962,8 +962,8 @@ class ImageBmpFile: public bob::io::File {
 
     virtual ~ImageBmpFile() { }
 
-    virtual const std::string& filename() const {
-      return m_filename;
+    virtual const char* filename() const {
+      return m_filename.c_str();
     }
 
     virtual const bob::core::array::typeinfo& type_all() const {
@@ -978,8 +978,8 @@ class ImageBmpFile: public bob::io::File {
       return m_length;
     }
 
-    virtual const std::string& name() const {
-      return s_codecname;
+    virtual const char* name() const {
+      return s_codecname.c_str();
     }
 
     virtual void read_all(bob::core::array::interface& buffer) {
@@ -1060,8 +1060,7 @@ std::string ImageBmpFile::s_codecname = "bob.image_bmp";
  * @note: This method can be static.
  */
 
-static boost::shared_ptr<bob::io::File>
-make_file (const std::string& path, char mode) {
+static boost::shared_ptr<bob::io::File> make_file (const char* path, char mode) {
   return boost::make_shared<ImageBmpFile>(path, mode);
 }
 

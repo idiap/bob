@@ -8,7 +8,7 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_IO_CODECREGISTRY_H 
+#ifndef BOB_IO_CODECREGISTRY_H
 #define BOB_IO_CODECREGISTRY_H
 
 #include <map>
@@ -28,7 +28,7 @@ namespace bob { namespace io {
   class CodecRegistry {
 
     public: //static access
-      
+
       /**
        * Returns the singleton
        */
@@ -38,7 +38,7 @@ namespace bob { namespace io {
         boost::shared_ptr<CodecRegistry> ptr = instance();
         return ptr->s_extension2description;
       }
- 
+
       /**
        * Sets and unsets double-registration ignore flag
        */
@@ -47,17 +47,22 @@ namespace bob { namespace io {
 
     public: //object access
 
-      void registerExtension(const std::string& extension,
-          const std::string& description,
+      void registerExtension(const char* extension, const char* description,
           file_factory_t factory);
 
       void deregisterFactory(file_factory_t factory);
-      void deregisterExtension(const std::string& codecname);
+      void deregisterExtension(const char* ext);
 
-      file_factory_t findByExtension(const std::string& ext);
-      file_factory_t findByFilenameExtension(const std::string& fn);
+      /**
+       * Returns the codec description, if an extension was registered with the
+       * matching input string. Otherwise, returns 0.
+       */
+      const char* getDescription(const char* ext);
 
-      bool isRegistered(const std::string& ext);
+      file_factory_t findByExtension(const char* ext);
+      file_factory_t findByFilenameExtension(const char* fn);
+
+      bool isRegistered(const char* ext);
 
     private:
 
@@ -69,7 +74,7 @@ namespace bob { namespace io {
       std::map<std::string, file_factory_t> s_extension2codec;
       std::map<std::string, std::string> s_extension2description;
       bool s_ignore; ///< shall I ignore double-registrations?
-    
+
   };
 
 }}

@@ -25,7 +25,7 @@ class HDF5ArrayFile: public bob::io::File {
 
   public:
 
-    HDF5ArrayFile (const std::string& filename, bob::io::HDF5File::mode_t mode):
+    HDF5ArrayFile (const char* filename, bob::io::HDF5File::mode_t mode):
       m_file(filename, mode),
       m_filename(filename),
       m_size_arrayset(0),
@@ -65,8 +65,8 @@ class HDF5ArrayFile: public bob::io::File {
 
     virtual ~HDF5ArrayFile() { }
 
-    virtual const std::string& filename() const {
-      return m_filename;
+    virtual const char* filename() const {
+      return m_filename.c_str();
     }
 
     virtual const bob::core::array::typeinfo& type_all () const {
@@ -81,8 +81,8 @@ class HDF5ArrayFile: public bob::io::File {
       return m_size_arrayset;
     }
 
-    virtual const std::string& name() const {
-      return s_codecname;
+    virtual const char* name() const {
+      return s_codecname.c_str();
     }
 
     virtual void read_all(bob::core::array::interface& buffer) {
@@ -194,8 +194,7 @@ std::string HDF5ArrayFile::s_codecname = "bob.hdf5";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File>
-make_file (const std::string& path, char mode) {
+static boost::shared_ptr<bob::io::File> make_file (const char* path, char mode) {
 
   bob::io::HDF5File::mode_t h5mode;
   if (mode == 'r') h5mode = bob::io::HDF5File::in;

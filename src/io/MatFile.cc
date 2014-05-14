@@ -26,7 +26,7 @@ class MatFile: public bob::io::File {
 
   public: //api
 
-    MatFile(const std::string& path, char mode):
+    MatFile(const char* path, char mode):
       m_filename(path),
       m_mode( (mode=='r')? MAT_ACC_RDONLY : MAT_ACC_RDWR ),
       m_map(new std::map<size_t, std::pair<std::string, bob::core::array::typeinfo> >()),
@@ -63,8 +63,8 @@ class MatFile: public bob::io::File {
       }
     }
 
-    virtual const std::string& filename() const {
-      return m_filename;
+    virtual const char* filename() const {
+      return m_filename.c_str();
     }
 
     virtual const bob::core::array::typeinfo& type_all () const {
@@ -79,8 +79,8 @@ class MatFile: public bob::io::File {
       return m_size;
     }
 
-    virtual const std::string& name() const {
-      return s_codecname;
+    virtual const char* name() const {
+      return s_codecname.c_str();
     }
 
     virtual void read_all(bob::core::array::interface& buffer) {
@@ -236,11 +236,8 @@ std::string MatFile::s_codecname = "bob.matlab";
  *
  * @note: This method can be static.
  */
-static boost::shared_ptr<bob::io::File>
-make_file (const std::string& path, char mode) {
-
+static boost::shared_ptr<bob::io::File> make_file (const char* path, char mode) {
   return boost::make_shared<MatFile>(path, mode);
-
 }
 
 /**
