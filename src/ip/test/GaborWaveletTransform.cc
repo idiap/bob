@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE( test_GWT_output )
   std::string data_dir(data);
 
   // Load original image
-  boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.pgm";
+  boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.hdf5";
   blitz::Array<uint8_t,2> uint8_image = bob::io::open(image_file.string().c_str(), 'r')->read_all<uint8_t,2>();
   blitz::Array<std::complex<double>,2> image = bob::core::array::cast<std::complex<double> >(uint8_image);
 

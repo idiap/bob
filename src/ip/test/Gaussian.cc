@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d )
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
-  testdata_path_img /= "image.pgm";
+  testdata_path_img /= "image.hdf5";
   boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_img.string().c_str(), 'r');
   blitz::Array<uint8_t,2> img = image_file->read_all<uint8_t,2>();
   blitz::Array<double,2> img_d = bob::core::array::cast<double>(img);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE( test_gaussianSmoothing_2d )
 
   // Compare to reference image
   testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_Gaussian.pgm";
+  testdata_path_img /= "image_Gaussian.hdf5";
   boost::shared_ptr<bob::io::File> ref_file = bob::io::open(testdata_path_img.string().c_str(), 'r');
   blitz::Array<uint8_t,2> img_ref = ref_file->read_all<uint8_t,2>();
   checkBlitzClose( img_processed, img_ref, eps);

@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
-  testdata_path_img /= "image_r10.pgm";
+  testdata_path_img /= "image_r10.hdf5";
   blitz::Array<uint8_t,2> img = bob::io::load<uint8_t,2>(testdata_path_img.string().c_str());
   blitz::Array<double,2> img_processed_d(40,40);
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm )
   geomnorm(img, img_processed_d, 54, 27);
   blitz::Array<uint8_t,2> img_processed = bob::core::array::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_r10_geomnorm.pgm";
+  testdata_path_img /= "image_r10_geomnorm.hdf5";
 //  bob::io::save(testdata_path_img.string().c_str(), img_processed); // Re-generate reference data
   blitz::Array<uint8_t,2> img_ref_geomnorm = bob::io::load<uint8_t,2>(testdata_path_img.string().c_str());
   checkBlitzClose( img_ref_geomnorm, img_processed, eps);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
   }
   // Load original image
   boost::filesystem::path testdata_path(testdata_cpath);
-  testdata_path /= "image_r70.pgm";
+  testdata_path /= "image_r70.hdf5";
   blitz::Array<uint8_t,2> input_image = bob::io::load<uint8_t,2>(testdata_path.string().c_str());
   blitz::Array<double,2> output_image(160,160);
 
@@ -130,14 +130,14 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_mask )
   // check that the image is close to the reference image
   blitz::Array<uint8_t,2> output_image_uint8 = bob::core::array::convertFromRange<uint8_t>(output_image, 0., 255.);
   testdata_path = testdata_cpath;
-  testdata_path /= "image_r70_geomnorm.pgm";
+  testdata_path /= "image_r70_geomnorm.hdf5";
 //  bob::io::open(testdata_path.string().c_str(), 'w')->write(output_image_uint8); // Re-generate reference data
   checkBlitzClose( output_image_uint8, bob::io::load<uint8_t,2>(testdata_path.string().c_str()), eps);
 
   // check that the mask is identical to the reference mask
   blitz::Array<uint8_t,2> output_mask_uint8 = bob::core::array::convertFromRange<uint8_t>(output_mask, false, true);
   testdata_path = testdata_cpath;
-  testdata_path /= "image_r70_mask.pgm";
+  testdata_path /= "image_r70_mask.hdf5";
 //  bob::io::open(testdata_path.string().c_str(), 'w')->write(output_mask_uint8); // Re-generate reference data
   blitz::Array<uint8_t,2> output_reference = bob::io::load<uint8_t,2>(testdata_path.string().c_str());
   checkBlitzEqual(output_mask_uint8, output_reference);

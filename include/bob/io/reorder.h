@@ -8,7 +8,7 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_IO_REORDER_H 
+#ifndef BOB_IO_REORDER_H
 #define BOB_IO_REORDER_H
 
 #include <bob/core/array.h>
@@ -22,8 +22,8 @@ namespace bob { namespace io {
    * matrixes given a certain index accessing a position in the matrix and the
    * matrix shape
    *
-   * @param row The resulting row-major linear index. 
-   *            (row,col) is a 2-tuple with the results: row-major and 
+   * @param row The resulting row-major linear index.
+   *            (row,col) is a 2-tuple with the results: row-major and
    *            column-major linear indexes
    * @param col The resulting column-major linear index. (see above)
    * @param i   Index of the column.
@@ -55,12 +55,12 @@ namespace bob { namespace io {
 
   /**
    * Converts the data from row-major order (C-Style) to column major order
-   * (Fortran style), which is required by matio. Input parameters are the src
-   * data in row-major order, the destination (pre-allocated) array of the same
-   * size and the type information.
+   * (Fortran style). Input parameters are the src data in row-major order, the
+   * destination (pre-allocated) array of the same size and the type
+   * information.
    */
-  void row_to_col_order(const void* src_, void* dst_, 
-      const bob::core::array::typeinfo& info);
+  void row_to_col_order(const void* src_, void* dst_, const
+      bob::core::array::typeinfo& info);
 
   /**
    * Converts the data from column-major order (Fortran-Style) to row major
@@ -68,14 +68,14 @@ namespace bob { namespace io {
    * data in column-major order, the destination (pre-allocated) array of the
    * same size and the type information.
    */
-  void col_to_row_order(const void* src_, void* dst_, 
+  void col_to_row_order(const void* src_, void* dst_,
       const bob::core::array::typeinfo& info);
 
   /**
    * Converts the data from row-major order (C-Style) to column major order
-   * (Fortran style), which is required by matio. Input parameters are the src
-   * data in row-major order, the destination (pre-allocated) array of the same
-   * size and the type information.
+   * (Fortran style). Input parameters are the src data in row-major order, the
+   * destination (pre-allocated) array of the same size and the type
+   * information.
    */
   void row_to_col_order_complex(const void* src_, void* dst_re_,
       void* dst_im_, const bob::core::array::typeinfo& info);
@@ -88,7 +88,7 @@ namespace bob { namespace io {
    */
   void col_to_row_order_complex(const void* src_re_, const void* src_im_,
       void* dst_, const bob::core::array::typeinfo& info);
-  
+
 }}
 
 #endif /* BOB_IO_REORDER_H */

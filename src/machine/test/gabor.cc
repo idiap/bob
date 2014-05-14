@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( test_gabor_graph_machine )
 #endif // GENERATE_NEW_REFERENCE_FILES
 
   // Load original image
-  boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.pgm";
+  boost::filesystem::path image_file = boost::filesystem::path(data_dir) / "image.hdf5";
   blitz::Array<uint8_t,2> uint8_image = bob::io::load<uint8_t,2>(image_file.string().c_str());
   blitz::Array<std::complex<double>,2> image = bob::core::array::cast<std::complex<double> >(uint8_image);
 

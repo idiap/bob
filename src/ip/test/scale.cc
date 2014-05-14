@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
-  testdata_path_img /= "image.pgm";
+  testdata_path_img /= "image.hdf5";
   blitz::Array<uint8_t,2> img = bob::io::load<uint8_t,2>(testdata_path_img.string().c_str());
   blitz::Array<double,2> img_processed;
 
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   img_processed.resize(137,137);
   bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_s137x137.pgm";
+  testdata_path_img /= "image_s137x137.hdf5";
 #ifdef REGENERATE_REFERENCE_IMAGES
   bob::io::save(testdata_path_img.string().c_str(), bob::core::array::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   img_processed.resize(77,77);
   bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_s77x77.pgm";
+  testdata_path_img /= "image_s77x77.hdf5";
 #ifdef REGENERATE_REFERENCE_IMAGES
   bob::io::save(testdata_path_img.string().c_str(), bob::core::array::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE( test_scale_2d_generic_uint8 )
   img_processed.resize(125,75);
   bob::ip::scale( img, img_processed, bob::ip::Rescale::BilinearInterp);
   testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_s125x75.pgm";
+  testdata_path_img /= "image_s125x75.hdf5";
 #ifdef REGENERATE_REFERENCE_IMAGES
   bob::io::save(testdata_path_img.string().c_str(), bob::core::array::cast<uint8_t>(img_processed));
 #else // REGENERATE_REFERENCE_IMAGES

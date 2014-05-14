@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   }
   // Load original image
   boost::filesystem::path testdata_path_img( testdata_cpath);
-  testdata_path_img /= "image_r10.pgm";
+  testdata_path_img /= "image_r10.hdf5";
   boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_img.string().c_str(), 'r');
   blitz::Array<uint8_t,2> img = image_file->read_all<uint8_t,2>();
   blitz::Array<double,2> img_processed_d(40,40);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
 
   blitz::Array<uint8_t,2> img_processed = bob::core::array::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
-  testdata_path_img /= "image_r10_facenorm.pgm";
+  testdata_path_img /= "image_r10_facenorm.hdf5";
   boost::shared_ptr<bob::io::File> ref_file = bob::io::open(testdata_path_img.string().c_str(), 'r');
   blitz::Array<uint8_t,2> img_ref_facenorm = ref_file->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_facenorm, img_processed, eps);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
   }
   // Load original image
   boost::filesystem::path testdata_path_image(testdata_cpath);
-  testdata_path_image /= "Nicolas_Cage_0001.pgm";
+  testdata_path_image /= "Nicolas_Cage_0001_Original.hdf5";
   boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_image.string().c_str(), 'r');
   blitz::Array<double,2> processed_image(80,64);
 
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( test_facenorm3 )
   }
   // Load original image
   boost::filesystem::path testdata_path_image(testdata_cpath);
-  testdata_path_image /= "Nicolas_Cage_0001.pgm";
+  testdata_path_image /= "Nicolas_Cage_0001_Original.hdf5";
   boost::shared_ptr<bob::io::File> image_file = bob::io::open(testdata_path_image.string().c_str(), 'r');
   blitz::Array<double,2> processed_image(80,64);
 
