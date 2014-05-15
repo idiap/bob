@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/idiap/bob.svg?branch=2.0)](https://travis-ci.org/idiap/bob)
+[![Coverage Status](https://coveralls.io/repos/idiap/bob/badge.png)](https://coveralls.io/r/idiap/bob)
+
 Bob
 ===
 
