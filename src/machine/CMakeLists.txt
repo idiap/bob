@@ -23,7 +23,6 @@ set(src
   "GaborGraphMachine.cc"
   "GaborJetSimilarities.cc"
   "BICMachine.cc"
-  "roll.cc"
   )
 
 # Define the library, compilation and linkage options
