@@ -42,6 +42,7 @@ endif()
 option(WITH_VLFEAT "Make VLFEAT detection obligatory" ON)
 option(WITH_PERFTOOLS "Make Google Perftools detection obligatory" OFF)
 option(WITH_MKL "Compile against the Intel MKL" OFF)
+option(WITH_COVERAGE "Compile with coverage support" OFF)
 
 # Calculates the library versions to set
 execute_process(COMMAND ${WITH_PYTHON} ${CMAKE_SOURCE_DIR}/bin/soversion.py ${BOB_VERSION} OUTPUT_VARIABLE BOB_SOVERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -56,6 +57,9 @@ message(STATUS "Bob version '${BOB_VERSION}' [${BOB_SOVERSION}] (${BOB_PLATFORM_
 
 # For both C and C++
 set(COMMON_FLAGS "-pedantic -Wall")
+if (WITH_COVERAGE)
+  set(COMMON_FLAGS "-coverage ${COMMON_FLAGS}")
+endif ()
 if (WIN32)
   set(COMMON_FLAGS "-D_WIN32_WINNT=0x501") # Set min. Windows version to XP
 else(WIN32)
