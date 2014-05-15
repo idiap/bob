@@ -6,10 +6,10 @@ before_install:
   - sudo apt-get install -qq --force-yes cmake python pkg-config liblapack-dev libatlas-base-dev libboost-all-dev libhdf5-serial-dev doxygen graphviz libblitz1-dev libvl-dev
   - sudo pip install cpp-coveralls
 install:
-  - "mkdir build"
-  - "cd build && CFLAGS=-coverage CXXFLAGS=-coverage cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=i .."
-  - "make -k -C build"
-  - "make -C build doxygen"
+  - "mkdir build && cd build"
+  - "CFLAGS=-coverage CXXFLAGS=-coverage cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=i .."
+  - "make -k"
+  - "make doxygen"
 script:
   - "make -C build test"
 after_success:
