@@ -11,6 +11,6 @@ install:
   - "make -k"
   - "make doxygen"
 script:
-  - "make -C build test"
+  - "make test"
 after_success:
   - "coveralls --build-root=`pwd`/build"
