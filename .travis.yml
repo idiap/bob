@@ -13,4 +13,4 @@ install:
 script:
   - "make test"
 after_success:
-  - "coveralls --build-root=`pwd`/build"
+  - "coveralls --build-root=`pwd`"
