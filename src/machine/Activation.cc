@@ -4,7 +4,7 @@
  *
  * @brief Implementation of activation functions
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <cmath>

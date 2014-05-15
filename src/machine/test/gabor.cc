@@ -1,11 +1,10 @@
 /**
- * @file machine/cxx/test/gabor.cc
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief Tests Gabor graphs and Gabor jet similarity functions.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

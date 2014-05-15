@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/extrapolateMask.cc
  * @date Mon May 9 19:54:44 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the extrapolate functions
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

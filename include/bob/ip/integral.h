@@ -1,12 +1,11 @@
 /**
- * @file bob/ip/integral.h
  * @date Thu Apr 28 20:09:16 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to compute the integral image of a 2D
  *  or 3D array/image.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_INTEGRAL_H

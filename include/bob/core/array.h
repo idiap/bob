@@ -1,15 +1,14 @@
 /**
- * @file bob/core/array.h
  * @date Tue Nov 8 15:34:31 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief The array API describes a non-specific way to handle N dimensional
  * array data.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_CORE_ARRAY_INTERFACE_H 
+#ifndef BOB_CORE_ARRAY_INTERFACE_H
 #define BOB_CORE_ARRAY_INTERFACE_H
 
 #include <stdexcept>
@@ -29,7 +28,7 @@
  * @addtogroup CORE_ARRAY core_array
  * @brief Array submodule API of the core module
  */
-namespace bob { namespace core { 
+namespace bob { namespace core {
 
 /**
  * @ingroup CORE
@@ -162,7 +161,7 @@ namespace array {
     inline size_t item_size() const { return getElementSize(dtype); }
 
     /**
-     * @brief Returns the total size (in bytes) of the buffer that I'm 
+     * @brief Returns the total size (in bytes) of the buffer that I'm
      * associated with.
      */
     size_t buffer_size() const;
@@ -178,20 +177,20 @@ namespace array {
     bool is_compatible(const typeinfo& other) const;
 
     /**
-     * @brief Formats and returns a string containing the full typeinfo 
+     * @brief Formats and returns a string containing the full typeinfo
      * description.
      */
     std::string str() const;
 
     /**
      * @brief Make it easy to set for blitz::Array<T,N>
-     */ 
+     */
     template <typename T, int N> void set(const blitz::Array<T,N>& array) {
       dtype = getElementType<T>();
       set_shape(array.shape());
     }
 
-    template <typename T, int N> 
+    template <typename T, int N>
       void set(boost::shared_ptr<blitz::Array<T,N> >& array) {
         dtype = getElementType<T>();
         set_shape(array->shape());
@@ -206,7 +205,7 @@ namespace array {
   };
 
   /**
-   * @brief The interface manager introduces a concept for managing the 
+   * @brief The interface manager introduces a concept for managing the
    * interfaces that can be handled as C-style arrays. It encapsulates methods
    * to store and delete the buffer contents in a safe way.
    *
@@ -218,7 +217,7 @@ namespace array {
     public: //api
 
       /**
-       * @brief By default, the interface is never freed. You must override 
+       * @brief By default, the interface is never freed. You must override
        * this method to do something special for your class type.
        */
       virtual ~interface() { }
@@ -245,9 +244,9 @@ namespace array {
       virtual const typeinfo& type() const =0;
 
       /**
-       * @brief Borrows a reference from the underlying memory. This means 
-       * this object continues to be responsible for deleting the memory and 
-       * you should make sure that it outlives the usage of the returned 
+       * @brief Borrows a reference from the underlying memory. This means
+       * this object continues to be responsible for deleting the memory and
+       * you should make sure that it outlives the usage of the returned
        * pointer.
        */
       virtual void* ptr() =0;

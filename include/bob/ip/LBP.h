@@ -1,5 +1,4 @@
 /**
- * @file bob/ip/LBP.h
  * @date Wed Apr 20 20:21:19 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -9,7 +8,7 @@
  *
  * This file defines a class to compute LBP and variants
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_LBP_H

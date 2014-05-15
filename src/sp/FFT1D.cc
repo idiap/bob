@@ -1,11 +1,10 @@
 /**
- * @file sp/cxx/FFT1D.cc
  * @date Fri Nov 15 09:32:32 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement a naive 1D Fast Fourier Transform
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/sp/FFT1D.h>

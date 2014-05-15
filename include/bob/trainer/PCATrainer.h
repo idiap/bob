@@ -1,5 +1,4 @@
 /**
- * @file bob/trainer/PCATrainer.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
@@ -8,7 +7,7 @@
  * Decomposition or using the Covariance Method. Both are implemented using
  * LAPACK.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_TRAINER_PCA_TRAINER_H

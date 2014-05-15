@@ -1,11 +1,10 @@
 /**
- * @file bob/machine/JFAMachine.h
  * @date Sat Jul 23 21:41:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief A base class for Joint Factor Analysis-like machines
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MACHINE_FABASE_H

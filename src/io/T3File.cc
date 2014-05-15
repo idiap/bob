@@ -1,5 +1,4 @@
 /**
- * @file io/cxx/T3File.cc
  * @date Wed Oct 26 17:11:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -16,7 +15,7 @@
  * Because of this restriction, this codec will only be able to work with
  * single-dimension input.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <fstream>

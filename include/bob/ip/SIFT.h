@@ -1,9 +1,8 @@
 /**
- * @file bob/ip/SIFT.h
  * @date Sun Sep 9 19:21:00 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_SIFT_H

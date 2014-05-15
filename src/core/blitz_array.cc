@@ -1,11 +1,10 @@
 /**
- * @file core/cxx/blitz_array.cc
  * @date Tue Nov 8 15:34:31 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implementation of non-templated methods of the blitz
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <stdexcept>

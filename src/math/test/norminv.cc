@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/norminv.cc
  * @date Tue Apr 12 21:33:32 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the inverse normal cumulative distribution
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

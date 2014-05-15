@@ -1,11 +1,10 @@
 /**
- * @file bob/core/array_index.h
  * @date Mon Apr 11 10:29:29 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file contains functions related to array indices manipulation
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_ARRAY_INDEX_H
@@ -42,7 +41,7 @@ inline int keepInRange( const int val, const int min, const int max) {
  * @param max The maximum of the range
  */
 inline int mirrorInRange( const int val, const int min, const int max) {
-  return (val < min ? mirrorInRange(min-val-1, min, max) : 
+  return (val < min ? mirrorInRange(min-val-1, min, max) :
             (val > max ? mirrorInRange(2*max-val+1, min, max) : val ) );
 }
 

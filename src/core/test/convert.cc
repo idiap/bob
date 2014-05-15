@@ -1,11 +1,10 @@
 /**
- * @file core/cxx/test/convert.cc
  * @date Thu Mar 3 20:17:53 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the convert function for blitz arrays of different types
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

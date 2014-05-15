@@ -1,11 +1,10 @@
 /**
- * @file bob/measure/error.h
  * @date Wed Apr 20 08:02:30 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A set of methods that evaluates error from score sets
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MEASURE_ERROR_H

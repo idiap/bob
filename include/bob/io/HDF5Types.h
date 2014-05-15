@@ -1,11 +1,10 @@
 /**
- * @file bob/io/HDF5Types.h
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A few helpers to handle HDF5 datasets in a more abstract way.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_HDF5TYPES_H

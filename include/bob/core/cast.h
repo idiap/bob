@@ -1,12 +1,11 @@
 /**
- * @file bob/core/cast.h
  * @date Wed Feb 9 12:26:11 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines functions which add std::complex support to the
  * static_cast function.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_CAST_H
@@ -28,7 +27,7 @@ namespace bob { namespace core {
  * function. This is done by considering the real part only of any
  * complex number.
  */
-template<typename T, typename U> 
+template<typename T, typename U>
 T cast(const U& in) {
   return static_cast<T>(in);
 }
@@ -39,7 +38,7 @@ T cast(const U& in) {
  */
 // Complex to regular
 #define COMPLEX_TO_REGULAR_DECL(COMP, REG) template<> \
-  REG cast<REG, COMP>( const COMP& in); 
+  REG cast<REG, COMP>( const COMP& in);
 
 #define COMPLEX_TO_REGULAR_FULL_DECL(COMP) \
   COMPLEX_TO_REGULAR_DECL(COMP, bool) \
@@ -53,7 +52,7 @@ T cast(const U& in) {
   COMPLEX_TO_REGULAR_DECL(COMP, uint64_t) \
   COMPLEX_TO_REGULAR_DECL(COMP, float) \
   COMPLEX_TO_REGULAR_DECL(COMP, double) \
-  COMPLEX_TO_REGULAR_DECL(COMP, long double) 
+  COMPLEX_TO_REGULAR_DECL(COMP, long double)
 
 COMPLEX_TO_REGULAR_FULL_DECL(std::complex<float>)
 COMPLEX_TO_REGULAR_FULL_DECL(std::complex<double>)
@@ -83,7 +82,7 @@ namespace array {
  * @ingroup CORE_ARRAY
  * @{
  */
-template<typename T, typename U> 
+template<typename T, typename U>
 blitz::Array<T,1> cast(const blitz::Array<U,1>& in) {
   bob::core::array::assertZeroBase(in);
   blitz::Array<T,1> out(in.extent(0));
@@ -92,7 +91,7 @@ blitz::Array<T,1> cast(const blitz::Array<U,1>& in) {
   return out;
 }
 
-template<typename T, typename U> 
+template<typename T, typename U>
 blitz::Array<T,2> cast(const blitz::Array<U,2>& in) {
   bob::core::array::assertZeroBase(in);
   blitz::Array<T,2> out(in.extent(0),in.extent(1));
@@ -102,7 +101,7 @@ blitz::Array<T,2> cast(const blitz::Array<U,2>& in) {
   return out;
 }
 
-template<typename T, typename U> 
+template<typename T, typename U>
 blitz::Array<T,3> cast(const blitz::Array<U,3>& in) {
   bob::core::array::assertZeroBase(in);
   blitz::Array<T,3> out(in.extent(0),in.extent(1),in.extent(2));
@@ -113,7 +112,7 @@ blitz::Array<T,3> cast(const blitz::Array<U,3>& in) {
   return out;
 }
 
-template<typename T, typename U> 
+template<typename T, typename U>
 blitz::Array<T,4> cast(const blitz::Array<U,4>& in) {
   bob::core::array::assertZeroBase(in);
   blitz::Array<T,4> out(in.extent(0),in.extent(1),in.extent(2),in.extent(3));

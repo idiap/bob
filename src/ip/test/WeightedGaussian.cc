@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/WeightedGaussian.cc
  * @date Fri Jul 20 14:54:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the Weighted Gaussian smoothing on 2D images
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

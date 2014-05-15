@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/gammaCorrection.cc
  * @date Thu Mar 17 18:46:09 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the gamma correction function for 2D arrays/images
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

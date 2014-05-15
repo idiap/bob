@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/Gaussian.cc
  * @date Sat Apr 30 17:52:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to process images with a Gaussian kernel
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/Gaussian.h"

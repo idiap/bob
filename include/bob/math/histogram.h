@@ -1,11 +1,10 @@
 /**
- * @file bob/math/histogram.h
  * @date Mon Apr 16
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief Implements fast versions of some histogram measures
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 

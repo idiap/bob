@@ -1,12 +1,11 @@
 /**
- * @file bob/math/svd.h
  * @date Sat Mar 19 22:14:10 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to determine the SVD decomposition
  * a 2D blitz array using LAPACK.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MATH_SVD_H

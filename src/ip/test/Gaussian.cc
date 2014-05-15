@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/Gaussian.cc
  * @date Sat Apr 30 17:52:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the Gaussian smoothing on 2D images
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

@@ -1,5 +1,4 @@
 /**
- * @file bob/ip/GeomNorm.h
  * @date Mon Apr 11 22:17:04 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -10,7 +9,7 @@
  *   3/ cropped with respect to the point given and the additional
  *        cropping parameters.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_GEOM_NORM_H

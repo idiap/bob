@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/VLSIFT.cc
  * @date Mon Dec 19 16:35:13 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief SIFT implementation
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/VLSIFT.h"

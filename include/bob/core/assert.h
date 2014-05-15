@@ -1,11 +1,10 @@
 /**
- * @file bob/core/assert.h
  * @date Sat Apr 9 18:10:10 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines assert functions over the blitz++ arrays
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_ASSERT_H
@@ -42,7 +41,7 @@ void assertZeroBase(const blitz::Array<T,D>& src)
   for( int i=0; i<src.rank(); ++i)
     if( src.base(i)!=0 ) {
       boost::format m("input array has dimension %d with a non-zero base index (base=%d)");
-      m % i % src.base(i); 
+      m % i % src.base(i);
       throw std::runtime_error(m.str());
     }
 }
@@ -57,7 +56,7 @@ void assertOneBase(const blitz::Array<T,D>& src)
   for( int i=0; i<src.rank(); ++i)
     if( src.base(i)!=1) {
       boost::format m("input array has dimension %d with a non-one base index (base=%d)");
-      m % i % src.base(i); 
+      m % i % src.base(i);
       throw std::runtime_error(m.str());
     }
 }
@@ -67,7 +66,7 @@ void assertOneBase(const blitz::Array<T,D>& src)
  * std::runtime_error exception if this is not the case.
  */
 template<typename T, typename U, int D>
-void assertSameBase(const blitz::Array<T,D>& a, 
+void assertSameBase(const blitz::Array<T,D>& a,
   const blitz::Array<U,D>& b)
 {
   if( !hasSameBase(a,b) )
@@ -76,7 +75,7 @@ void assertSameBase(const blitz::Array<T,D>& a,
 
 /**
  * @brief Checks that a blitz array is a C-style array stored contiguously
- * in memory, and throws a std::runtime_error exception if this is not 
+ * in memory, and throws a std::runtime_error exception if this is not
  * the case.
  */
 template<typename T, int D>
@@ -88,8 +87,8 @@ void assertCContiguous(const blitz::Array<T,D>& src)
 }
 
 /**
- * @brief Checks that a blitz array is a Fortran-style array stored 
- * contiguously in memory, and throws a std::runtime_error exception if 
+ * @brief Checks that a blitz array is a Fortran-style array stored
+ * contiguously in memory, and throws a std::runtime_error exception if
  * this is not the case.
  */
 template<typename T, int D>
@@ -102,7 +101,7 @@ void assertFortranContiguous(const blitz::Array<T,D>& src)
 
 /**
  * @brief Checks that a blitz array is a C-style array stored contiguously
- * in memory with zero base indices, and throws a 
+ * in memory with zero base indices, and throws a
  * std::runtime_error exception if this is not the case.
  */
 template<typename T, int D>
@@ -113,9 +112,9 @@ void assertCZeroBaseContiguous(const blitz::Array<T,D>& src)
 }
 
 /**
- * @brief Checks that a blitz array is a Fortran-style array stored 
- * contiguously in memory with one base indices, and throws a 
- * std::runtime_error exception if this 
+ * @brief Checks that a blitz array is a Fortran-style array stored
+ * contiguously in memory with one base indices, and throws a
+ * std::runtime_error exception if this
  * is not the case.
  */
 template<typename T, int D>
@@ -130,7 +129,7 @@ void assertFortranOneBaseContiguous(const blitz::Array<T,D>& src)
  * std::runtime_error exception if this is not the case.
  */
 template<typename T, int D>
-void assertSameShape(const blitz::Array<T,D>& ar, 
+void assertSameShape(const blitz::Array<T,D>& ar,
   const blitz::TinyVector<int, D>& shape)
 {
   if( !hasSameShape(ar,shape) ) {
@@ -145,7 +144,7 @@ void assertSameShape(const blitz::Array<T,D>& ar,
  * std::runtime_error exception if this is not the case.
  */
 template<typename T, int D>
-void assertSameShape(const blitz::TinyVector<int,D>& shape, 
+void assertSameShape(const blitz::TinyVector<int,D>& shape,
   const blitz::Array<T,D>& ar)
 {
   if( !hasSameShape(shape,ar) ) {
@@ -160,7 +159,7 @@ void assertSameShape(const blitz::TinyVector<int,D>& shape,
  * std::runtime_error exception if this is not the case.
  */
 template<typename T, typename U, int D>
-void assertSameShape(const blitz::Array<T,D>& a, 
+void assertSameShape(const blitz::Array<T,D>& a,
   const blitz::Array<U,D>& b)
 {
   if( !hasSameShape(a,b) ) {

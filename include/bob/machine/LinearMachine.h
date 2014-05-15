@@ -1,5 +1,4 @@
 /**
- * @file bob/machine/LinearMachine.h
  * @date Tue May 31 09:22:33 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -12,7 +11,7 @@
  * A linear classifier. See C. M. Bishop, "Pattern Recognition and Machine
  * Learning", chapter 4
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MACHINE_LINEARMACHINE_H

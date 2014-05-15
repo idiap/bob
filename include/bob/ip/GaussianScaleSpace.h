@@ -1,9 +1,8 @@
 /**
- * @file bob/ip/GaussianScaleSpace.h
  * @date Thu Apr 7 19:52:29 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_GAUSSIANSCALESPACE_H
@@ -24,15 +23,15 @@ namespace bob {
  */
 namespace ip {
 
-/** 
+/**
  * @brief Structure for the GSS keypoints (location)
  */
 typedef struct GSSKeypoint_
 {
-  GSSKeypoint_(const double s, const double y_, const double x_, 
-      const double o_=0.): 
+  GSSKeypoint_(const double s, const double y_, const double x_,
+      const double o_=0.):
     sigma(s), y(y_), x(x_), orientation(o_)
-  {   
+  {
   }
 
   double sigma; //< sigma
@@ -41,19 +40,19 @@ typedef struct GSSKeypoint_
   double orientation; //< orientation (0 if not estimated)
 } GSSKeypoint;
 
-/** 
+/**
  * @brief Additional structure for the GSS keypoints (location)
- * This keeps track of more detailed information. This can be useful for 
+ * This keeps track of more detailed information. This can be useful for
  * paramater tuning.
  */
 typedef struct GSSKeypointInfo_
 {
-  GSSKeypointInfo_(const size_t o_=0, const size_t s_=0, 
-      const int iy_=0, const int ix_=0, 
+  GSSKeypointInfo_(const size_t o_=0, const size_t s_=0,
+      const int iy_=0, const int ix_=0,
       const double peak_score_=0., const double edge_score_=0.):
     o(o_), s(s_), iy(iy_), ix(ix_), peak_score(peak_score_),
     edge_score(edge_score_)
-  {   
+  {
   }
 
   size_t o; //< octave index in the vector of octaves
@@ -67,7 +66,7 @@ typedef struct GSSKeypointInfo_
 
 /**
  * @brief This class can be used to extract a Gaussian Scale Space
- * Reference: "Distinctive Image Features from Scale-Invariant Keypoints", 
+ * Reference: "Distinctive Image Features from Scale-Invariant Keypoints",
  * D. Lowe, International Journal of Computer Vision, 2004.
  */
 class GaussianScaleSpace
@@ -83,10 +82,10 @@ class GaussianScaleSpace
      *   requires additional (n_invervals+3) scales per octave, because of
      *   the use of Difference of Gaussians (DoG) during detection, and of
      *   scale interpolation during descriptor computation.
-     * @param octave_min Index of the first octave. It should be in the 
+     * @param octave_min Index of the first octave. It should be in the
      *   range [-1,+inf]. If set to -1, the image will be upsampled in
      *   the first octave, if set to 0 the initial image dimensions will
-     *   be used in the first octave, if set to 1, the image will be 
+     *   be used in the first octave, if set to 1, the image will be
      *   downsampled, etc.
      * @param sigma_n Input image is assumed to be smoothed at this sigma
      *   level (to take finite resolution into consideration)
@@ -94,14 +93,14 @@ class GaussianScaleSpace
      *   sigma smoothing coefficient of the image of octave o at scale s
      *   is equal to sigma0.2^{o+s/n_intervals}
      * @param kernel_radius_factor Factor used to compute the radius of any
-     *   Gaussian kernel. The radius of the Gaussian kernel with a 
-     *   standard deviation/sigma will be equal to 
-     *   radius=ceil(kernel_radius_factor*sigma), the size of the kernel 
+     *   Gaussian kernel. The radius of the Gaussian kernel with a
+     *   standard deviation/sigma will be equal to
+     *   radius=ceil(kernel_radius_factor*sigma), the size of the kernel
      *   being: size=2*radius + 1 = 2*ceil(kernel_radius_factor*sigma) + 1.
-     *   A value of 3 leads to a support that contains more than 99.6% of 
-     *   the energy of the perfect continuous filter. Large values lead to 
+     *   A value of 3 leads to a support that contains more than 99.6% of
+     *   the energy of the perfect continuous filter. Large values lead to
      *   large kernels, and might cause run-time exceptions, as our
-     *   implementation requires kernels too be smaller than inputs while 
+     *   implementation requires kernels too be smaller than inputs while
      *   performing convolutions.
      * @param border_type The way we deal with convolution at the boundaries
      *   of the input image.
@@ -110,7 +109,7 @@ class GaussianScaleSpace
       const size_t n_octaves, const size_t n_intervals, const int octave_min,
       const double sigma_n=0.5, const double sigma0=1.6,
       const double kernel_radius_factor=4.,
-      const bob::sp::Extrapolation::BorderType border_type = 
+      const bob::sp::Extrapolation::BorderType border_type =
         bob::sp::Extrapolation::Mirror);
 
     /**
@@ -135,7 +134,7 @@ class GaussianScaleSpace
     /**
      * @brief Not equal to
      */
-    bool operator!=(const GaussianScaleSpace& b) const; 
+    bool operator!=(const GaussianScaleSpace& b) const;
 
     /**
      * @brief Getters
@@ -149,49 +148,49 @@ class GaussianScaleSpace
     double getSigmaN() const { return m_sigma_n; }
     double getSigma0() const { return m_sigma0; }
     double getKernelRadiusFactor() const { return m_kernel_radius_factor; }
-    bob::sp::Extrapolation::BorderType getConvBorder() const 
+    bob::sp::Extrapolation::BorderType getConvBorder() const
     { return m_conv_border; }
-    boost::shared_ptr<bob::ip::Gaussian> getGaussian(const size_t i) const 
+    boost::shared_ptr<bob::ip::Gaussian> getGaussian(const size_t i) const
     { return m_gaussians[i]; }
 
     /**
      * @brief Setters
      */
-    void setHeight(const size_t height) 
+    void setHeight(const size_t height)
     { m_height = height; }
-    void setWidth(const size_t width) 
+    void setWidth(const size_t width)
     { m_width = width; }
-    void setNOctaves(const size_t n_octaves) 
+    void setNOctaves(const size_t n_octaves)
     { m_n_octaves = n_octaves; resetGaussians(); }
-    void setNIntervals(const size_t n_intervals) 
+    void setNIntervals(const size_t n_intervals)
     { m_n_intervals = n_intervals; resetGaussians(); }
-    void setOctaveMin(const int octave_min) 
+    void setOctaveMin(const int octave_min)
     { m_octave_min = octave_min; checkOctaveMin(); resetGaussians(); }
-    void setSigmaN(const double sigma_n) 
+    void setSigmaN(const double sigma_n)
     { m_sigma_n = sigma_n; resetGaussians(); }
-    void setSigma0(const double sigma0) 
+    void setSigma0(const double sigma0)
     { m_sigma0 = sigma0; resetGaussians(); }
-    void setKernelRadiusFactor(const double kernel_radius_factor) 
+    void setKernelRadiusFactor(const double kernel_radius_factor)
     { m_kernel_radius_factor = kernel_radius_factor; resetGaussians(); }
     void setConvBorder(const bob::sp::Extrapolation::BorderType border_type)
     { m_conv_border = border_type; resetGaussians(); }
 
     /**
      * Automatically sets sigma0 to a value such that there is no smoothing
-     * initially. sigma0 is then set such that the sigma value for the 
-     * first scale (index -1) of the octave octave_min is equal to 
+     * initially. sigma0 is then set such that the sigma value for the
+     * first scale (index -1) of the octave octave_min is equal to
      * sigma_n*2^(-octave_min).
-     */ 
+     */
     void setSigma0NoInitSmoothing();
 
     /**
      * @brief Process a 2D blitz Array/Image by extracting a Gaussian Pyramid.
      * @param src The 2D input blitz array
      * @param dst A vector of 3D blitz Arrays. Each octave is described by
-     *   one element of the vector. The bliz Arrays should have the 
+     *   one element of the vector. The bliz Arrays should have the
      *   expected size.
      */
-    template <typename T> 
+    template <typename T>
     void operator()(const blitz::Array<T,2>& src, std::vector<blitz::Array<double,3> >& dst) const;
 
     /**
@@ -202,11 +201,11 @@ class GaussianScaleSpace
     void allocateOutputPyramid(std::vector<blitz::Array<double,3> >& dst) const;
 
     /**
-     * @brief Returns the output shape for a given octave. 
-     * @param octave The index of the octave. This should be in the range 
+     * @brief Returns the output shape for a given octave.
+     * @param octave The index of the octave. This should be in the range
      *   [octave_min, octave_min+N_octaves]
      * @return A TinyVector with the length of each of the three dimensions.
-     *   The first dimension corresponds to the number of scales/images at 
+     *   The first dimension corresponds to the number of scales/images at
      *   this octave. This is equal to Nintervals+3. The last two dimensions
      *   are the height and width of Gaussian filtered images at this octave.
      */
@@ -244,7 +243,7 @@ class GaussianScaleSpace
 };
 
 
-namespace detail 
+namespace detail
 {
   template <typename T>
   void upsample(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst)
@@ -284,7 +283,7 @@ namespace detail
   }
 
   template <typename T>
-  void downsample(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst, 
+  void downsample(const blitz::Array<T,2>& src, blitz::Array<double,2>& dst,
     const size_t d)
   {
     // Checks dimensions
@@ -305,7 +304,7 @@ namespace detail
 
 
 template <typename T>
-void bob::ip::GaussianScaleSpace::operator()(const blitz::Array<T,2>& src, 
+void bob::ip::GaussianScaleSpace::operator()(const blitz::Array<T,2>& src,
   std::vector<blitz::Array<double,3> >& dst) const
 {
   // Checks

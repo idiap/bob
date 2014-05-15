@@ -1,12 +1,11 @@
 /**
- * @file bob/ip/GaborSpatial.h
  * @date Wed Apr 13 20:12:03 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to filter a 2D image/array with a Gabor
  * filter in the spatial domain.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_GABOR_SPATIAL_H

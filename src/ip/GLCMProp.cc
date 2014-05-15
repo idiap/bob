@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/GLCM.cc
  * @date Wed Jan 30 17:25:28 CET 2013
  * @author Ivana Chingovska <ivana.chingovska@idiap.ch> 
  *
  * @brief GLCMProp implementation
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/GLCMProp.h"

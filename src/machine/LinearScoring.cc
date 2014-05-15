@@ -1,9 +1,8 @@
 /**
- * @file machine/cxx/LinearScoring.cc
  * @date Wed Jul 13 16:00:04 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 #include <bob/machine/LinearScoring.h>
 #include <bob/math/linear.h>

@@ -1,12 +1,11 @@
 /**
- * @file ip/cxx/test/zigzag.cc
  * @date Tue Apr 5 16:55:23 2011 +0200
  * @author Niklas Johansson <niklas.johansson@idiap.ch>
  *
  * @brief Test the zigzag decomposition function for 2D arrays/images,
  *   which is used by the DCT features
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

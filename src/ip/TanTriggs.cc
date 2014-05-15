@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/TanTriggs.cc
  * @date Fri Mar 18 18:09:25 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to perform Tan and Triggs preprocessing.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/TanTriggs.h"

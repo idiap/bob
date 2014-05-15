@@ -1,14 +1,13 @@
 /**
- * @file bob/io/HDF5Attribute.h
  * @author Andre Anjos <andre.anjos@idiap.ch>
- * @date Fri  2 Mar 08:19:03 2012 
+ * @date Fri  2 Mar 08:19:03 2012
  *
  * @brief Simple attribute support for HDF5 files
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_IO_HDF5ATTRIBUTE_H 
+#ifndef BOB_IO_HDF5ATTRIBUTE_H
 #define BOB_IO_HDF5ATTRIBUTE_H
 
 #include <string>
@@ -47,7 +46,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
   template <typename T> void set_attribute(boost::shared_ptr<hid_t> location,
       const std::string& name, const T& v) {
     bob::io::HDF5Type dest_type(v);
-    write_attribute(location, name, dest_type, 
+    write_attribute(location, name, dest_type,
         reinterpret_cast<const void*>(&v));
   }
 
@@ -67,7 +66,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
   /**
    * Checks if a certain attribute exists in this location.
    */
-  bool has_attribute(const boost::shared_ptr<hid_t> location, 
+  bool has_attribute(const boost::shared_ptr<hid_t> location,
       const std::string& name);
 
   /**

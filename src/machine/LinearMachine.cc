@@ -1,11 +1,10 @@
 /**
- * @file machine/cxx/LinearMachine.cc
  * @date Tue May 31 09:22:33 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements a LinearMachine
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <cmath>

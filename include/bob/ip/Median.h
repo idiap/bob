@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/Median.h
  * @date Wed Sep 28 13:34:10 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to filter an image with a median filter
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_MEDIAN_H

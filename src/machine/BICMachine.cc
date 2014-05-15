@@ -1,5 +1,4 @@
 /**
- * @file machine/cxx/BICMachine.cc
  * @date Tue Jun  5 16:54:27 CEST 2012
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
@@ -12,7 +11,7 @@
  * A linear classifier. See C. M. Bishop, "Pattern Recognition and Machine
  * Learning", chapter 4
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/machine/BICMachine.h>

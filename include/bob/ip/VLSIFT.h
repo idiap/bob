@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/VLSIFT.h
  * @date Mon Dec 19 16:35:13 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines classes to compute SIFT features using VLFeat
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_VLSIFT_H

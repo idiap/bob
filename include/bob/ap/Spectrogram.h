@@ -1,12 +1,11 @@
 /**
- * @file bob/ap/Spectrogram.h
  * @date Wed Jan 11:10:20 2013 +0200
  * @author Elie Khoury <Elie.Khoury@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement spectrogram
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 

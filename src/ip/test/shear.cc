@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/shear.cc
  * @date Wed Mar 9 19:09:08 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the shear function for 2D and 3D arrays/images
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/Sobel.h
  * @date Fri Apr 29 12:13:22 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to process images with the Sobel operator
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_SOBEL_H

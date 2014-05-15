@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/HOG.h
  * @date Sun Apr 22 18:43:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Computes Histogram of Oriented Gradients (HOG) descriptors
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_HOG_H

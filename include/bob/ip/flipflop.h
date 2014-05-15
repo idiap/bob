@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/flipflop.h
  * @date Mon Mar 14 16:31:07 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to flip/flop a 2D or 3D array/image.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_FLIPFLOP_H

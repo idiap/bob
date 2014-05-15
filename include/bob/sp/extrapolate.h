@@ -1,12 +1,11 @@
 /**
- * @file bob/sp/extrapolate.h
  * @date Wed Apr 13 23:08:13 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implements various extrapolation techniques for 1D and 2D blitz
  * arrays.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_SP_EXTRAPOLATE_H

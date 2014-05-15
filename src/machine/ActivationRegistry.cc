@@ -4,7 +4,7 @@
  *
  * @brief Implementation of the activation registry
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/machine/ActivationRegistry.h"

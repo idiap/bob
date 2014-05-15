@@ -1,11 +1,10 @@
 /**
- * @file bob/io/HDF5Group.h
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed 29 Feb 17:24:10 2012
  *
  * @brief Describes HDF5 groups.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_HDF5GROUP_H
@@ -358,7 +357,7 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
        * Reads an attribute into a user buffer. It is the user's responsibility
        * to have a buffer that represents the given type.
        */
-      void read_attribute (const std::string& name, 
+      void read_attribute (const std::string& name,
           const bob::io::HDF5Type& dest, void* buffer) const;
 
       /**

@@ -1,11 +1,10 @@
 /**
- * @file sp/cxx/test/conv.cc
  * @date Thu Jan 27 18:12:12 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the blitz-based convolution product
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

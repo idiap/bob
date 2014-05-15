@@ -1,12 +1,11 @@
 /**
- * @file bob/ip/maxRectInMask.h
  * @date Mon Apr 18 20:25:30 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file extract a rectangle of maximal area from a 2D mask of
  *    booleans.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_MAX_RECT_IN_MASK_H

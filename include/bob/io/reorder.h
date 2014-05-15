@@ -1,11 +1,10 @@
 /**
- * @file bob/io/reorder.h
  * @date Tue Nov 22 11:24:44 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Row-major to column-major reordering and vice-versa
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_REORDER_H

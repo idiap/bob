@@ -1,16 +1,15 @@
 /**
- * @file bob/ip/GaborBankSpatial.h
  * @date Wed Apr 13 20:45:32 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to filter a 2D image/array with a Gabor
  * filter bank in the spatial domain.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB5SPRO_IP_GABOR_BANK_SPATIAL_H
-#define BOB5SPRO_IP_GABOR_BANK_SPATIAL_H 
+#define BOB5SPRO_IP_GABOR_BANK_SPATIAL_H
 
 #include "bob/core/cast.h"
 #include "bob/ip/GaborSpatial.h"
@@ -35,12 +34,12 @@ namespace bob {
         /**
          * @brief Constructor: generates the Gabor filter
          */
-        GaborBankSpatial(const int n_orient=8, const int n_freq=5, 
+        GaborBankSpatial(const int n_orient=8, const int n_freq=5,
           const double fmax=0.25, const bool orientation_full=false,
-          const double k=1.414, const double p=0.5, 
+          const double k=1.414, const double p=0.5,
           // Gabor Spatial filter options
           const double gamma=1., const double eta=1.,
-          const int spatial_size=35, const bool cancel_dc=false, 
+          const int spatial_size=35, const bool cancel_dc=false,
           const enum ip::Gabor::NormOption norm_opt=ip::Gabor::SpatialFactor,
           // const enum sp::Convolution::SizeOption size_opt=sp::Convolution::Same,
           const enum sp::Extrapolation::BorderType border_type=sp::Extrapolation::Mirror);
@@ -81,26 +80,26 @@ namespace bob {
           { m_n_orient = n_orient; computeFilters(); }
         inline void setNFreq(const int n_freq)
           { m_n_freq = n_freq; computeFilters(); }
-        inline void setFmax(const double fmax) 
+        inline void setFmax(const double fmax)
           { m_fmax = fmax; computeFilters(); }
-        inline void setOrientationFull(const bool orientation_full) 
+        inline void setOrientationFull(const bool orientation_full)
           { m_orientation_full = orientation_full; computeFilters(); }
-        inline void setK(const double k) 
+        inline void setK(const double k)
           { m_k = k; computeFilters(); }
-        inline void setP(const double p) 
+        inline void setP(const double p)
           { m_p = p; computeFilters(); }
-        inline void setGamma(const double gamma) 
+        inline void setGamma(const double gamma)
           { m_gamma = gamma; computeFilters(); }
-        inline void setEta(const double eta) 
+        inline void setEta(const double eta)
           { m_eta = eta; computeFilters(); }
-        inline void setSpatialSize(const int spatial_size) 
+        inline void setSpatialSize(const int spatial_size)
           { m_spatial_size = spatial_size; computeFilters(); }
-        inline void setCancelDc(const bool cancel_dc) 
+        inline void setCancelDc(const bool cancel_dc)
           { m_cancel_dc = cancel_dc; computeFilters(); }
         inline void setNormOption(const enum ip::Gabor::NormOption norm_opt)
           { m_norm_opt = norm_opt; computeFilters(); }
         inline void setBorderType( const enum sp::Extrapolation::BorderType
-            border_type) 
+            border_type)
           { m_border_type = border_type; }
 
       private:

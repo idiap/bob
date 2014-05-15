@@ -1,12 +1,11 @@
 /**
- * @file math/cxx/sqrtm.cc
  * @date Wed Oct 12 18:02:26 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to compute the (unique) square root of
  * a real symmetric definite-positive matrix.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 

@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/sqrtm.cc
  * @date Fri Jan 27 17:37:41 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the computation of the square root of a matrix
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

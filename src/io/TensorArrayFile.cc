@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/TensorArrayFile.cc
  * @date Wed Oct 26 17:11:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements the TensorArrayCodec type
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/io/TensorFile.h>

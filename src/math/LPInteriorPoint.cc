@@ -1,12 +1,11 @@
 /**
- * @file math/cxx/LPInteriorPoint.cc
  * @date Thu Mar 31 14:32:14 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines interior point methods which allow to solve a
  *        linear program (LP).
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <stdexcept>

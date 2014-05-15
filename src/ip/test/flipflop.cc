@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/flipflop.cc
  * @date Mon Mar 14 16:31:07 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the flip/flop functions for 2D and 3D arrays/images
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

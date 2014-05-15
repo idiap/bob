@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/HDF5Dataset.cc
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed 29 Feb 17:51:21 2012
  *
  * @brief Implementation of the Dataset class
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <boost/format.hpp>

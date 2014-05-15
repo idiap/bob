@@ -1,9 +1,8 @@
 /**
- * @file bob/machine/WienerMachine.h
  * @date Fri Sep 30 16:56:06 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MACHINE_WIENERMACHINE_H

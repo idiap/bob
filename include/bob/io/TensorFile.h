@@ -1,11 +1,10 @@
 /**
- * @file bob/io/TensorFile.h
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief This class can be used to load and store arrays from/to .tensor files
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_TENSORFILE_H

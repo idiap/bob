@@ -4,7 +4,7 @@
  *
  * @brief Activation functions for linear and MLP machines.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MACHINE_ACTIVATION_H

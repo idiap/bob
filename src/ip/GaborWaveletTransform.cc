@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/GaborWaveletTransform.cc
  * @date 2012-02-27
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief This file provides a class to perform a Gabor wavelet transform.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/core/assert.h"

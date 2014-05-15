@@ -1,5 +1,4 @@
 /**
- * @file bob/ip/zigzag.h
  * @date Tue Apr 5 17:28:28 2011 +0200
  * @author Niklas Johansson <niklas.johansson@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
@@ -10,7 +9,7 @@
  *   from C. Sanderson and K. Paliwal, in the proceedings of the
  *   IEEE International Conference on Image Processing 2002.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_ZIGZAG_H

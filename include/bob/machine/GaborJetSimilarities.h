@@ -1,11 +1,10 @@
 /**
- * @file bob/machine/GaborJetSimilarities.h
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief Similarity functions of two Gabor jets.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MACHINE_GABOR_JET_SIMILARITY_H

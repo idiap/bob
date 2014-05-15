@@ -1,5 +1,4 @@
 /**
- * @file bob/ip/MultiscaleRetinex.h
  * @date Mon May 2 10:01:08 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -8,7 +7,7 @@
  *   Human observation of scenes", D. Jobson, Z. Rahman and G. Woodell,
  *  in IEEE Transactions on Image Processing, vol. 6, n. 7, July 1997
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_MULTISCALE_RETINEX_H

@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/GLCM.cc
  * @date Tue Jan 22 15:59:37 CET 2013
  * @author Ivana Chingovska <ivana.chingovska@idiap.ch> 
  *
  * @brief GLCM implementation
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/GLCM.h"

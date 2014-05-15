@@ -1,12 +1,11 @@
 /**
- * @file bob/sp/FFT2D.h
  * @date Fri Nov 15 10:13:37 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement a blitz-based 2D Fast Fourier Transform s FFT
  * from a FFT 1D.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

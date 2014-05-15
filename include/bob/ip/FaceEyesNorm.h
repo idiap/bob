@@ -1,9 +1,8 @@
 /**
- * @file bob/ip/FaceEyesNorm.h
  * @date Thu Apr 14 21:03:45 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_FACE_EYES_NORM_H

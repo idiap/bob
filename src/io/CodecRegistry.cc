@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/CodecRegistry.cc
  * @date Tue Oct 25 23:25:46 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements the CodecRegistry class.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <vector>

@@ -1,5 +1,4 @@
 /**
- * @file bob/ip/shear.h
  * @date Wed Mar 9 19:09:08 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -9,7 +8,7 @@
  * proceedings of Graphics Interface '86, p. 77-81.
  * The notes of Tobin Fricke about this article might also be of interest.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_SHEAR_H

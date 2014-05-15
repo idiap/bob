@@ -1,12 +1,11 @@
 /**
- * @file bob/core/array_random.h
  * @date Tue Apr 2 13:00:00 2013 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_CORE_ARRAY_RANDOM_H 
+#ifndef BOB_CORE_ARRAY_RANDOM_H
 #define BOB_CORE_ARRAY_RANDOM_H
 
 #include <blitz/array.h>
@@ -27,11 +26,11 @@ namespace bob { namespace core { namespace array {
  * because of design considerations.
  */
 template <typename T, int N>
-void randn(boost::mt19937& rng, blitz::Array<T,N>& dest, 
+void randn(boost::mt19937& rng, blitz::Array<T,N>& dest,
   const T mean=0., const T var=1.)
 {
   boost::normal_distribution<T> distrib(mean, var);
-  boost::variate_generator<boost::mt19937, boost::normal_distribution<T> > 
+  boost::variate_generator<boost::mt19937, boost::normal_distribution<T> >
     vg(rng, distrib);
   typedef typename blitz::Array<T,N>::iterator BA_iterator;
   for (BA_iterator it=dest.begin(); it !=dest.end(); ++it)

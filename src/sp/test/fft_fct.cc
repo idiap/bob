@@ -1,12 +1,11 @@
 /**
- * @file sp/cxx/test/fft_fct.cc
  * @date Fri Nov 15 09:57:58 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Compare FFT and FCT based on NumPy with naive DFT DCT
  * implementations.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

@@ -1,9 +1,8 @@
 /**
- * @file bob/ip/histo.h
  * @date Mon Apr 18 16:08:34 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 #ifndef BOB5SPRO_IP_HISTO_H
 #define BOB5SPRO_IP_HISTO_H

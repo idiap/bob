@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/block.h
  * @date Tue Apr 5 12:38:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to perform a decomposition by block.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_BLOCK_H

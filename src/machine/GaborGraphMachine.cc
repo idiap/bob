@@ -1,11 +1,10 @@
 /**
- * @file machine/cxx/GaborGraphMachine.cc
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief Implements the extraction of Gabor graphs
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/machine/GaborGraphMachine.h>

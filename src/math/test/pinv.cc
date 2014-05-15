@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/pinv.cc
  * @date Tue Jun 18 18:55:23 CEST 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the pseudo-inverse
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

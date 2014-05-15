@@ -1,9 +1,8 @@
 /**
- * @file math/cxx/pinv.cc
  * @date Tue Jun 18 18:31:12 CEST 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/math/pinv.h>

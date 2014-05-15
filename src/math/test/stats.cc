@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/stats.cc
  * @date Mon Jul  8 12:08:50 CEST 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the computation of the scatter matrices
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

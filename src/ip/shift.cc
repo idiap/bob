@@ -1,9 +1,8 @@
 /**
- * @file ip/cxx/shift.cc
  * @date Sun Apr 17 23:11:51 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <stdexcept>

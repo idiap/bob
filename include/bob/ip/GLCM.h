@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/GLCM.h
  * @date Tue Jan 22 12:31:59 CET 2013
  * @author Ivana Chingovska <ivana.chingovska@idiap.ch>
  *
  * This file defines a function to compute the Grey Level Co-occurence Matrix (GLCM)
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_GLCM_H

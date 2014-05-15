@@ -1,12 +1,11 @@
 /**
- * @file bob/core/blitz_array.h
  * @date Tue Nov 8 15:34:31 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief A class that implements the polimorphic behaviour required when
  * reading and writing blitz arrays to disk or memory.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_BLITZ_ARRAY_H
@@ -85,7 +84,7 @@ namespace bob { namespace core { namespace array {
       virtual void set(boost::shared_ptr<interface> other);
 
       /**
-       * @brief Re-allocates this buffer taking into consideration new 
+       * @brief Re-allocates this buffer taking into consideration new
        * requirements. The internal memory should be considered uninitialized.
        */
       virtual void set (const typeinfo& req);
@@ -101,9 +100,9 @@ namespace bob { namespace core { namespace array {
       virtual const typeinfo& type() const { return m_type; }
 
       /**
-       * @brief Borrows a reference from the underlying memory. This means 
-       * this object continues to be responsible for deleting the memory and 
-       * you should make sure that it outlives the usage of the returned 
+       * @brief Borrows a reference from the underlying memory. This means
+       * this object continues to be responsible for deleting the memory and
+       * you should make sure that it outlives the usage of the returned
        * pointer.
        */
       virtual void* ptr() { return m_ptr; }
@@ -120,21 +119,21 @@ namespace bob { namespace core { namespace array {
 
       /**
        * @brief Starts me with new arbitrary data. Please note we refer to the
-       * given array. External modifications to the array memory will affect 
+       * given array. External modifications to the array memory will affect
        * me. If you don't want that to be the case, use the const variant.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         blitz_array(boost::shared_ptr<blitz::Array<T,N> > data) {
           set(data);
         }
 
       /**
-       * @brief Starts me with new arbitrary data. Please note we copy the 
-       * given array. External modifications to the array memory will not 
-       * affect me. If you don't want that to be the case, start with a 
+       * @brief Starts me with new arbitrary data. Please note we copy the
+       * given array. External modifications to the array memory will not
+       * affect me. If you don't want that to be the case, start with a
        * non-const reference.
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         blitz_array(const blitz::Array<T,N>& data) {
           set(data);
         }
@@ -145,21 +144,21 @@ namespace bob { namespace core { namespace array {
        * @warning Any resize of the given blitz::Array after this call leads to
        * unexpected results
        */
-      template <typename T, int N> 
+      template <typename T, int N>
         blitz_array(blitz::Array<T,N>& data) {
           set(data);
         }
 
       /**
-       * @brief This method will set my internal data to the value you 
+       * @brief This method will set my internal data to the value you
        * specify. We will do this by referring to the data you gave.
        */
       template <typename T, int N>
         void set(boost::shared_ptr<blitz::Array<T,N> > data) {
-          
+
           if (getElementType<T>() == t_unknown)
             throw std::runtime_error("unsupported element type on blitz::Array<>");
-          if (N > BOB_MAX_DIM) 
+          if (N > BOB_MAX_DIM)
             throw std::runtime_error("unsupported number of dimensions on blitz::Array<>");
 
           if (!isCContiguous(*data.get()))
@@ -173,7 +172,7 @@ namespace bob { namespace core { namespace array {
         }
 
       /**
-       * @brief This method will set my internal data to the value you 
+       * @brief This method will set my internal data to the value you
        * specify. We will do this by copying the data you gave.
        */
       template <typename T, int N> void set(const blitz::Array<T,N>& data) {
@@ -209,32 +208,32 @@ namespace bob { namespace core { namespace array {
        * blitz::Array<T,N>.
        */
       template <typename T, int N> blitz::Array<T,N> get(bool temporary=false) {
-        
+
         if (m_is_blitz) {
 
           if (!m_data) throw std::runtime_error("empty blitz array");
-          
+
           if (m_type.dtype != getElementType<T>()) {
             boost::format m("cannot efficiently retrieve blitz::Array<%s,%d> from buffer of type '%s'");
             m % stringize<T>() % N % m_type.str();
             throw std::runtime_error(m.str());
           }
-          
+
           if (m_type.nd != N) {
             boost::format m("cannot retrieve blitz::Array<%s,%d> from buffer of type '%s'");
             m % stringize<T>() % N % m_type.str();
             throw std::runtime_error(m.str());
           }
-          
+
           return *boost::static_pointer_cast<blitz::Array<T,N> >(m_data).get();
         }
 
         else {
-        
+
           if (temporary) { //returns a temporary reference
             return bob::core::array::wrap<T,N>(*this);
           }
-          
+
           else {
             throw std::runtime_error("cannot get() external non-temporary non-blitz array buffer -- for a temporary object, set temporary=true; if you need the returned object to outlive this buffer; use copy() or cast()");
           }

@@ -1,9 +1,8 @@
 /**
- * @file math/cxx/svd.cc
  * @date Sat Mar 19 22:14:10 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <stdexcept>

@@ -1,11 +1,10 @@
 /**
- * @file bob/sp/fftshift.h
  * @date Thu Apr 14 13:39:40 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement blitz-based fftshift functions
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_SP_FFTSHIFT_H

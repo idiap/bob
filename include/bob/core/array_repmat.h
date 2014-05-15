@@ -1,5 +1,4 @@
 /**
- * @file bob/core/array_repmat.h
  * @date Fri Jul 15 18:50:40 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -7,7 +6,7 @@
  * (matlab repmat-like) a 2D (or 1D) blitz array of a given type.
  * The output should be allocated and sized by the user.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_ARRAY_REPMAT_H
@@ -27,13 +26,13 @@ namespace bob { namespace core { namespace array {
 /**
  * @brief Function which replicates an input 2D array like the matlab
  * repmat function.
- * 
+ *
  * @warning No checks are performed on the array sizes and is recommended
  * only in scenarios where you have previously checked conformity and is
  * focused only on speed.
  */
-template<typename T> 
-void repmat_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
+template<typename T>
+void repmat_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 {
   int m = dst.extent(0) / src.extent(0);
   int n = dst.extent(1) / src.extent(1);
@@ -41,8 +40,8 @@ void repmat_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
   {
     for(int j=0; j<n; ++j)
     {
-      blitz::Array<T,2> dst_mn = 
-        dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1), 
+      blitz::Array<T,2> dst_mn =
+        dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1),
           blitz::Range(src.extent(1)*j,src.extent(1)*(j+1)-1));
       dst_mn = src;
     }
@@ -57,8 +56,8 @@ void repmat_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
  * raise an appropriate exception if that is not cased. If you know that the
  * input and output matrices conform, use the repmat_() variant.
  */
-template<typename T> 
-void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
+template<typename T>
+void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 {
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
@@ -76,7 +75,7 @@ void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 }
 
 /**
- * @brief Function which replicates an input 1D array, and generates a 2D 
+ * @brief Function which replicates an input 1D array, and generates a 2D
  * array like the matlab repmat function.
  *
  * @param src Input array
@@ -88,8 +87,8 @@ void repmat(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
  * only in scenarios where you have previously checked conformity and is
  * focused only on speed.
  */
-template<typename T> 
-void repmat_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst, 
+template<typename T>
+void repmat_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
   bool row_vector_src=false)
 {
   if(row_vector_src)
@@ -105,7 +104,7 @@ void repmat_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
     {
       for(int j=0; j<n; ++j)
       {
-        blitz::Array<T,1> dst_mn = 
+        blitz::Array<T,1> dst_mn =
           dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1), j);
         dst_mn = src;
       }
@@ -113,7 +112,7 @@ void repmat_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
   }
 }
 /**
- * @brief Function which replicates an input 1D array, and generates a 2D 
+ * @brief Function which replicates an input 1D array, and generates a 2D
  * array like the matlab repmat function.
  *
  * @param src Input array
@@ -124,9 +123,9 @@ void repmat_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
  * The input and output data have their sizes checked and this method will
  * raise an appropriate exception if that is not cased. If you know that the
  * input and output matrices conform, use the repmat_() variant.
- */ 
-template<typename T> 
-void repmat(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst, 
+ */
+template<typename T>
+void repmat(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
   bool row_vector_src=false)
 {
   bob::core::array::assertZeroBase(src);
@@ -152,20 +151,20 @@ void repmat(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst,
 }
 
 /**
- * @brief Function which replicates an input 1D array, generating a new 
+ * @brief Function which replicates an input 1D array, generating a new
  * (larger) 1D array.
  *
  * @warning No checks are performed on the array sizes and is recommended
  * only in scenarios where you have previously checked conformity and is
  * focused only on speed.
  */
-template<typename T> 
+template<typename T>
 void repvec_(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 {
   int m = dst.extent(0) / src.extent(0);
   for(int i=0; i<m; ++i)
   {
-    blitz::Array<T,1> dst_m = 
+    blitz::Array<T,1> dst_m =
       dst(blitz::Range(src.extent(0)*i,src.extent(0)*(i+1)-1));
     dst_m = src;
   }
@@ -173,14 +172,14 @@ void repvec_(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 
 
 /**
- * @brief Function which replicates an input 1D array, generating a new 
+ * @brief Function which replicates an input 1D array, generating a new
  * (larger) 1D array.
  *
  * The input and output data have their sizes checked and this method will
  * raise an appropriate exception if that is not cased. If you know that the
  * input and output matrices conform, use the repmat_() variant.
  */
-template<typename T> 
+template<typename T>
 void repvec(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 {
   bob::core::array::assertZeroBase(src);
@@ -194,7 +193,7 @@ void repvec(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 }
 
 /**
- * @brief Function which replicates the elements of an input 1D array, 
+ * @brief Function which replicates the elements of an input 1D array,
  * generating a new (larger) 1D array. In contrast to repvec, repetitions
  * occur at the element level, rather than at the vector level.
  *
@@ -202,13 +201,13 @@ void repvec(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
  * only in scenarios where you have previously checked conformity and is
  * focused only on speed.
  */
-template<typename T> 
+template<typename T>
 void repelem_(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 {
   int size_block = dst.extent(0) / src.extent(0);
   for(int i=0; i<src.extent(0); ++i)
   {
-    blitz::Array<T,1> dst_m = 
+    blitz::Array<T,1> dst_m =
       dst(blitz::Range(size_block*i, size_block*(i+1)-1));
     dst_m = src(i);
   }
@@ -216,7 +215,7 @@ void repelem_(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 
 
 /**
- * @brief Function which replicates the elements of an input 1D array, 
+ * @brief Function which replicates the elements of an input 1D array,
  * generating a new (larger) 1D array. In contrast to repvec, repetitions
  * occur at the element level, rather than at the vector level.
  *
@@ -224,7 +223,7 @@ void repelem_(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
  * raise an appropriate exception if that is not cased. If you know that the
  * input and output matrices conform, use the repmat_() variant.
  */
-template<typename T> 
+template<typename T>
 void repelem(const blitz::Array<T,1>& src, blitz::Array<T,1>& dst)
 {
   bob::core::array::assertZeroBase(src);

@@ -1,12 +1,11 @@
 /**
- * @file sp/cxx/DCT2D.cc
  * @date Thu Nov 14 22:59:47 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement a 2D Discrete Cosine Transform using
  * a 1D DCT implementation.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/sp/DCT2D.h>

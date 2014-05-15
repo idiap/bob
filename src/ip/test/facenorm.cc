@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/facenorm.cc
  * @date Thu Apr 14 21:03:45 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the geometric normalization function for 2D arrays/images
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

@@ -1,5 +1,4 @@
 /**
- * @file trainer/cxx/FisherLDATrainer.cc
  * @date Sat Jun 4 21:38:59 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -8,7 +7,7 @@
  * and associated methods, please consult Bishop, Machine Learning and Pattern
  * Recognition chapter 4.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <boost/format.hpp>

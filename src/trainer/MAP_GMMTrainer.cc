@@ -1,9 +1,8 @@
 /**
- * @file trainer/cxx/MAP_GMMTrainer.cc
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/trainer/MAP_GMMTrainer.h>

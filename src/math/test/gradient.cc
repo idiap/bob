@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/gradient.cc
  * @date Sun Apr 15 13:40:23 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the gradient computation for 1D/2D arrays
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

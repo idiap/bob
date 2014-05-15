@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/HDF5Group.cc
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed 29 Feb 17:24:10 2012
  *
  * @brief Implements HDF5 groups.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <boost/make_shared.hpp>

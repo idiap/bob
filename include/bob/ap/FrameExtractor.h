@@ -1,12 +1,11 @@
 /**
- * @file bob/ap/FrameExtractor.h
- * @date Wed Jan 11:10:20 2013 +0200
  * @author Elie Khoury <Elie.Khoury@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @date Wed Jan 11:10:20 2013 +0200
  *
  * @brief Implement a rectangular window frame extractor
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_AP_FRAME_EXTRACTOR_H
@@ -32,13 +31,13 @@ class FrameExtractor
     /**
      * @brief Constructor. Initializes working arrays
      */
-    FrameExtractor(const double sampling_frequency, 
+    FrameExtractor(const double sampling_frequency,
       const double win_length_ms=20., const double win_shift_ms=10.);
 
     /**
      * @brief Copy Constructor
      */
-    FrameExtractor(const FrameExtractor& other); 
+    FrameExtractor(const FrameExtractor& other);
 
     /**
      * @brief Assignment operator
@@ -110,14 +109,14 @@ class FrameExtractor
      * @brief Extracts the frame of the given index
      * @warning No check is performed
      */
-    virtual void extractNormalizeFrame(const blitz::Array<double,1>& input, 
+    virtual void extractNormalizeFrame(const blitz::Array<double,1>& input,
       const size_t i, blitz::Array<double,1>& frame) const;
     virtual void initWinSize();
     virtual void initWinLength();
     virtual void initWinShift();
 
     double m_sampling_frequency; ///< The sampling frequency
-    double m_win_length_ms; ///< The window length in miliseconds 
+    double m_win_length_ms; ///< The window length in miliseconds
     size_t m_win_length;
     double m_win_shift_ms;
     size_t m_win_shift;

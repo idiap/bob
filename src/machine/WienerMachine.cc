@@ -1,11 +1,10 @@
 /**
- * @file machine/cxx/WienerMachine.cc
  * @date Fri Sep 30 16:56:06 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implements a WienerMachine
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/core/array_copy.h>

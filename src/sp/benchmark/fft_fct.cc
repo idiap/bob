@@ -1,11 +1,10 @@
 /**
- * @file sp/cxx/test/fft_fct.cc
  * @date Thu Sep  5 11:32:14 CEST 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Benchmark of FFT/DFT and FCT/DCT implementations
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/core/array_random.h>

@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/norm.cc
  * @date Thu Jan 17 17:50:00 2013 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the Frobenius norm
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

@@ -1,12 +1,11 @@
 /**
- * @file ip/cxx/test/SIFT.cc
  * @date Tue Sep 18 18:56:25 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the SIFT implementation for 2D arrays and compare against
  *   VLfeat one.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

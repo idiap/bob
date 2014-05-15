@@ -1,12 +1,11 @@
 /**
- * @file bob/trainer/GMMTrainer.h
  * @date Tue May 10 11:35:58 2011 +0200
  * @author Francois Moulin <Francois.Moulin@idiap.ch>
  *
  * @brief This class implements the E-step of the expectation-maximisation algorithm for a GMM Machine.
  * @details See Section 9.2.2 of Bishop, "Pattern recognition and machine learning", 2006
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_TRAINER_GMMTRAINER_H

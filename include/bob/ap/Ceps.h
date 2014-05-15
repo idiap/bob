@@ -1,13 +1,12 @@
 /**
- * @file bob/ap/Ceps.h
- * @date Wed Jan 11:10:20 2013 +0200
  * @author Elie Khoury <Elie.Khoury@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @date Wed Jan 11:10:20 2013 +0200
  *
  * @brief Implement Linear and Mel Frequency Cepstral Coefficients
  * functions (MFCC and LFCC)
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
  */
 
 
@@ -44,7 +43,7 @@ class Ceps: public Spectrogram
      */
     Ceps(const double sampling_frequency, const double win_length_ms=20.,
       const double win_shift_ms=10., const size_t n_filters=24,
-      const size_t n_ceps=19, const double f_min=0., 
+      const size_t n_ceps=19, const double f_min=0.,
       const double f_max=4000., const size_t delta_win=2,
       const double pre_emphasis_coef=0.95, const bool mel_scale=true,
       const bool dct_norm=false);
@@ -54,17 +53,17 @@ class Ceps: public Spectrogram
      */
     Ceps(const Ceps& other);
 
-    /** 
+    /**
      * @brief Assignment operator
      */
     Ceps& operator=(const Ceps& other);
 
-    /** 
+    /**
      * @brief Equal to
      */
     bool operator==(const Ceps& other) const;
 
-    /** 
+    /**
      * @brief Not equal to
      */
     bool operator!=(const Ceps& other) const;
@@ -107,19 +106,19 @@ class Ceps: public Spectrogram
     bool getDctNorm() const
     { return m_dct_norm; }
     /**
-     * @brief Tells whether the energy is added to the cepstral coefficients 
+     * @brief Tells whether the energy is added to the cepstral coefficients
      * or not
      */
     bool getWithEnergy() const
     { return m_with_energy; }
     /**
-     * @brief Tells whether the first order derivatives are added to the 
+     * @brief Tells whether the first order derivatives are added to the
      * cepstral coefficients or not
      */
     bool getWithDelta() const
     { return m_with_delta; }
     /**
-     * @brief Tells whether the second order derivatives are added to the 
+     * @brief Tells whether the second order derivatives are added to the
      * cepstral coefficients or not
      */
     bool getWithDeltaDelta() const
@@ -138,26 +137,26 @@ class Ceps: public Spectrogram
      * order derivatives
      */
     virtual void setDeltaWin(size_t delta_win)
-    { m_delta_win = delta_win; } 
+    { m_delta_win = delta_win; }
     /**
      * @brief Sets whether the DCT coefficients are normalized or not
      */
     virtual void setDctNorm(bool dct_norm);
     /**
-     * @brief Sets whether the energy is added to the cepstral coefficients 
+     * @brief Sets whether the energy is added to the cepstral coefficients
      * or not
      */
     void setWithEnergy(bool with_energy)
     { m_with_energy = with_energy; }
     /**
-     * @brief Sets whether the first order derivatives are added to the 
+     * @brief Sets whether the first order derivatives are added to the
      * cepstral coefficients or not
      */
     void setWithDelta(bool with_delta)
     { if (!with_delta) m_with_delta_delta = false;
       m_with_delta = with_delta; }
     /**
-     * @brief Sets whether the first order derivatives are added to the 
+     * @brief Sets whether the first order derivatives are added to the
      * cepstral coefficients or not. If enabled, first order derivatives are
      * automatically enabled as well.
      */
@@ -167,7 +166,7 @@ class Ceps: public Spectrogram
 
   private:
     /**
-     * @brief Computes the first order derivative from the given input. 
+     * @brief Computes the first order derivative from the given input.
      * This methods is used to compute both the delta's and double delta's.
      */
     void addDerivative(const blitz::Array<double,2>& input, blitz::Array<double,2>& output) const;

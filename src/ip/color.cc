@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/color.cc
  * @date Fri Mar 25 09:59:18 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements many sorts of color transformations using standards
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <cmath>

@@ -1,5 +1,4 @@
 /**
- * @file bob/ip/LBPTop.h
  * @date Tue Apr 26 19:20:57 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  * @author Tiago Freitas Pereira <Tiago.Pereira@idiap.ch>
@@ -10,7 +9,7 @@
  * Binary Patterns with an Application to Facial Expression from Zhao &
  * Pietikäinen, IEEE Trans. on PAMI, 2007)
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_LBPTOP_H

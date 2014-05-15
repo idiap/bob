@@ -1,9 +1,8 @@
 /**
- * @file ip/cxx/HOG.cc
  * @date Sun Apr 22 21:13:44 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/HOG.h"

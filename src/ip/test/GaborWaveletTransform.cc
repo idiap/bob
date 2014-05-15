@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/GaborWaveletTransform.cc
  * @date 2012-02-27
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief Test the Gabor wavelet transform and performs some sanity checks
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

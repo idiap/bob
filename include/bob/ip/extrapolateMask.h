@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/extrapolateMask.h
  * @date Mon May 9 19:54:44 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Extrapolate an image given a mask
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_EXTRAPOLATE_MASK_H
@@ -23,7 +22,7 @@ namespace bob {
   namespace ip {
 
     /**
-      * @brief Function which extracts an image with a nearest neighbour 
+      * @brief Function which extracts an image with a nearest neighbour
       *   technique, a boolean mask being given.
       *   a/ The columns of the image are firstly extrapolated wrt. to the
       *   nearest neighbour on the same column.
@@ -36,18 +35,18 @@ namespace bob {
       * @warning The function assumes that the true values on the mask form
       *   a convex area.
       * @warning img is used as both an input and output, in order to provide
-      *   high performance. A copy might be done by the user before calling 
+      *   high performance. A copy might be done by the user before calling
       *   the function if required.
       */
-    template <typename T> 
-    void extrapolateMask( const blitz::Array<bool,2>& src_mask, 
+    template <typename T>
+    void extrapolateMask( const blitz::Array<bool,2>& src_mask,
       blitz::Array<T,2>& img)
     {
       // Check input and output size
       bob::core::array::assertSameShape(src_mask, img);
       bob::core::array::assertZeroBase(src_mask);
       bob::core::array::assertZeroBase(img);
-      
+
       // TODO: check that the input mask is convex
 
       // Determine the "full of false" columns
@@ -70,7 +69,7 @@ namespace bob {
         }
 
         int i_last=blitz::last(src_col);
-        if( i_last+1<src_mask.extent(0))  
+        if( i_last+1<src_mask.extent(0))
         {
           blitz::Range r_last(i_last+1,src_mask.extent(0)-1);
           img(r_last,jj) = img(i_last,jj);
@@ -78,13 +77,13 @@ namespace bob {
       }
 
       // Extrapolate the rows
-      if(true_min_index>0) 
+      if(true_min_index>0)
       {
         blitz::Range r_left(0,true_min_index-1);
         for(int i=0; i<src_mask.extent(0); ++i)
           img(i,r_left) = img(i,true_min_index);
-      }   
-      if(true_max_index+1<src_mask.extent(1)) 
+      }
+      if(true_max_index+1<src_mask.extent(1))
       {
         blitz::Range r_right(true_max_index+1,src_mask.extent(1)-1);
         for(int i=0; i<src_mask.extent(0); ++i)

@@ -1,11 +1,10 @@
 /**
- * @file machine/cxx/GaborJetSimilarities.cc
  * @date 2012-03-05
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
  * @brief Implements the Gabor jet similarity functions.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/machine/GaborJetSimilarities.h"

@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/shift.h
  * @date Mon Mar 7 20:06:35 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to shift a 2D or 3D array/image.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_SHIFT_H

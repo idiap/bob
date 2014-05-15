@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/DCTFeatures.cc
  * @date Mon Aug 27 20:29:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to DCT by blocks features
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/DCTFeatures.h"

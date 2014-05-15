@@ -1,9 +1,8 @@
 /**
- * @file trainer/cxx/BICTrainer.cc
  * @date Wed Jun  6 10:29:09 CEST 2012
  * @author Manuel Guenther <Manuel.Guenther@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/trainer/BICTrainer.h>

@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/SelfQuotientImage.cc
  * @date Thu Jul 19 11:52:08 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implements the Self Quotient Image algorithm
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/SelfQuotientImage.h"

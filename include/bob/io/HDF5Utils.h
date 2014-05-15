@@ -1,5 +1,4 @@
 /**
- * @file bob/io/HDF5Utils.h
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -22,10 +21,10 @@
  * @todo Missing support for automatic endianness conversion
  * @todo Missing true support for scalars
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_IO_HDF5UTILS_H 
+#ifndef BOB_IO_HDF5UTILS_H
 #define BOB_IO_HDF5UTILS_H
 
 #include <boost/filesystem.hpp>

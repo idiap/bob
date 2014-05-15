@@ -1,12 +1,11 @@
 /**
- * @file bob/trainer/EMPCATrainer.h
  * @date Tue Oct 11 12:18:23 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Expectation Maximization Algorithm for Principal Component 
  * Analysis
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_TRAINER_EMPCA_TRAINER_H

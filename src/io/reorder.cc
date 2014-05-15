@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/reorder.cc
  * @date Tue Nov 22 11:24:44 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implementation of row-major/column-major reordering
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <boost/format.hpp>

@@ -1,11 +1,10 @@
 /**
- * @file core/cxx/test/repmat.cc
  * @date Fri Jul 15 18:50:40 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the repmat function for 1D and 2D blitz arrays
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

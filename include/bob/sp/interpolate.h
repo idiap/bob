@@ -1,12 +1,11 @@
 /**
- * @file bob/sp/interpolate.h
  * @date Mon Apr 25 18:06:14 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implements various interpolation techniques for 1D and 2D blitz
  * arrays.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_SP_INTERPOLATE_H

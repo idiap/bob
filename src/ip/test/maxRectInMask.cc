@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/maxRectInMask.cc
  * @date Mon Apr 18 20:25:30 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the maxRectInMask function
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

@@ -1,12 +1,11 @@
 /**
- * @file io/cxx/CSVFile.cc
  * @date Thu 10 May 2012 15:19:24 CEST
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Code to read and write CSV files to/from arrays. CSV files are always
  * treated as containing sequences of double precision numbers.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <sstream>

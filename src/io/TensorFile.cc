@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/TensorFile.cc
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief This class can be used to store and load multiarrays into/from files.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/core/array_type.h>

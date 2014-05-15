@@ -1,9 +1,8 @@
 /**
- * @file math/cxx/pavx.cc
  * @date Sat Dec 8 19:35:25 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 #include <bob/math/pavx.h>
 #include <bob/core/assert.h>

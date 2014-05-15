@@ -1,5 +1,4 @@
 /**
- * @file bob/ip/SelfQuotientImage.h
  * @date Thu July 19 11:44:08 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -9,7 +8,7 @@
  *  in Proceedings of the IEEE International Conference on Image Processing, 
  *     October 2004, vol. 2, p. 1397-1400
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_SELF_QUOTIENT_IMAGE_H

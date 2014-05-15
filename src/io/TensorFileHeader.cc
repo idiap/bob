@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/TensorFileHeader.cc
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * This class defines an header for storing multiarrays into .tensor files.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <boost/format.hpp>

@@ -1,9 +1,8 @@
 /**
- * @file bob/core/check.h
  * @date Wed Feb 9 12:26:11 2013 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_CHECK_H

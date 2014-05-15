@@ -4,7 +4,7 @@
  *
  * @brief A registration system for new activation routines
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MACHINE_ACTIVATIONREGISTRY_H

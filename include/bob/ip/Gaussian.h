@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/Gaussian.h
  * @date Sat Apr 30 17:52:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to smooth an image with a Gaussian kernel
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_GAUSSIAN_H
@@ -39,7 +38,7 @@ namespace bob {
          * @param sigma_x The standard deviation of the kernel along the x-axis
          * @param border_type The interpolation type for the convolution
          */
-        Gaussian(const size_t radius_y=1, const size_t radius_x=1, 
+        Gaussian(const size_t radius_y=1, const size_t radius_x=1,
             const double sigma_y=sqrt(2.5), const double sigma_x=sqrt(2.5),
             const bob::sp::Extrapolation::BorderType border_type =
               bob::sp::Extrapolation::Mirror):
@@ -52,9 +51,9 @@ namespace bob {
         /**
          * @brief Copy constructor
          */
-        Gaussian(const Gaussian& other): 
-          m_radius_y(other.m_radius_y), m_radius_x(other.m_radius_x), 
-          m_sigma_y(other.m_sigma_y), m_sigma_x(other.m_sigma_x), 
+        Gaussian(const Gaussian& other):
+          m_radius_y(other.m_radius_y), m_radius_x(other.m_radius_x),
+          m_sigma_y(other.m_sigma_y), m_sigma_x(other.m_sigma_x),
           m_conv_border(other.m_conv_border)
         {
           computeKernel();
@@ -77,8 +76,8 @@ namespace bob {
         /**
          * @brief Not equal to
          */
-        bool operator!=(const Gaussian& b) const; 
- 
+        bool operator!=(const Gaussian& b) const;
+
         /**
          * @brief Resets the parameters of the filter
          * @param radius_y The height of the kernel along the y-axis
@@ -102,17 +101,17 @@ namespace bob {
         bob::sp::Extrapolation::BorderType getConvBorder() const { return m_conv_border; }
         const blitz::Array<double,1>& getKernelY() const { return m_kernel_y; }
         const blitz::Array<double,1>& getKernelX() const { return m_kernel_x; }
-       
+
         /**
          * @brief Setters
          */
-        void setRadiusY(const size_t radius_y) 
+        void setRadiusY(const size_t radius_y)
         { m_radius_y = radius_y; computeKernel(); }
-        void setRadiusX(const size_t radius_x) 
+        void setRadiusX(const size_t radius_x)
         { m_radius_x = radius_x; computeKernel(); }
-        void setSigmaY(const double sigma_y) 
+        void setSigmaY(const double sigma_y)
         { m_sigma_y = sigma_y; computeKernel(); }
-        void setSigmaX(const double sigma_x) 
+        void setSigmaX(const double sigma_x)
         { m_sigma_x = sigma_x; computeKernel(); }
         void setConvBorder(const bob::sp::Extrapolation::BorderType border_type)
         { m_conv_border = border_type; }
@@ -122,8 +121,8 @@ namespace bob {
          * @param src The 2D input blitz array
          * @param dst The 2D output blitz array
          */
-        template <typename T> 
-        void operator()(const blitz::Array<T,2>& src, 
+        template <typename T>
+        void operator()(const blitz::Array<T,2>& src,
           blitz::Array<double,2>& dst);
 
         /**
@@ -131,16 +130,16 @@ namespace bob {
          * @param src The 3D input blitz array
          * @param dst The 3D output blitz array
          */
-        template <typename T> 
-        void operator()(const blitz::Array<T,3>& src, 
+        template <typename T>
+        void operator()(const blitz::Array<T,3>& src,
           blitz::Array<double,3>& dst);
 
       private:
-        void computeKernel(); 
+        void computeKernel();
 
         /**
          * @brief Attributes
-         */  
+         */
         size_t m_radius_y;
         size_t m_radius_x;
         double m_sigma_y;
@@ -156,12 +155,12 @@ namespace bob {
     };
 
     // Declare template method full specialization
-    template <> 
-    void bob::ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src, 
+    template <>
+    void bob::ip::Gaussian::operator()<double>(const blitz::Array<double,2>& src,
       blitz::Array<double,2>& dst);
 
-    template <typename T> 
-    void bob::ip::Gaussian::operator()(const blitz::Array<T,2>& src, 
+    template <typename T>
+    void bob::ip::Gaussian::operator()(const blitz::Array<T,2>& src,
       blitz::Array<double,2>& dst)
     {
       // Casts the input to double
@@ -170,16 +169,16 @@ namespace bob {
       this->operator()(src_d, dst);
     }
 
-    template <typename T> 
-    void bob::ip::Gaussian::operator()(const blitz::Array<T,3>& src, 
+    template <typename T>
+    void bob::ip::Gaussian::operator()(const blitz::Array<T,3>& src,
       blitz::Array<double,3>& dst)
     {
       for( int p=0; p<dst.extent(0); ++p) {
-        const blitz::Array<T,2> src_slice = 
+        const blitz::Array<T,2> src_slice =
           src( p, blitz::Range::all(), blitz::Range::all() );
-        blitz::Array<double,2> dst_slice = 
+        blitz::Array<double,2> dst_slice =
           dst( p, blitz::Range::all(), blitz::Range::all() );
-        
+
         // Gaussian smooth plane
         this->operator()(src_slice, dst_slice);
       }

@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/linear.cc
  * @date Fri Apr 8 20:57:37 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test basic linear algebra operations
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

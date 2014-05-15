@@ -1,12 +1,11 @@
 /**
- * @file bob/ip/WeightedGaussian.h
  * @date Sat Apr 30 17:52:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to smooth an image with a Weighted
  *        Gaussian kernel (used by the Self Quotient Image)
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_WEIGHTED_GAUSSIAN_H

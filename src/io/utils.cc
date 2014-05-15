@@ -1,11 +1,10 @@
 /**
- * @file io/cxx/utils.cc
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed  3 Oct 08:36:48 2012
  *
  * @brief Implementation of some compile-time I/O utitlites
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/io/utils.h>

@@ -1,12 +1,11 @@
 /**
- * @file ip/cxx/WeightedGaussian.cc
  * @date Thu July 19 12:27:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to process images with a weighted
  *        Gaussian kernel (Used by the Self Quotient Image)
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <boost/format.hpp>

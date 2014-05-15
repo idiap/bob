@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/GaborBankSpatial.cc
  * @date Wed Apr 13 20:45:32 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to perform a Gabor bank filtering
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/ip/GaborBankSpatial.h>

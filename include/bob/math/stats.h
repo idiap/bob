@@ -1,12 +1,11 @@
 /**
- * @file bob/math/stats.h
  * @date Mon Jun 20 11:47:58 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Some statistical base methods
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MATH_STATS_H 

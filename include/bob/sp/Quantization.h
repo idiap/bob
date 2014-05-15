@@ -1,11 +1,10 @@
 /**
- * @file bob/sp/Quantization.h
  * @date Tue Feb  5 12:47:58 CET 2013
  * @author Ivana Chingovska <ivana.chingovska@idiap.ch>
  *
  * @brief Implement a blitz-based Quantization of 1D and 2D signals
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_SP_QUANTIZATION_H

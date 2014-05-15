@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/color.h
  * @date Fri Mar 25 10:02:16 2011 +0100
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Methods to convert between color spaces
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_COLOR_H

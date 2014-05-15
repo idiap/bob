@@ -1,12 +1,11 @@
 /**
- * @file bob/io/File.h
  * @date Tue Oct 25 23:25:46 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Describes a generic API for reading and writing data to external
  * files.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_FILE_H

@@ -1,11 +1,10 @@
 /**
- * @file sp/cxx/DCT1D.cc
  * @date Thu Nov 14 18:15:49 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief 1D Discrete Cosine Transform using a 1D FFT
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/sp/DCT1D.h>

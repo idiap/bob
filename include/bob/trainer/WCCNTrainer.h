@@ -1,10 +1,9 @@
 /**
- * @file bob/trainer/WCCNTrainer.h
  * @date Tue Apr 9 22:10:00 2013 +0200
  * @author Elie Khoury <Elie.Khoury@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_TRAINER_WCCN_TRAINER_H

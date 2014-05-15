@@ -1,5 +1,4 @@
 /**
- * @file bob/core/array_reshape.h
  * @date Sun Jul 17 13:31:35 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
@@ -7,7 +6,7 @@
  * (matlab repshape-like) a 2D (or 1D) blitz array of a given type.
  * The output should be allocated and sized by the user.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_ARRAY_RESHAPE_H
@@ -36,8 +35,8 @@ namespace bob { namespace core { namespace array {
  * only in scenarios where you have previously checked conformity and is
  * focused only on speed.
  */
-template<typename T> 
-void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
+template<typename T>
+void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 {
   int is=0;
   int js=0;
@@ -46,7 +45,7 @@ void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
     {
       dst(i,j) = src(is,js);
       ++is;
-      if(is>=src.extent(0)) 
+      if(is>=src.extent(0))
       {
         ++js;
         is=0;
@@ -62,8 +61,8 @@ void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
  * raise an appropriate exception if that is not cased. If you know that the
  * input and output matrices conform, use the reshape_() variant.
  */
-template<typename T> 
-void reshape(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst) 
+template<typename T>
+void reshape(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
 {
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
@@ -85,8 +84,8 @@ void reshape(const blitz::Array<T,2>& src, blitz::Array<T,2>& dst)
  * only in scenarios where you have previously checked conformity and is
  * focused only on speed.
  */
-template<typename T> 
-void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst) 
+template<typename T>
+void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst)
 {
   int n_blocks = src.extent(1);
   int size_block = src.extent(0);
@@ -106,8 +105,8 @@ void reshape_(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst)
  * raise an appropriate exception if that is not cased. If you know that the
  * input and output matrices conform, use the reshape_() variant.
  */
-template<typename T> 
-void reshape(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst) 
+template<typename T>
+void reshape(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst)
 {
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);
@@ -129,7 +128,7 @@ void reshape(const blitz::Array<T,2>& src, blitz::Array<T,1>& dst)
  * only in scenarios where you have previously checked conformity and is
  * focused only on speed.
  */
-template<typename T> 
+template<typename T>
 void reshape_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst)
 {
   int n_blocks = dst.extent(1);
@@ -150,8 +149,8 @@ void reshape_(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst)
  * raise an appropriate exception if that is not cased. If you know that the
  * input and output matrices conform, use the reshape_() variant.
  */
-template<typename T> 
-void reshape(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst) 
+template<typename T>
+void reshape(const blitz::Array<T,1>& src, blitz::Array<T,2>& dst)
 {
   bob::core::array::assertZeroBase(src);
   bob::core::array::assertZeroBase(dst);

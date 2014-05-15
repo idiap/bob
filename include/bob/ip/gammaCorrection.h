@@ -1,12 +1,11 @@
 /**
- * @file bob/ip/gammaCorrection.h
  * @date Thu Mar 17 18:46:09 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to perform power-law gamma correction
  *   on a 2D array/image.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_GAMMA_CORRECTION_H

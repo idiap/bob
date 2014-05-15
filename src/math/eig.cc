@@ -1,10 +1,9 @@
 /**
- * @file math/cxx/eig.cc
  * @date Mon May 16 21:45:27 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <stdexcept>

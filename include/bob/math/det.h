@@ -1,12 +1,11 @@
 /**
- * @file bob/math/det.h
  * @date Fri Jan 27 14:10:23 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines function to compute the determinant of
  *   a 2D blitz array matrix.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MATH_DET_H

@@ -1,5 +1,4 @@
 /**
- * @file bob/io/HDF5File.h
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -7,7 +6,7 @@
  * self-describing data files. You can get more information in this webpage:
  * http://www.hdfgroup.org/HDF5
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_HDF5FILE_H

@@ -1,11 +1,10 @@
 /**
- * @file bob/sp/conv.h
  * @date Thu Feb 3 16:39:25 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement a blitz-based convolution product with zero padding
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_SP_CONV_H

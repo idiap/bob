@@ -1,12 +1,11 @@
 /**
- * @file bob/trainer/EMTrainer.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Base class for Expectation-Maximization-like algorithms
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 

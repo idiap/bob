@@ -1,5 +1,4 @@
 /**
- * @file bob/core/logging.h
  * @date Tue Jan 18 17:07:26 2011 +0100
  * @author André Anjos <andre.anjos@idiap.ch>
  *
@@ -8,7 +7,7 @@
  * iostreams framework. Manual here:
  * http://www.boost.org/doc/libs/release/libs/iostreams/doc/index.html
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_LOGGING_H

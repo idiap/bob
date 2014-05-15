@@ -1,12 +1,11 @@
 /**
- * @file bob/ip/BlockCellGradientDescriptors.h
  * @date Sun Apr 22 16:03:15 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Abstract class for extracting gradient-based descriptors by
  *   decomposing an image (or an image patch) into a set of cells, and blocks.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_BLOCK_CELL_GRADIENT_DESCRIPTORS_H

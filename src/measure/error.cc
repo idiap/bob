@@ -1,11 +1,10 @@
 /**
- * @file measure/cxx/error.cc
  * @date Wed Apr 20 08:02:30 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Implements the error evaluation routines
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <stdexcept>

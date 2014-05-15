@@ -1,11 +1,10 @@
 /**
- * @file bob/core/array_type.h
  * @date Sat Apr 9 18:10:10 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file contains information about the supported arrays
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_ARRAY_TYPE_H
@@ -151,7 +150,7 @@ namespace bob {
     const char* stringize(ElementType t);
 
     /**
-     * @brief Equivalent to call stringize() on the result of 
+     * @brief Equivalent to call stringize() on the result of
      * getElementType<T>().
      */
     template<typename T> const char* stringize() {

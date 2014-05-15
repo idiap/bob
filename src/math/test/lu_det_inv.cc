@@ -1,11 +1,10 @@
 /**
- * @file math/cxx/test/lu_det_inv.cc
  * @date Fri Jan 27 14:10:23 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the LU decomposition and the determinant
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

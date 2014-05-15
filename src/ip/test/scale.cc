@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/scale.cc
  * @date Mon Mar 14 11:21:29 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the rescaling function for 2D and 3D arrays/images
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

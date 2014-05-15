@@ -1,10 +1,9 @@
 /**
- * @file bob/ap/Energy.h
- * @date Wed Jan 11:10:20 2013 +0200
  * @author Elie Khoury <Elie.Khoury@idiap.ch>
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
+ * @date Wed Jan 11:10:20 2013 +0200
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
  */
 
 
@@ -34,22 +33,22 @@ class Energy: public FrameExtractor
     Energy(const double sampling_frequency, const double win_length_ms=20.,
       const double win_shift_ms=10.);
 
-    /** 
+    /**
      * @brief Copy constructor
      */
     Energy(const Energy& other);
 
-    /** 
+    /**
      * @brief Assignment operator
      */
     Energy& operator=(const Energy& other);
 
-    /** 
+    /**
      * @brief Equal to
      */
     bool operator==(const Energy& other) const;
 
-    /** 
+    /**
      * @brief Not equal to
      */
     bool operator!=(const Energy& other) const;
@@ -70,18 +69,18 @@ class Energy: public FrameExtractor
      */
     void operator()(const blitz::Array<double,1>& input, blitz::Array<double,1>& output);
 
-    /** 
+    /**
      * @brief Gets the energy floor
      */
     virtual double getEnergyFloor() const
     { return m_energy_floor; }
 
-    /** 
+    /**
      * @brief Sets the energy floor
      */
     virtual void setEnergyFloor(double energy_floor)
-    { m_energy_floor = energy_floor; 
-      m_log_energy_floor = log(m_energy_floor); } 
+    { m_energy_floor = energy_floor;
+      m_log_energy_floor = log(m_energy_floor); }
 
   protected:
     /**

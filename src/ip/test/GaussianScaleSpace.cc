@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/test/GaussianScaleSpace.cc
  * @date Mon Sep 3 11:32:00 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Test the Gaussian Scale Space
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

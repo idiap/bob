@@ -1,12 +1,11 @@
 /**
- * @file core/cxx/cast.cc
  * @date Wed Feb 9 16:19:18 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines functions which add std::complex support to the
  * static_cast function.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/core/cast.h>

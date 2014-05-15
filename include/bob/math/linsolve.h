@@ -1,12 +1,11 @@
 /**
- * @file bob/math/linsolve.h
  * @date Sat Mar 19 19:49:51 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines functions to solve linear systems
  *   A*x=b using LAPACK or a conjugate gradient implementation.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MATH_LINSOLVE_H

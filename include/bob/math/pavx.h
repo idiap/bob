@@ -1,11 +1,10 @@
 /**
- * @file bob/math/pavx.h
  * @date Sat Dec 8 19:35:25 2012 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Pool Adjacent Violators algorithm
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MATH_PAVX_H

@@ -1,12 +1,11 @@
 /**
- * @file bob/ip/LBPHSFeatures.h
  * @date Wed Apr 27 20:40:12 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to extract features based on histogram
  *   sequences of Local Binary Patterns, as described in:
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_LBPHS_FEATURES_H

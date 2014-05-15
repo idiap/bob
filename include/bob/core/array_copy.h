@@ -1,11 +1,10 @@
 /**
- * @file bob/core/array_copy.h
  * @date Thu Oct 20 11:25:46 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines deep copy functions for blitz++ arrays
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_ARRAY_COPY_H
@@ -23,7 +22,7 @@ namespace bob {
      */
 
     /**
-     * @brief Copies a blitz array like copy() does, but resets the storage 
+     * @brief Copies a blitz array like copy() does, but resets the storage
      * ordering.
      */
     template <typename T, int D>
@@ -35,7 +34,7 @@ namespace bob {
     }
 
     /**
-     * @brief Copies a std::vector of blitz arrays, making deep copies of the 
+     * @brief Copies a std::vector of blitz arrays, making deep copies of the
      * arrays.
      * @warning Previous content of the destination will be erased
      */
@@ -44,13 +43,13 @@ namespace bob {
                std::vector<blitz::Array<T,D> >& dst)
     {
       dst.clear(); // makes sure dst is empty
-      for(typename std::vector<blitz::Array<T,D> >::const_iterator 
+      for(typename std::vector<blitz::Array<T,D> >::const_iterator
             it=src.begin(); it!=src.end(); ++it)
         dst.push_back(ccopy(*it));
     }
 
     /**
-     * @brief Copies a std::map of blitz arrays, making deep copies of the 
+     * @brief Copies a std::map of blitz arrays, making deep copies of the
      * arrays.
      * @warning Previous content of the destination will be erased
      */
@@ -59,7 +58,7 @@ namespace bob {
                std::map<K, blitz::Array<T,D> >& dst)
     {
       dst.clear(); // makes sure dst is empty
-      for(typename std::map<K, blitz::Array<T,D> >::const_iterator 
+      for(typename std::map<K, blitz::Array<T,D> >::const_iterator
             it=src.begin(); it!=src.end(); ++it)
         dst[it->first].reference(ccopy(it->second));
     }

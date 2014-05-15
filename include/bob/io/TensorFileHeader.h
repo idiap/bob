@@ -1,12 +1,11 @@
 /**
- * @file bob/io/TensorFileHeader.h
  * @date Wed Jun 22 17:50:08 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief This class defines an header for storing multiarrays into
  * .tensor files.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_TENSORFILEHEADER_H
@@ -16,7 +15,7 @@
 #include <blitz/array.h>
 #include <bob/core/array.h>
 
-namespace bob { namespace io { 
+namespace bob { namespace io {
 
   // TensorType
   enum TensorType
@@ -49,7 +48,7 @@ namespace bob { namespace io {
        */
       virtual ~TensorFileHeader();
 
-      /** 
+      /**
        * Gets the offset of some array in the file
        */
       size_t getArrayIndex(size_t index) const;
@@ -84,7 +83,7 @@ namespace bob { namespace io {
       void update();
 
       //representation
-      TensorType m_tensor_type; ///< array element type 
+      TensorType m_tensor_type; ///< array element type
       bob::core::array::typeinfo m_type; ///< the type information
       size_t m_n_samples; ///< total number of arrays in the file
       size_t m_tensor_size; ///< the number of dimensions in each array

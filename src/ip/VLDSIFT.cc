@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/VLDSIFT.cc
  * @date Mon Jan 23 20:46:07 2012 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Dense SIFT implementation using VLFeat
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <cstring> //for memcpy

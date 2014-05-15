@@ -1,11 +1,10 @@
 /**
- * @file bob/ip/scale.h
  * @date Mon Mar 14 11:21:29 2011 +0100
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file defines a function to rescale a 2D or 3D array/image.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IP_SCALE_H

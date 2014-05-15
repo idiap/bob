@@ -1,9 +1,8 @@
 /**
- * @file trainer/cxx/CGLogRegTrainer.cc
  * @date Sat Sep 1 19:26:00 2012 +0100
  * @author Laurent El Shafey <laurent.el-shafey@idiap.ch>
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/trainer/CGLogRegTrainer.h>

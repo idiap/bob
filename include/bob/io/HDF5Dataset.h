@@ -1,11 +1,10 @@
 /**
- * @file bob/io/HDF5Dataset.h
  * @author Andre Anjos <andre.anjos@idiap.ch>
  * @date Wed 29 Feb 17:27:45 2012
  *
  * @brief Describes HDF5 datasets
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_IO_HDF5DATASET_H

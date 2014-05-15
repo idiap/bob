@@ -1,5 +1,4 @@
 /**
- * @file bob/core/array_cat.h
  * @date Fri Jul 29 22:22:48 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
@@ -7,7 +6,7 @@
  * configurable dimensions in a generic way and optimally avoiding excessive
  * copying.
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_CORE_ARRAY_CAT_H

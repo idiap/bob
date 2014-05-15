@@ -1,12 +1,11 @@
 /**
- * @file bob/sp/DCT1D.h
  * @date Thu Nov 14 18:16:30 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement a blitz-based 1D Discrete Cosine Transform using a 1D FFT
  * functions
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

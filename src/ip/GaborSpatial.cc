@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/GaborSpatial.cc
  * @date Wed Apr 13 20:12:03 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief This file provides a class to perform Gabor filtering
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include <bob/ip/GaborSpatial.h>

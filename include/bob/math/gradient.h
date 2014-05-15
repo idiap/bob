@@ -1,11 +1,10 @@
 /**
- * @file bob/math/gradient.h
  * @date Sat Apr 14 21:01:15 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Computes the gradient of a signal
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #ifndef BOB_MATH_GRADIENT_H

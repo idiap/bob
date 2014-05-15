@@ -1,11 +1,10 @@
 /**
- * @file machine/cxx/test/linear.cc
  * @date Mon Jun 20 17:58:16 2011 +0200
  * @author Andre Anjos <andre.anjos@idiap.ch>
  *
  * @brief Tests linear machine loading/unloading and execution
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #define BOOST_TEST_DYN_LINK

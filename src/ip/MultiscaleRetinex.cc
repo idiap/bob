@@ -1,11 +1,10 @@
 /**
- * @file ip/cxx/MultiscaleRetinex.cc
  * @date Mon May 2 10:01:08 2011 +0200
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implements the MultiscaleRetinex algorithm
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  */
 
 #include "bob/ip/MultiscaleRetinex.h"

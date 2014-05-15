@@ -1,12 +1,11 @@
 /**
- * @file bob/sp/FFT1D.h
  * @date Thu Nov 14 11:58:53 CET 2013
  * @author Laurent El Shafey <Laurent.El-Shafey@idiap.ch>
  *
  * @brief Implement a blitz-based 1D Fast Fourier Transform using kiss FFT
  * functions
  *
- * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
+ * Copyright (C) Idiap Research Institute, Martigny, Switzerland
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
