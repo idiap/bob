@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/idiap/bob.svg?branch=2.0)](https://travis-ci.org/idiap/bob)
-[![Coverage Status](https://coveralls.io/repos/idiap/bob/2.0.png)](https://coveralls.io/r/idiap/bob)
+[![Coverage Status](https://coveralls.io/repos/idiap/bob/badge.png?branch=2.0)](https://coveralls.io/r/idiap/bob?branch=2.0)
 [![Github Tag](http://img.shields.io/github/tag/idiap/bob.svg)](https://github.com/idiap/bob)
 
 Bob
