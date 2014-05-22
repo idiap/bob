@@ -7,8 +7,6 @@ set(incdir ${cxx_incdir})
 
 # This defines the list of source files inside this package.
 set(src
-  "PCATrainer.cc"
-  "FisherLDATrainer.cc"
   "KMeansTrainer.cc"
   "GMMTrainer.cc"
   "MAP_GMMTrainer.cc"
@@ -19,9 +17,7 @@ set(src
   "EMPCATrainer.cc"
   "PLDATrainer.cc"
   "BICTrainer.cc"
-  "CGLogRegTrainer.cc"
-  "WhiteningTrainer.cc"
-  "WCCNTrainer.cc"
+  "PCATrainer.cc"
   )
 
 # Define the library, compilation and linkage options
