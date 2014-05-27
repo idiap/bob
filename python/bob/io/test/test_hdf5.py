@@ -408,3 +408,24 @@ def test_append_compression():
   finally:
 
     os.unlink(tmpname)
+
+def test_close():
+  try:
+    tmpname = testutils.temporary_filename()
+    outfile = HDF5File(tmpname, 'w')
+    outfile.close()
+
+    def set():
+      outfile.set("Test", numpy.array([1,2]))
+    def read():
+      test = outfile.read("Test")
+    def name():
+      outfile.filename
+
+    nose.tools.assert_raises(RuntimeError, set)
+    nose.tools.assert_raises(RuntimeError, read)
+    nose.tools.assert_raises(RuntimeError, name)
+
+  finally:
+    os.unlink(tmpname)
+

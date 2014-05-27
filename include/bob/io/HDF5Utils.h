@@ -25,7 +25,7 @@
  * Copyright (C) 2011-2013 Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef BOB_IO_HDF5UTILS_H 
+#ifndef BOB_IO_HDF5UTILS_H
 #define BOB_IO_HDF5UTILS_H
 
 #include <boost/filesystem.hpp>
@@ -112,9 +112,14 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       void reset();
 
       /**
-       * Tells if this file is writeable
+       * Flushes the current content of the file to disk
        */
-      bool writeable() const;
+      void flush();
+
+      /**
+       * Tells if this file is writable
+       */
+      bool writable() const;
 
     private: //representation
 

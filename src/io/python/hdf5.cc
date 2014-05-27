@@ -662,6 +662,8 @@ void bind_io_hdf5() {
   class_<bob::io::HDF5File, boost::shared_ptr<bob::io::HDF5File> >("HDF5File", "A HDF5File allows users to read and write data from and to files containing standard bob binary coded data in HDF5 format. For an introduction to HDF5, please visit http://www.hdfgroup.org/HDF5.", no_init)
     .def(init<const bob::io::HDF5File&> ((arg("self"), arg("other")), "Generates a shallow copy of the already opened file."))
     .def(init<const std::string&, const char> ((arg("self"), arg("filename"), arg("openmode_string")='r'), "Opens a new file in one of these supported modes: 'r' (read-only), 'a' (read/write/append), 'w' (read/write/truncate) or 'x' (read/write/exclusive)"))
+    .def("close", &bob::io::HDF5File::close, (arg("self")), "Closes this file and writes its contents to disk. Any operation on a closed file will result in an exception.")
+    .def("flush", &bob::io::HDF5File::flush, (arg("self")), "Flushed the current content of the HDF5File to disk.")
     .def("cd", &bob::io::HDF5File::cd, (arg("self"), arg("path")), "Changes the current prefix path. When this object is started, the prefix path is empty, which means all following paths to data objects should be given using the full path. If you set this to a different value, it will be used as a prefix to any subsequent operation until you reset it. If path starts with '/', it is treated as an absolute path. '..' and '.' are supported. This object should be a std::string. If the value is relative, it is added to the current path. If it is absolute, it causes the prefix to be reset. Note all operations taking a relative path, following a cd(), will be considered relative to the value defined by the 'cwd' property of this object.")
     .def("has_group", &bob::io::HDF5File::hasGroup, (arg("self"), arg("path")), "Checks if a path exists inside a file - does not work for datasets, only for directories. If the given path is relative, it is take w.r.t. to the current working directory")
     .def("create_group", &bob::io::HDF5File::createGroup, (arg("self"), arg("path")), "Creates a new directory inside the file. A relative path is taken w.r.t. to the current directory. If the directory already exists (check it with hasGroup()), an exception will be raised.")
@@ -711,5 +713,6 @@ void bind_io_hdf5() {
     .def("delete_attributes", &hdf5file_del_attributes, hdf5file_del_attributes_overloads((arg("self"), arg("path")="."), "Deletes **all** attributes associated to a (existing) path in the file. The path may point to a subdirectory or to a particular dataset. If the path does not exist, a RuntimeError is raised."))
 
     .add_property("filename", &bob::io::HDF5File::filename, "The name of the underlying file.")
+    .add_property("writable", &bob::io::HDF5File::writable, "Is the file opened for writing?")
     ;
 }

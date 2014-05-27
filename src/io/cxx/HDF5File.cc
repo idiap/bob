@@ -65,17 +65,24 @@ bob::io::HDF5File& bob::io::HDF5File::operator =(const bob::io::HDF5File& other_
   return *this;
 }
 
+void bob::io::HDF5File::close() {
+  m_file.reset();
+  m_cwd.reset();
+}
 
 void bob::io::HDF5File::cd(const std::string& path) {
+  check_open();
   m_cwd = m_cwd->cd(path);
 }
 
 bool bob::io::HDF5File::hasGroup(const std::string& path) {
+  check_open();
   return m_cwd->has_group(path);
 }
 
 void bob::io::HDF5File::createGroup(const std::string& path) {
-  if (!m_file->writeable()) {
+  check_open();
+  if (!m_file->writable()) {
     boost::format m("cannot create group '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
@@ -84,20 +91,24 @@ void bob::io::HDF5File::createGroup(const std::string& path) {
 }
 
 std::string bob::io::HDF5File::cwd() const {
+  check_open();
   return m_cwd->path();
 }
 
 bool bob::io::HDF5File::contains (const std::string& path) const {
+  check_open();
   return m_cwd->has_dataset(path);
 }
 
 const std::vector<bob::io::HDF5Descriptor>& bob::io::HDF5File::describe
 (const std::string& path) const {
+  check_open();
   return (*m_cwd)[path]->m_descr;
 }
 
 void bob::io::HDF5File::unlink (const std::string& path) {
-  if (!m_file->writeable()) {
+  check_open();
+  if (!m_file->writable()) {
     boost::format m("cannot remove dataset at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
@@ -106,7 +117,8 @@ void bob::io::HDF5File::unlink (const std::string& path) {
 }
 
 void bob::io::HDF5File::rename (const std::string& from, const std::string& to) {
-  if (!m_file->writeable()) {
+  check_open();
+  if (!m_file->writable()) {
     boost::format m("cannot rename dataset '%s' -> '%s' at path '%s' of file '%s' because it is not writeable");
     m % from % to % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
@@ -119,7 +131,8 @@ void bob::io::HDF5File::rename (const std::string& from, const std::string& to) 
 }
 
 void bob::io::HDF5File::copy (HDF5File& other) {
-  if (!m_file->writeable()) {
+  check_open();
+  if (!m_file->writable()) {
     boost::format m("cannot copy data of file '%s' to path '%s' of file '%s' because it is not writeable");
     m % other.filename() % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
@@ -144,7 +157,8 @@ void bob::io::HDF5File::copy (HDF5File& other) {
 
 void bob::io::HDF5File::create (const std::string& path, const bob::io::HDF5Type& type,
     bool list, size_t compression) {
-  if (!m_file->writeable()) {
+  check_open();
+  if (!m_file->writable()) {
     boost::format m("cannot create dataset '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
@@ -155,12 +169,14 @@ void bob::io::HDF5File::create (const std::string& path, const bob::io::HDF5Type
 
 void bob::io::HDF5File::read_buffer (const std::string& path, size_t pos,
     const bob::io::HDF5Type& type, void* buffer) const {
+  check_open();
   (*m_cwd)[path]->read_buffer(pos, type, buffer);
 }
 
 void bob::io::HDF5File::write_buffer (const std::string& path,
     size_t pos, const bob::io::HDF5Type& type, const void* buffer) {
-  if (!m_file->writeable()) {
+  check_open();
+  if (!m_file->writable()) {
     boost::format m("cannot write to object '%s' at path '%s' of file '%s' because it is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
@@ -170,7 +186,8 @@ void bob::io::HDF5File::write_buffer (const std::string& path,
 
 void bob::io::HDF5File::extend_buffer(const std::string& path,
     const bob::io::HDF5Type& type, const void* buffer) {
-  if (!m_file->writeable()) {
+  check_open();
+  if (!m_file->writable()) {
     boost::format m("cannot extend object '%s' at path '%s' of file '%s' because the file is not writeable");
     m % path % m_cwd->path() % m_file->filename();
     throw std::runtime_error(m.str());
@@ -180,6 +197,7 @@ void bob::io::HDF5File::extend_buffer(const std::string& path,
 
 bool bob::io::HDF5File::hasAttribute(const std::string& path,
     const std::string& name) const {
+  check_open();
   if (m_cwd->has_dataset(path)) {
     return (*m_cwd)[path]->has_attribute(name);
   }
@@ -191,6 +209,7 @@ bool bob::io::HDF5File::hasAttribute(const std::string& path,
 
 void bob::io::HDF5File::getAttributeType(const std::string& path,
     const std::string& name, HDF5Type& type) const {
+  check_open();
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->gettype_attribute(name, type);
   }
@@ -206,6 +225,7 @@ void bob::io::HDF5File::getAttributeType(const std::string& path,
 
 void bob::io::HDF5File::deleteAttribute(const std::string& path,
     const std::string& name) {
+  check_open();
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->delete_attribute(name);
   }
@@ -221,6 +241,7 @@ void bob::io::HDF5File::deleteAttribute(const std::string& path,
 
 void bob::io::HDF5File::listAttributes(const std::string& path,
     std::map<std::string, bob::io::HDF5Type>& attributes) const {
+  check_open();
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->list_attributes(attributes);
   }
@@ -236,6 +257,7 @@ void bob::io::HDF5File::listAttributes(const std::string& path,
 
 void bob::io::HDF5File::read_attribute(const std::string& path,
     const std::string& name, const bob::io::HDF5Type& type, void* buffer) const {
+  check_open();
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->read_attribute(name, type, buffer);
   }
@@ -251,6 +273,7 @@ void bob::io::HDF5File::read_attribute(const std::string& path,
 
 void bob::io::HDF5File::write_attribute(const std::string& path,
     const std::string& name, const bob::io::HDF5Type& type, const void* buffer) {
+  check_open();
   if (m_cwd->has_dataset(path)) {
     (*m_cwd)[path]->write_attribute(name, type, buffer);
   }
@@ -261,5 +284,11 @@ void bob::io::HDF5File::write_attribute(const std::string& path,
     boost::format m("cannot set attribute '%s' at path/dataset '%s' of file '%s' (cwd: '%s') because this path/dataset does not currently exist");
     m % name % path % m_file->filename() % m_cwd->path();
     throw std::runtime_error(m.str());
+  }
+}
+
+void bob::io::HDF5File::check_open() const{
+  if (!m_cwd || ! m_file){
+    throw std::runtime_error("The file is not opened yet / any more");
   }
 }

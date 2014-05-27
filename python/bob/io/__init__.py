@@ -137,6 +137,7 @@ def save(array, filename, create_directories = False):
 
 # Just to make it homogenous with the C++ API
 write = save
+read = load
 
 def append(array, filename):
   """Appends the contents of an array-like object to file.
