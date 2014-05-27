@@ -59,6 +59,16 @@ namespace bob { namespace io {
       virtual ~HDF5File();
 
       /**
+       * Flushes the current content of the file to disk.
+       */
+      void flush() {m_file->flush();}
+
+      /**
+       * Closes the file after writing its content to disk
+       */
+      void close();
+
+      /**
        * Changes the current prefix path. When this object is started, it
        * points to the root of the file. If you set this to a different
        * value, it will be used as a prefix to any subsequent operation on
@@ -87,7 +97,12 @@ namespace bob { namespace io {
       /**
        * Returns the name of the file currently opened
        */
-      const std::string filename() const { return m_file->filename(); }
+      const std::string filename() const {check_open(); return m_file->filename(); }
+
+      /**
+       * Checks if the file is open for writing
+       */
+      bool writable() const {check_open(); return m_file->writable();}
 
       /**
        * Returns the current working path, fully resolved. This is
@@ -130,6 +145,7 @@ namespace bob { namespace io {
        */
       template <typename T> void paths (T& container, const bool relative = false) const {
         m_cwd->dataset_paths(container);
+        check_open();
         if (relative){
           const std::string d = cwd();
           const int len = d.length()+1;
@@ -147,6 +163,7 @@ namespace bob { namespace io {
        * container with T = std::string and accepting push_back()
        */
       template <typename T> void sub_groups (T& container, bool relative = false, bool recursive = true) const {
+        check_open();
         m_cwd->subgroup_paths(container, recursive);
         if (!relative){
           const std::string d = cwd() + "/";
@@ -175,6 +192,7 @@ namespace bob { namespace io {
        */
       template <typename T>
         void read(const std::string& path, size_t pos, T& value) {
+          check_open();
           (*m_cwd)[path]->read(pos, value);
         }
 
@@ -183,6 +201,7 @@ namespace bob { namespace io {
        * type T is incompatible. Relative paths are accepted.
        */
       template <typename T> T read(const std::string& path, size_t pos) {
+        check_open();
         return (*m_cwd)[path]->read<T>(pos);
       }
 
@@ -201,6 +220,7 @@ namespace bob { namespace io {
        */
       template <typename T, int N> void readArray(const std::string& path,
           size_t pos, blitz::Array<T,N>& value) {
+        check_open();
         (*m_cwd)[path]->readArray(pos, value);
       }
 
@@ -211,6 +231,7 @@ namespace bob { namespace io {
        */
       template <typename T, int N> blitz::Array<T,N> readArray
         (const std::string& path, size_t pos) {
+        check_open();
         return (*m_cwd)[path]->readArray<T,N>(pos);
       }
 
@@ -241,7 +262,8 @@ namespace bob { namespace io {
        */
       template <typename T> void replace(const std::string& path, size_t pos,
           const T& value) {
-        if (!m_file->writeable()) {
+        check_open();
+        if (!m_file->writable()) {
           boost::format m("cannot replace value at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
           throw std::runtime_error(m.str());
@@ -265,7 +287,8 @@ namespace bob { namespace io {
        */
       template <typename T> void replaceArray(const std::string& path,
           size_t pos, const T& value) {
-        if (!m_file->writeable()) {
+        check_open();
+        if (!m_file->writable()) {
           boost::format m("cannot replace array at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
           throw std::runtime_error(m.str());
@@ -289,7 +312,8 @@ namespace bob { namespace io {
        */
       template <typename T> void append(const std::string& path,
           const T& value) {
-        if (!m_file->writeable()) {
+        check_open();
+        if (!m_file->writable()) {
           boost::format m("cannot append value to dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
           throw std::runtime_error(m.str());
@@ -310,7 +334,8 @@ namespace bob { namespace io {
        */
       template <typename T> void appendArray(const std::string& path,
           const T& value, size_t compression=0) {
-        if (!m_file->writeable()) {
+        check_open();
+        if (!m_file->writable()) {
           boost::format m("cannot append array to dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
           throw std::runtime_error(m.str());
@@ -325,7 +350,8 @@ namespace bob { namespace io {
        * replacing it. If the path does not exist, we append the new scalar.
        */
       template <typename T> void set(const std::string& path, const T& value) {
-        if (!m_file->writeable()) {
+        check_open();
+        if (!m_file->writable()) {
           boost::format m("cannot set value at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
           throw std::runtime_error(m.str());
@@ -347,7 +373,8 @@ namespace bob { namespace io {
        */
       template <typename T> void setArray(const std::string& path,
           const T& value, size_t compression=0) {
-        if (!m_file->writeable()) {
+        check_open();
+        if (!m_file->writable()) {
           boost::format m("cannot set array at dataset '%s' at path '%s' of file '%s' because it is not writeable");
           m % path % m_cwd->path() % m_file->filename();
           throw std::runtime_error(m.str());
@@ -414,6 +441,7 @@ namespace bob { namespace io {
       template <typename T>
         void getAttribute(const std::string& path, const std::string& name,
             T& value) const {
+          check_open();
           if (m_cwd->has_dataset(path)) {
             value = (*m_cwd)[path]->get_attribute<T>(name);
           }
@@ -435,6 +463,7 @@ namespace bob { namespace io {
       template <typename T, int N>
         void getArrayAttribute(const std::string& path,
             const std::string& name, blitz::Array<T,N>& value) const {
+          check_open();
           if (m_cwd->has_dataset(path)) {
             value = (*m_cwd)[path]->get_array_attribute<T,N>(name);
           }
@@ -454,6 +483,7 @@ namespace bob { namespace io {
       template <typename T>
         void setAttribute(const std::string& path, const std::string& name,
             const T value) {
+          check_open();
           if (m_cwd->has_dataset(path)) {
             (*m_cwd)[path]->set_attribute(name, value);
           }
@@ -473,6 +503,7 @@ namespace bob { namespace io {
       template <typename T, int N>
         void setArrayAttribute(const std::string& path,
             const std::string& name, const blitz::Array<T,N>& value) {
+          check_open();
           if (m_cwd->has_dataset(path)) {
             (*m_cwd)[path]->set_array_attribute(name, value);
           }
@@ -513,6 +544,8 @@ namespace bob { namespace io {
           const bob::io::HDF5Type& type, const void* buffer);
 
     private: //representation
+
+      void check_open() const;
 
       boost::shared_ptr<detail::hdf5::File> m_file; ///< the file itself
       boost::shared_ptr<detail::hdf5::Group> m_cwd; ///< current working dir

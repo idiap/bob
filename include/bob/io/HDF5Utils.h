@@ -111,9 +111,14 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       void reset();
 
       /**
-       * Tells if this file is writeable
+       * Flushes the current content of the file to disk
        */
-      bool writeable() const;
+      void flush();
+
+      /**
+       * Tells if this file is writable
+       */
+      bool writable() const;
 
     private: //representation
 

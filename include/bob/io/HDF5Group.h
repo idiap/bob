@@ -246,8 +246,13 @@ namespace bob { namespace io { namespace detail { namespace hdf5 {
       template <typename T> void subgroup_paths (T& container, bool recursive = true) const {
         for (std::map<std::string, boost::shared_ptr<io::detail::hdf5::Group> >::const_iterator it=m_groups.begin(); it != m_groups.end(); ++it){
           container.push_back(it->first);
-          if (recursive)
+          if (recursive){
+            unsigned pos = container.size();
             it->second->subgroup_paths(container);
+            for (unsigned p = pos; p < container.size(); ++p){
+              container[p] = it->first + "/" + container[p];
+            }
+          }
         }
       }
 

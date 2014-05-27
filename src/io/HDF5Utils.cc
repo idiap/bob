@@ -124,7 +124,14 @@ void bob::io::detail::hdf5::File::reset() {
   m_root.reset();
 }
 
-bool bob::io::detail::hdf5::File::writeable() const {
+void bob::io::detail::hdf5::File::flush() {
+  herr_t err = H5Fflush(*m_id, H5F_SCOPE_GLOBAL);
+  if (err < 0){
+    std::runtime_error("H5Fflush returned with an error code.");
+  }
+}
+
+bool bob::io::detail::hdf5::File::writable() const {
   return (m_flags != H5F_ACC_RDONLY);
 }
 
