@@ -146,6 +146,9 @@ def git_next_major_version(verbose):
   next_version[1] += 1
   next_version.append(0)
 
+  # special cases
+  if next_version == [1, 3, 0]: next_version = [2, 1, 0]
+
   return '.'.join([str(k) for k in next_version])
 
 def git_next_version(branch, verbose):
