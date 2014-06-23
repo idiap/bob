@@ -20,8 +20,6 @@ set(src
   "IVectorMachine.cc"
   "WienerMachine.cc"
   "PLDAMachine.cc"
-  "GaborGraphMachine.cc"
-  "GaborJetSimilarities.cc"
   "BICMachine.cc"
   )
 
@@ -35,7 +33,6 @@ target_link_libraries(${PROJECT_NAME} ${shared})
 
 # Defines tests for this package
 bob_add_test(${PROJECT_NAME} linear test/linear.cc)
-bob_add_test(${PROJECT_NAME} gabor test/gabor.cc)
 
 # Pkg-Config generator
 bob_pkgconfig(${PROJECT_NAME} "${bob_deps}")

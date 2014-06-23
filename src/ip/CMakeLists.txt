@@ -28,7 +28,6 @@ set(src
    "GeomNorm.cc"
    "maxRectInMask.cc"
    "FaceEyesNorm.cc"
-   "GaborWaveletTransform.cc"
    "BlockCellGradientDescriptors.cc"
    "HOG.cc"
    "LBP.cc"
@@ -69,7 +68,6 @@ bob_add_test(${PROJECT_NAME} crop test/crop.cc)
 bob_add_test(${PROJECT_NAME} dctfeatures test/dctfeatures.cc)
 bob_add_test(${PROJECT_NAME} extrapolateMask test/extrapolateMask.cc)
 bob_add_test(${PROJECT_NAME} flipflop test/flipflop.cc)
-bob_add_test(${PROJECT_NAME} gwt test/GaborWaveletTransform.cc)
 bob_add_test(${PROJECT_NAME} gaussian test/Gaussian.cc)
 bob_add_test(${PROJECT_NAME} gaussianScaleSpace test/GaussianScaleSpace.cc)
 bob_add_test(${PROJECT_NAME} weightedGaussian test/WeightedGaussian.cc)
