@@ -34,7 +34,7 @@ struct T {
   blitz::Array<double,3> dst_cx1;
 
   T(): eps(1e-10), src_a(6), src_b(2,3), src_c(2,3,2),
-       dst_a1(6), dst_a2(6), 
+       dst_a1(6), dst_a2(6),
        dst_by1(2,3), dst_bx1(2,3), dst_by2(2,3), dst_bx2(2,3),
        dst_cz1(2,3,2), dst_cy1(2,3,2), dst_cx1(2,3,2)
   {
@@ -44,7 +44,7 @@ struct T {
 
     dst_a1 = 1., 1.5, 2.5, 3.5, 4.5, 5.;
     dst_a2 = 0.5, 0.75, 1.25, 1.75, 2.25, 2.5;
-    
+
     dst_by1 = 2., 2., -1., 2., 2., -1.;
     dst_bx1 = 1., 2.5, 4., 1., 1., 1.;
     dst_by2 = 4., 4., -2, 4., 4., -2.;
@@ -54,20 +54,20 @@ struct T {
     dst_cy1 = -2., -3., 0., 1., 2., 5., -6., -5., -0.5, 0.5, 5., 6.;
     dst_cx1 = 2., 2., 1., 1., 4., 4., 1., 1., 2., 2., 3., 3.;
   }
-  
+
   ~T() {}
 };
 
-template<typename T, typename U, int d>  
-void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2) 
+template<typename T, typename U, int d>
+void check_dimensions( blitz::Array<T,d>& t1, blitz::Array<U,d>& t2)
 {
   BOOST_REQUIRE_EQUAL(t1.dimensions(), t2.dimensions());
   for( int i=0; i<t1.dimensions(); ++i)
     BOOST_CHECK_EQUAL(t1.extent(i), t2.extent(i));
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,1>& t1, blitz::Array<T,1>& t2, 
+template<typename T>
+void checkBlitzClose( blitz::Array<T,1>& t1, blitz::Array<T,1>& t2,
   const double eps )
 {
   check_dimensions( t1, t2);
@@ -75,8 +75,8 @@ void checkBlitzClose( blitz::Array<T,1>& t1, blitz::Array<T,1>& t2,
     BOOST_CHECK_SMALL( fabs( t2(i)-t1(i) ), eps);
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2, 
+template<typename T>
+void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
   const double eps )
 {
   check_dimensions( t1, t2);
@@ -85,8 +85,8 @@ void checkBlitzClose( blitz::Array<T,2>& t1, blitz::Array<T,2>& t2,
       BOOST_CHECK_SMALL( fabs( t2(i,j)-t1(i,j) ), eps);
 }
 
-template<typename T>  
-void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2, 
+template<typename T>
+void checkBlitzClose( blitz::Array<T,3>& t1, blitz::Array<T,3>& t2,
   const double eps )
 {
   check_dimensions( t1, t2);
@@ -102,11 +102,19 @@ BOOST_AUTO_TEST_CASE( test_gradient_1d )
 {
   blitz::Array<double,1> dst(6);
 
-  // Process src_a 
+  // Process src_a
   bob::math::gradient_(src_a, dst);
   checkBlitzClose(dst, dst_a1, eps);
 
   bob::math::gradient_(src_a, dst, 2.);
+  checkBlitzClose(dst, dst_a2, eps);
+
+  blitz::Array<uint8_t, 1> src_8(bob::core::array::cast<uint8_t>(src_a));
+  bob::math::gradient_(src_8, dst, 2.);
+  checkBlitzClose(dst, dst_a2, eps);
+
+  blitz::Array<uint16_t, 1> src_16(bob::core::array::cast<uint16_t>(src_a));
+  bob::math::gradient_(src_16, dst, 2.);
   checkBlitzClose(dst, dst_a2, eps);
 }
 
@@ -114,12 +122,22 @@ BOOST_AUTO_TEST_CASE( test_gradient_2d )
 {
   blitz::Array<double,2> dst_x(2,3), dst_y(2,3);
 
-  // Process src_b 
+  // Process src_b
   bob::math::gradient_(src_b, dst_y, dst_x);
   checkBlitzClose(dst_y, dst_by1, eps);
   checkBlitzClose(dst_x, dst_bx1, eps);
 
   bob::math::gradient_(src_b, dst_y, dst_x, 0.5, 2.);
+  checkBlitzClose(dst_y, dst_by2, eps);
+  checkBlitzClose(dst_x, dst_bx2, eps);
+
+  blitz::Array<uint8_t, 2> src_8(bob::core::array::cast<uint8_t>(src_b));
+  bob::math::gradient_(src_8, dst_y, dst_x, 0.5, 2.);
+  checkBlitzClose(dst_y, dst_by2, eps);
+  checkBlitzClose(dst_x, dst_bx2, eps);
+
+  blitz::Array<uint16_t, 2> src_16(bob::core::array::cast<uint16_t>(src_b));
+  bob::math::gradient_(src_16, dst_y, dst_x, 0.5, 2.);
   checkBlitzClose(dst_y, dst_by2, eps);
   checkBlitzClose(dst_x, dst_bx2, eps);
 }
@@ -128,7 +146,7 @@ BOOST_AUTO_TEST_CASE( test_gradient_3d )
 {
   blitz::Array<double,3> dst_z(2,3,2), dst_y(2,3,2), dst_x(2,3,2);
 
-  // Process src_a 
+  // Process src_a
   bob::math::gradient_(src_c, dst_z, dst_y, dst_x);
   checkBlitzClose(dst_z, dst_cz1, eps);
   checkBlitzClose(dst_y, dst_cy1, eps);
