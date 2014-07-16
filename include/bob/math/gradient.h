@@ -59,7 +59,8 @@ void gradient_(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
     blitz::Range r(1,M-2);
     blitz::Range rp(2,M-1);
     blitz::Range rm(0,M-3);
-    g(r) = (input(rp) - input(rm)) / 2.;
+    g(r) = input(rp) - input(rm);
+    g(r) /= 2.;
   }
 
   // Update scaling if required
@@ -95,6 +96,7 @@ void gradient(const blitz::Array<T,1>& input, blitz::Array<U,1>& g,
  * @param dy The sample distance along the y-axis
  * @param dx The sample distance along the x-axis
  * @warning Does not check that gx and gy have the same size as input
+ * @warning For unsigned input datatypes, this function might not work as expected.
  */
 template <typename T, typename U>
 void gradient_(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
@@ -142,14 +144,16 @@ void gradient_(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
     blitz::Range ry(1,M-2);
     blitz::Range ryp(2,M-1);
     blitz::Range rym(0,M-3);
-    gy(ry,rall) = (input(ryp,rall) - input(rym,rall)) / 2.;
+    gy(ry,rall) = input(ryp,rall) - input(rym,rall);
+    gy(ry,rall) /= 2.;
   }
   if (N>2)
   {
     blitz::Range rx(1,N-2);
     blitz::Range rxp(2,N-1);
     blitz::Range rxm(0,N-3);
-    gx(rall,rx) = (input(rall,rxp) - input(rall,rxm)) / 2.;
+    gx(rall,rx) = input(rall,rxp) - input(rall,rxm);
+    gx(rall,rx) /= 2.;
   }
 
   // Update scaling if required
@@ -166,6 +170,7 @@ void gradient_(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
  * @param gx The output blitz array for the gradient along the x-axis
  * @param dy The sample distance along the y-axis
  * @param dx The sample distance along the x-axis
+ * @warning For unsigned input datatypes, this function might not work as expected.
  */
 template <typename T, typename U>
 void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
@@ -190,6 +195,7 @@ void gradient(const blitz::Array<T,2>& input, blitz::Array<U,2>& gy,
  * @param dy The sample distance along the y-axis
  * @param dx The sample distance along the x-axis
  * @warning Does not check that gx and gy have the same size as input
+ * @warning For unsigned input datatypes, this function might not work as expected.
  */
 template <typename T, typename U>
 void gradient_(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
@@ -252,21 +258,24 @@ void gradient_(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
     blitz::Range rz(1,M-2);
     blitz::Range rzp(2,M-1);
     blitz::Range rzm(0,M-3);
-    gz(rz,rall,rall) = (input(rzp,rall,rall) - input(rzm,rall,rall)) / 2.;
+    gz(rz,rall,rall) = input(rzp,rall,rall) - input(rzm,rall,rall);
+    gz(rz,rall,rall) /= 2.;
   }
   if (N>2)
   {
     blitz::Range ry(1,N-2);
     blitz::Range ryp(2,N-1);
     blitz::Range rym(0,N-3);
-    gy(rall,ry,rall) = (input(rall,ryp,rall) - input(rall,rym,rall)) / 2.;
+    gy(rall,ry,rall) = input(rall,ryp,rall) - input(rall,rym,rall);
+    gy(rall,ry,rall) /= 2.;
   }
   if (P>2)
   {
     blitz::Range rx(1,P-2);
     blitz::Range rxp(2,P-1);
     blitz::Range rxm(0,P-3);
-    gx(rall,rall,rx) = (input(rall,rall,rxp) - input(rall,rall,rxm)) / 2.;
+    gx(rall,rall,rx) = input(rall,rall,rxp) - input(rall,rall,rxm);
+    gx(rall,rall,rx) /= 2.;
   }
 
   // Update scaling if required
@@ -286,6 +295,7 @@ void gradient_(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
  * @param dz The sample distance along the z-axis
  * @param dy The sample distance along the y-axis
  * @param dx The sample distance along the x-axis
+ * @warning For unsigned input datatypes, this function might not work as expected.
  */
 template <typename T, typename U>
 void gradient(const blitz::Array<T,3>& input, blitz::Array<U,3>& gz,
