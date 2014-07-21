@@ -64,7 +64,7 @@ bob::ip::GeomNorm::operator()(const blitz::TinyVector<double,2>& position,
   const double rot_c_y, const double rot_c_x) const
 {
   // compute scale and angle parameters
-  const double sin_angle = -sin(m_rotation_angle * M_PI / 180.) * m_scaling_factor,
+  const double sin_angle = sin(m_rotation_angle * M_PI / 180.) * m_scaling_factor,
                cos_angle = cos(m_rotation_angle * M_PI / 180.) * m_scaling_factor;
 
   const double centered_y = position(0) - rot_c_y,

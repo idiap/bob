@@ -158,9 +158,9 @@ BOOST_AUTO_TEST_CASE( test_geomnorm_with_points )
 
   // check the new position
   // new y-value should be 0 plus offset
-  BOOST_CHECK_CLOSE(rotated(0), 40., 1e-10);
+  BOOST_CHECK_CLOSE(rotated(0), 40. - 5. * std::sqrt(2.) * 2, 1e-10);
   // new x value is the length of the centered vector (i.e. 5*sqrt(2)) times the scaling factor 2 plus offset
-  BOOST_CHECK_CLOSE(rotated(1), 80. + 5. * std::sqrt(2.) * 2, 1e-10);
+  BOOST_CHECK_CLOSE(rotated(1), 80., 1e-10);
 
 }
 

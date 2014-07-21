@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   blitz::Array<uint8_t,2> img = image_file->read_all<uint8_t,2>();
   blitz::Array<double,2> img_processed_d(40,40);
 
-
-  bob::ip::FaceEyesNorm facenorm(20,40,40,5/19.*40,20);
+  double offset_h = 5./19.*40;
+  bob::ip::FaceEyesNorm facenorm(20,40,40,offset_h,20);
 
   // Process giving the coordinates of the eyes
   facenorm(img,img_processed_d,67,47,62,71);
@@ -91,9 +91,23 @@ BOOST_AUTO_TEST_CASE( test_facenorm )
   blitz::Array<uint8_t,2> img_processed = bob::core::array::convertFromRange<uint8_t>( img_processed_d, 0., 255.);
   testdata_path_img = testdata_cpath;
   testdata_path_img /= "image_r10_facenorm.hdf5";
+//bob::io::save(testdata_path_img.string().c_str(), img_processed); // Re-generate reference data
   boost::shared_ptr<bob::io::File> ref_file = bob::io::open(testdata_path_img.string().c_str(), 'r');
   blitz::Array<uint8_t,2> img_ref_facenorm = ref_file->read_all<uint8_t,2>();
   checkBlitzClose( img_ref_facenorm, img_processed, eps);
+
+  // check that the eye positions are at the requested positions
+  blitz::TinyVector<double,2> right_eye(67,47), left_eye(62,71);
+
+  double center_y = (right_eye[0] + left_eye[0]) / 2.;
+  double center_x = (right_eye[1] + left_eye[1]) / 2.;
+  blitz::TinyVector<double,2> new_right_eye = facenorm.getGeomNorm()->operator()(right_eye, center_y, center_x);
+  blitz::TinyVector<double,2> new_left_eye = facenorm.getGeomNorm()->operator()(left_eye, center_y, center_x);
+
+  BOOST_CHECK_CLOSE(new_right_eye(0), offset_h, 1e-8);
+  BOOST_CHECK_CLOSE(new_right_eye(1), 10., 1e-8);
+  BOOST_CHECK_CLOSE(new_left_eye(0), offset_h, 1e-8);
+  BOOST_CHECK_CLOSE(new_left_eye(1), 30., 1e-8);
 }
 
 BOOST_AUTO_TEST_CASE( test_facenorm2 )
@@ -126,8 +140,8 @@ BOOST_AUTO_TEST_CASE( test_facenorm2 )
   // check that the eye positions are at the requested positions
   blitz::TinyVector<double,2> right_eye(116,104), left_eye(116,147);
 
-  double center_y = 116.;
-  double center_x = (104. + 147.) / 2.;
+  double center_y = (right_eye[0] + left_eye[0]) / 2.;
+  double center_x = (right_eye[1] + left_eye[1]) / 2.;
   blitz::TinyVector<double,2> new_right_eye = facenorm.getGeomNorm()->operator()(right_eye, center_y, center_x);
   blitz::TinyVector<double,2> new_left_eye = facenorm.getGeomNorm()->operator()(left_eye, center_y, center_x);
 
