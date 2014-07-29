@@ -50,7 +50,6 @@ set(cxx_incdir ${Blitz_INCLUDE_DIR};${boost_INCLUDE_DIRS})
 add_subdirectory(core)
 
 add_subdirectory(io)
-add_subdirectory(measure)
 add_subdirectory(sp)
 add_subdirectory(math)
 add_subdirectory(ip)
