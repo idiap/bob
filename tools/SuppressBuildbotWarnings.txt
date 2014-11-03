@@ -1,0 +1,11 @@
+# Warnings that should be suppressed at Buildbot - no solution for those...
+.* : .*arg is not a Python function.*
+.* : ^\s*1.*This is a warning message.*
+.* : .*LaTeX Warning:\s+.*
+.* : .*Package\s+\S+\s+Warning:.*
+.* : .*unusable reference target found: \.\./\.\./doxygen/html/index.html.*
+.* : .*no files found matching '\*\.sql3' under directory 'bob'.*
+.* : .*dereferencing type-punned pointer will break strict-aliasing rules.*
+.*: .*: .*standard file.*-c.*not found.*
+.*: .*no previously-included files matching .* found anywhere in distribution.*
+.*: WARNING: duplicate citation .*, other instance in.*
