@@ -2,9 +2,9 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Mon 03 Nov 2014 10:37:52 CET
 
-====================================================
- Bob - Signal Processing & Machine Learning Toolkit
-====================================================
+===========================================
+ Bob: Signal Processing & Machine Learning
+===========================================
 
 Bob is a free signal-processing and machine learning toolbox originally
 developed by the Biometrics group at `Idiap`_ Research Institute, Switzerland.
@@ -14,8 +14,8 @@ both efficient and reduce development time. It is composed of a reasonably
 large number of `packages`_ that implement tools for image, audio & video
 processing, machine learning and pattern recognition.
 
-**This package is only a place-holder for Bob's `Wiki`_ and for `Bug
-tracker`_.**
+**This package is only a place-holder for Bob's** `Wiki`_ **and** `Bug
+tracker`_.
 
 If just want to use Bob's functionalities on your experiments, you are **not**
 supposed to install this package on your machine, but rather `create your own
@@ -38,7 +38,7 @@ satisified, you should be able to::
   $ ./bin/buildout
 
 You may tweak the options in ``buildout.cfg`` to disable/enable verbosity and
-debug builds, **before you run ``./bin/buildout``**.
+debug builds, **before you run** ``./bin/buildout``.
 
 Documentation
 -------------
