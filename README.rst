@@ -2,9 +2,9 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Mon 03 Nov 2014 10:37:52 CET
 
-===========================================
- Bob: Signal Processing & Machine Learning
-===========================================
+=====
+ Bob
+=====
 
 Bob is a free signal-processing and machine learning toolbox originally
 developed by the Biometrics group at `Idiap`_ Research Institute, Switzerland.
