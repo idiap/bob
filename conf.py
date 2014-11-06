@@ -68,7 +68,7 @@ copyright = u'%s, Idiap Research Institute' % time.strftime('%Y')
 # built documents.
 #
 # The short X.Y version.
-version = '2.0.0a0'
+version = '2.0.0b1'
 # The full version, including alpha/beta/rc tags.
 release = version
 
