@@ -1,0 +1,45 @@
+language: python
+matrix:
+  include:
+  - python: 2.6
+    env:
+    - SCIPYSPEC===0.12.0
+  - python: 2.7
+    env:
+    - SCIPYSPEC===0.12.0
+    - secure: C2kkALnw5j4FpfkpcPGrmaxjkymqRmWJpyY51d20Sds53qZ+9wwHQAieirp0XHaFdf305uJagETTBWQYHXIYGqDiW3famaPHg+v+lB5qW6w+84oIswzWHrGH9hFjN/MT0dyAjYy7l/wIR2Ex63Uzfjj0SNCTlO5cXHF8qVmURIk=
+    - secure: i65x4/rpPzIZwnAC+VQwzHTsz9yA7JYx/PXfqr2mgdvSe6m3XvTNEE045LnpoJ06Y4fwE+anBFjPpdVQZkAjWG8E4jcDc8XwxrPKGkqTRxo0Rp5uqAUNCmmPdy2BsggXrm1FfbpoJr+wf2FVFA13KIbrLyKguLhUAaIvFIEP8QA=
+    - BOB_DOCUMENTATION_SERVER=https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master
+  - python: 3.2
+    env:
+    - NUMPYSPEC===1.8.0
+    - SCIPYSPEC===0.13.1
+  - python: 3.3
+    env:
+    - NUMPYSPEC===1.8.0
+    - SCIPYSPEC===0.13.1
+before_install:
+- sudo add-apt-repository -y ppa:biometrics/bob
+- sudo apt-get update -qq
+- sudo apt-get install -qq --force-yes libboost-all-dev libblitz1-dev libhdf5-serial-dev libvl-dev
+- sudo apt-get install -qq --force-yes libjpeg8-dev libnetpbm10-dev libpng12-dev libtiff4-dev libgif-dev
+- sudo apt-get install -qq --force-yes libavcodec-dev libavformat-dev libswscale-dev
+- sudo apt-get install -qq --force-yes python-imaging
+- sudo apt-get install -qq --force-yes libmatio-dev
+- sudo apt-get install -qq --force-yes libsvm-dev
+- sudo apt-get install -qq --force-yes python-opencv libcv-dev libcvaux-dev libopencv-dev
+- sudo apt-get install -qq --force-yes libatlas-dev libatlas-base-dev liblapack-dev gfortran
+- sudo apt-get install -qq --force-yes dvipng texlive-latex-base texlive-latex-extra texlive-math-extra texlive-latex-recommended texlive-fonts-recommended
+- if [ -n "${NUMPYSPEC}" ]; then pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel numpy$NUMPYSPEC; fi
+- pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel scipy$SCIPYSPEC matplotlib==1.3.0 sphinx nose==1.3.0 setuptools==7.0
+- pip install cpp-coveralls
+install:
+- python bootstrap.py
+- ./bin/buildout -c first.cfg
+- CFLAGS=-coverage BOB_BUILD_PARALLEL=2 MAX_CONCURRENCY=1 ./bin/buildout buildout:debug=false
+script:
+- if [ ./bin/sphinx-build -b html . sphinx ]; then ./layers/0/bob.extension/scripts/upload-sphinx.sh; fi
+- ./bin/sphinx-build -b doctest . sphinx
+- ./bin/coverage run --source=bob ./bin/nosetests -sv bob facereclib antispoofing
+after_success:
+- coveralls --build-root=`pwd` --exclude=src
