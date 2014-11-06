@@ -143,6 +143,7 @@ Modules for Developers
 .. toctree::
    :maxdepth: 2
 
+   layers/0/bob.buildout/doc/index
    layers/0/bob.extension/doc/index
    layers/0/bob.blitz/doc/index
 
