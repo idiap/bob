@@ -7,8 +7,8 @@ matrix:
   - python: 2.7
     env:
     - SCIPYSPEC===0.12.0
-    - secure: C2kkALnw5j4FpfkpcPGrmaxjkymqRmWJpyY51d20Sds53qZ+9wwHQAieirp0XHaFdf305uJagETTBWQYHXIYGqDiW3famaPHg+v+lB5qW6w+84oIswzWHrGH9hFjN/MT0dyAjYy7l/wIR2Ex63Uzfjj0SNCTlO5cXHF8qVmURIk=
-    - secure: i65x4/rpPzIZwnAC+VQwzHTsz9yA7JYx/PXfqr2mgdvSe6m3XvTNEE045LnpoJ06Y4fwE+anBFjPpdVQZkAjWG8E4jcDc8XwxrPKGkqTRxo0Rp5uqAUNCmmPdy2BsggXrm1FfbpoJr+wf2FVFA13KIbrLyKguLhUAaIvFIEP8QA=
+    - secure: SsnDR9z/p2iaAtPDBz3HbXilWzV/EaKBvENc1kr73+Ass5VdNxp0zfpWImGFnG3FOonpaM+hGTAyPxRB2PyXKyxOcbypmOyXdmqwxEpCr0iDQyCAKbBVA7olxQ6r3y3rsjdJj4k6KSuCLKKUisn3YhIRQBuXT2KZ67kHCILOfoo=
+    - secure: QLYfjFzGtifNQ21Z0Pih8Ds7nN9BwkUeKc9UuSQWB4MANKx0T7gcB3WJzID65vneTXjfT4bYt/ZtGnaVh12mbKBGn6krXOc71kZOcdVY9P1xTvekt+vC+sVW6SqZaqp5xcV0d4/28kiGgHDiokPK2c/4sGp2IWbHvGZP88oJ0f8=
     - BOB_DOCUMENTATION_SERVER=https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master
   - python: 3.2
     env:
@@ -31,8 +31,7 @@ before_install:
 - sudo apt-get install -qq --force-yes libatlas-dev libatlas-base-dev liblapack-dev gfortran
 - sudo apt-get install -qq --force-yes dvipng texlive-latex-base texlive-latex-extra texlive-math-extra texlive-latex-recommended texlive-fonts-recommended
 - if [ -n "${NUMPYSPEC}" ]; then pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel numpy$NUMPYSPEC; fi
-- pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel scipy$SCIPYSPEC matplotlib==1.3.0 sphinx nose==1.3.0 setuptools==7.0
-- pip install cpp-coveralls
+- pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel scipy$SCIPYSPEC matplotlib==1.3.0 sphinx nose==1.3.0 jinja2==2.6 setuptools==7.0 cpp-coveralls
 install:
 - python bootstrap.py
 - ./bin/buildout -c first.cfg
