@@ -3,7 +3,7 @@ project(bob_io)
 # This defines the dependencies of this package
 set(bob_deps "bob_core")
 set(shared "${bob_deps};${HDF5_hdf5_LIBRARY_RELEASE}")
-set(incdir ${cxx_incdir};${HDF5_CXX_INCLUDE_DIR})
+set(incdir ${cxx_incdir})
 set(libdir "")
 
 # This defines the list of source files inside this package.
