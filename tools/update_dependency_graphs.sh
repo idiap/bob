@@ -19,7 +19,7 @@ else
     shift
     if [ -d $directory ]; then
       package=`basename "$directory"`
-      bin/bob_dependecy_graph.py -p $package -X -w $directory/dependencies.svg -v
+      bin/bob_dependecy_graph.py -p $package -X -w $directory/dependencies.png -v
     fi
   done
 fi

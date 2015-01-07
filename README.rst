@@ -21,7 +21,7 @@ If just want to use Bob's functionalities on your experiments, you are **not**
 supposed to install this package on your machine, but rather `create your own
 personalised work environment
 <https://github.com/idiap/bob/wiki/Installation>`_ depending on your needs, by
-collecting individual subpackages based on your requirements.
+collecting individual sub-packages based on your requirements.
 
 If you are developing Bob packages which are supposed to built along side our
 `nightly build system <https://www.idiap.ch/software/bob/buildbot/waterfall>`_,
@@ -32,13 +32,14 @@ Installation
 
 As per-usual, make sure all external `dependencies`_ are installed on your host
 before trying to compile the whole of Bob. Once all dependencies_ are
-satisified, you should be able to::
+satisfied, you should be able to::
 
   $ python bootstrap.py
   $ ./bin/buildout
 
 You may tweak the options in ``buildout.cfg`` to disable/enable verbosity and
 debug builds, **before you run** ``./bin/buildout``.
+
 
 Documentation
 -------------
@@ -105,6 +106,16 @@ Then, update the following files:
 
 4. Add a row for your package in our Packages_ list
 
+5. Update the dependency graph::
+
+   $ tools/update_dependency_graphs.sh all
+   
+   The current dependency graph looks like that:
+   
+   .. image:: https://raw.githubusercontent.com/idiap/bob/master/dependencies.png
+      :target: https://raw.githubusercontent.com/idiap/bob/master/dependencies.png
+      :width: 50%
+
 Updating a Package
 ------------------
 
@@ -114,8 +125,8 @@ you have to tell the main module that it now needs to use a new commit
 identifier. If you don't do so, the main module will continue to checkout the
 old version of the submodule.
 
-In case a submodule is updated, this packagee will not automatically update its
-reference to such database. You need to explicetly do it. To update a
+In case a submodule is updated, this package will not automatically update its
+reference to such database. You need to explicitly do it. To update a
 submodule, first initialize this package::
 
   $ git submodule init
