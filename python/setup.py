@@ -338,7 +338,6 @@ setup(
       'matplotlib',
       'sqlalchemy',
       'scipy',
-      'nose',
       ] + EXTRA_REQUIREMENTS,
 
     entry_points={

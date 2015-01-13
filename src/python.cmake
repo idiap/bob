@@ -51,7 +51,6 @@ find_python_module(matplotlib REQUIRED)
 find_python_module(sqlalchemy REQUIRED)
 find_python_module(scipy REQUIRED)
 find_python_module(sphinx REQUIRED)
-find_python_module(nose REQUIRED)
 if(WIN32)
   find_python_module(Image REQUIRED)
 else()
@@ -80,7 +79,7 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.get_i
 # version is selected). This may cause compilation problems.
 set(python_INCLUDE_DIRS "${PYTHON_NUMPY_INCLUDE_DIR};${PYTHON_PREFIX}/include/python${PYTHON_VERSION}" CACHE INTERNAL "incdirs")
 get_filename_component(python_LIBRARY_DIRS ${PYTHON_LIBRARY} PATH CACHE)
-  
+
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; print('%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2]))" OUTPUT_VARIABLE PYTHON_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.version.version)" OUTPUT_VARIABLE NUMPY_VERSION_COMPLETE OUTPUT_STRIP_TRAILING_WHITESPACE)
