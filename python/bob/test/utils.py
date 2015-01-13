@@ -10,7 +10,6 @@ import os
 import tempfile
 import pkg_resources
 import functools
-from nose.plugins.skip import SkipTest
 from distutils.version import StrictVersion as SV
 
 def datafile(f, module=None, path='data'):
@@ -91,6 +90,8 @@ def ffmpeg_found(version_geq=None):
   Versions you can test for are set in the ``ffmpeg_versions`` dictionary in
   this module.
   '''
+  
+  from nose.plugins.skip import SkipTest
 
   def test_wrapper(test):
 
@@ -115,6 +116,8 @@ def ffmpeg_found(version_geq=None):
 
 def codec_available(codec):
   '''Decorator to check if a codec is available before enabling a test'''
+  
+  from nose.plugins.skip import SkipTest
 
   def test_wrapper(test):
 
@@ -132,6 +135,8 @@ def codec_available(codec):
   return test_wrapper
 
 def visioner_available(test):
+  
+  from nose.plugins.skip import SkipTest
 
   @functools.wraps(test)
   def wrapper(*args, **kwargs):
@@ -144,6 +149,8 @@ def visioner_available(test):
   return wrapper
 
 def libsvm_available(test):
+  
+  from nose.plugins.skip import SkipTest
 
   @functools.wraps(test)
   def wrapper(*args, **kwargs):
@@ -157,6 +164,8 @@ def libsvm_available(test):
 
 def extension_available(extension):
   '''Decorator to check if a extension is available before enabling a test'''
+
+  from nose.plugins.skip import SkipTest
 
   def test_wrapper(test):
 
