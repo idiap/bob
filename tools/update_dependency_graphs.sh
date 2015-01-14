@@ -11,6 +11,7 @@ fi
 
 if [ "$1" == "all" ]; then
   # generate overall plot for all packages
+  echo "bin/bob_dependecy_graph.py -P requirements*.txt -W x.dot -v -X"
   bin/bob_dependecy_graph.py -P requirements*.txt -W x.dot -v -X
 else
   # generate dependency graph for each of the given directories
@@ -19,6 +20,7 @@ else
     shift
     if [ -d $directory ]; then
       package=`basename "$directory"`
+      echo "bin/bob_dependecy_graph.py -p $package -X -w $directory/dependencies.png -v"
       bin/bob_dependecy_graph.py -p $package -X -w $directory/dependencies.png -v
     fi
   done
