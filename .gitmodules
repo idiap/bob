@@ -151,3 +151,6 @@
 [submodule "layers/2/facereclib"]
 	path = layers/2/facereclib
 	url = https://github.com/idiap/facereclib.git
+[submodule "layers/2/bob.ip.facedetect"]
+	path = layers/2/bob.ip.facedetect
+	url = https://github.com/bioidiap/bob.ip.facedetect.git

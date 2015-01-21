@@ -43,6 +43,7 @@ Signal, Audio, Image and Video Processing
    layers/1/bob.ip.color/doc/index
    layers/1/bob.ip.draw/doc/index
    layers/1/bob.ip.gabor/doc/index
+   layers/2/bob.ip.facedetect/doc/index
    layers/2/bob.ip.optflow.liu/doc/index
    layers/2/bob.ip.optflow.hornschunck/doc/index
    layers/2/bob.ip.flandmark/doc/index

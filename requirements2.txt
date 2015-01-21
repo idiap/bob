@@ -1,3 +1,4 @@
+bob.ip.facedetect
 bob.ip.flandmark
 bob.ip.optflow.hornschunck
 bob.ip.optflow.liu
@@ -26,4 +27,3 @@ bob.db.replay
 bob.db.casia_fasd
 bob.example.faceverify
 facereclib
-
