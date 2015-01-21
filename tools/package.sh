@@ -19,4 +19,4 @@ fi
 echo "Creating packages..."
 git submodule foreach `pwd`/bin/python setup.py sdist --formats=zip
 echo "Copying packages to ${dest}..."
-git submodule foreach cp -va dist/*.zip ${dest}
+git submodule foreach "cp -va dist/*.zip ${dest}"
