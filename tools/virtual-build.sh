@@ -29,6 +29,7 @@ one is given.
          (default: release)
 -p INT   If specified, Bob will be compiled with the given number of parallel
          threads
+-i       ignore installation errors and keep going
 EOF
 }
 
@@ -38,8 +39,9 @@ find_links=""
 directory=""
 optimize="release"
 parallel=""
+ignore=0
 
-while getopts "hr:x:f:d:o:p:" opt; do
+while getopts "hr:x:f:d:o:p:i" opt; do
   case "$opt" in
     h)
       show_help
@@ -56,6 +58,8 @@ while getopts "hr:x:f:d:o:p:" opt; do
     o)  optimize=$OPTARG
       ;;
     p)  parallel=$OPTARG
+      ;;
+    i)  ignore=1
       ;;
     '?')
       show_help >&2
@@ -108,7 +112,9 @@ if [ -n "${requirements}" ]; then
     echo "Installing \`${req}'..."
     ${directory}/bin/pip install ${pip_opt} "${req}"
     status=$?
-    if [ ${status} != 0 ]; then exit ${status}; fi
+    if [ ${ignore} == 0 -a ${status} != 0 ]; then
+      echo "Installation of package ${req} failed; aborting"
+    exit ${status}; fi
   done
 fi
 
