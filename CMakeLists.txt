@@ -39,7 +39,7 @@ if(NOT BOB_VERSION)
 endif()
 
 # Flags for switching ON/OFF optional requirements
-option(WITH_QT4 "Make Qt4 detection obligatory" ON)
+option(WITH_QT4 "Make Qt4 detection obligatory" OFF)
 option(WITH_LIBSVM "Make LibSVM detection obligatory" ON)
 option(WITH_VLFEAT "Make VLFEAT detection obligatory" ON)
 option(WITH_MATIO "Make Matio detection obligatory" ON)
@@ -165,7 +165,7 @@ install(DIRECTORY include/bob DESTINATION include FILES_MATCHING PATTERN "*.h")
 #
 # Example: bob_add_library(bob_core "foo.cc;bar.cc")
 macro(bob_add_library name src)
-  include_directories(BEFORE 
+  include_directories(BEFORE
     "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_library(${name} ${src})
   if (BOB_SOVERSION)
@@ -187,7 +187,7 @@ endmacro()
 macro(bob_add_test package name src)
   set(bin_name test_${package}_${name})
   string(REPLACE "test_bob_" "" test_name ${bin_name})
-  include_directories(BEFORE 
+  include_directories(BEFORE
     "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_executable(${bin_name} ${src})
   target_link_libraries(${bin_name} ${package};${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE})
@@ -205,7 +205,7 @@ endmacro()
 # Example: bob_add_executable(io array test/array.cc)
 macro(bob_add_executable package name src)
   set(ename ${package}_${name})
-  include_directories(BEFORE 
+  include_directories(BEFORE
     "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_executable(${ename} ${src})
   target_link_libraries(${ename} ${package})
@@ -222,7 +222,7 @@ endmacro()
 # Example: bob_add_benchmark(io array test/array.cc)
 macro(bob_add_benchmark package name src)
   set(ename ${package}_${name})
-  include_directories(BEFORE 
+  include_directories(BEFORE
     "${CMAKE_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/include")
   add_executable(${ename} ${src})
   target_link_libraries(${ename} ${package})
@@ -239,7 +239,7 @@ macro(bob_pkgconfig package requires)
   set(pkgconfigdir "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
   string(REPLACE "_" "-" BOB_PACKAGE_NAME ${package})
   set(BOB_PACKAGE_LIBRARY ${package})
-  
+
   get_directory_property(my_defines COMPILE_DEFINITIONS)
   list(REMOVE_DUPLICATES my_defines)
   set(BOB_PACKAGE_DEFINES "")
@@ -248,7 +248,7 @@ macro(bob_pkgconfig package requires)
   endforeach()
 
   get_directory_property(my_includes INCLUDE_DIRECTORIES)
-  list(REMOVE_ITEM my_includes "${CMAKE_SOURCE_DIR}/include" 
+  list(REMOVE_ITEM my_includes "${CMAKE_SOURCE_DIR}/include"
     "${CMAKE_BINARY_DIR}/include")
   list(REMOVE_DUPLICATES my_includes)
   set(BOB_PACKAGE_INCLUDES "")
