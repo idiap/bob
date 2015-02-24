@@ -154,3 +154,6 @@
 [submodule "layers/2/bob.ip.facedetect"]
 	path = layers/2/bob.ip.facedetect
 	url = https://github.com/bioidiap/bob.ip.facedetect.git
+[submodule "layers/1/bob.learn.em"]
+	path = layers/1/bob.learn.em
+	url = https://github.com/bioidiap/bob.learn.em
