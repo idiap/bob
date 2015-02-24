@@ -11,3 +11,4 @@ bob.learn.linear
 bob.learn.mlp
 bob.learn.misc
 bob.learn.boosting
+bob.learn.em
