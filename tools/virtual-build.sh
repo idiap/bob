@@ -13,7 +13,7 @@
 show_help() {
 cat << EOF
 Usage: ${0##*/} [-r requirements] [-x externals] [-f find-links]
-                [-d folder] [-o debug/release] [-p threads] [-h]
+                [-d folder] [-o debug/release] [-p threads] [-P python] [-h] [-i] [-u] [-F]
 
 Creates a virtual environment, basing itself on the given externals area.
 Pre-populates the virtual environment with the package list provided, if
@@ -29,7 +29,10 @@ one is given.
          (default: release)
 -p INT   If specified, Bob will be compiled with the given number of parallel
          threads
+-P EXE   If specified, uses the given python to initialize the virtualenv
 -i       ignore installation errors and keep going
+-u       upgrade the given requirements
+-F       forces the installation of a certain package
 EOF
 }
 
@@ -39,9 +42,12 @@ find_links=""
 directory=""
 optimize="release"
 parallel=""
+python=""
+upgrade=""
 ignore=0
+force=""
 
-while getopts "hr:x:f:d:o:p:i" opt; do
+while getopts "hr:x:f:d:o:p:P:iuF" opt; do
   case "$opt" in
     h)
       show_help
@@ -59,8 +65,15 @@ while getopts "hr:x:f:d:o:p:i" opt; do
       ;;
     p)  parallel=$OPTARG
       ;;
+    P)  python="-p $OPTARG"
+      ;;
     i)  ignore=1
       ;;
+    u)  upgrade="--upgrade"
+      ;;
+    F)  force="--force-reinstall"
+      ;;
+
     '?')
       show_help >&2
       exit 1
@@ -78,7 +91,7 @@ fi
 
 if [ ! -d ${directory}/bin ]; then
   echo "Initializing virtual environment at \`${directory}'..."
-  ${virtualenv} --system-site-packages ${directory}
+  ${virtualenv} --system-site-packages ${python} ${directory}
   ${directory}/bin/pip install --upgrade setuptools pip
 else
   echo "Skipped virtual environment initialization at \`${directory}'"
@@ -110,7 +123,7 @@ if [ -n "${requirements}" ]; then
   echo "Installing all requirements in \`${requirements}'..."
   for req in `cat ${requirements}`; do
     echo "Installing \`${req}'..."
-    ${directory}/bin/pip install ${pip_opt} "${req}"
+    ${directory}/bin/pip install ${upgrade} ${force} ${pip_opt} "${req}"
     status=$?
     if [ ${ignore} == 0 -a ${status} != 0 ]; then
       echo "Installation of package ${req} failed; aborting"
