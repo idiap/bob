@@ -58,9 +58,8 @@ Machine Learning
    layers/1/bob.learn.linear/doc/index
    layers/1/bob.learn.mlp/doc/index
    layers/1/bob.learn.libsvm/doc/index
-   layers/1/bob.learn.misc/doc/index
-   layers/1/bob.learn.boosting/doc/index
    layers/1/bob.learn.em/doc/index
+   layers/1/bob.learn.boosting/doc/index
 
 Database Modules
 ----------------

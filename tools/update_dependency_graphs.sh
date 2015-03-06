@@ -5,7 +5,7 @@
 if [ $# == 0 ]; then
   echo "usage: $0 directory [directory] [...]"
   echo "e.g. $0 layers/0/bob.io.base layers/1/bob.ip.base ..."
-  echo "or: $0 bob"
+  echo "or: $0 all"
   exit 1
 fi
 
@@ -25,5 +25,3 @@ else
     fi
   done
 fi
-
-

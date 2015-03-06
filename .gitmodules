@@ -70,9 +70,6 @@
 [submodule "layers/1/bob.ip.base"]
 	path = layers/1/bob.ip.base
 	url = https://github.com/bioidiap/bob.ip.base.git
-[submodule "layers/1/bob.learn.misc"]
-	path = layers/1/bob.learn.misc
-	url = https://github.com/bioidiap/bob.learn.misc.git
 [submodule "layers/2/bob.db.iris"]
 	path = layers/2/bob.db.iris
 	url = https://github.com/bioidiap/bob.db.iris

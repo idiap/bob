@@ -9,6 +9,5 @@ bob.learn.activation
 bob.learn.libsvm
 bob.learn.linear
 bob.learn.mlp
-bob.learn.misc
-bob.learn.boosting
 bob.learn.em
+bob.learn.boosting
