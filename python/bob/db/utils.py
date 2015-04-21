@@ -105,7 +105,8 @@ class SQLiteConnector(object):
     """Returns an SQLAlchemy engine"""
 
     from sqlalchemy import create_engine
-    return create_engine('sqlite://', creator=self, echo=echo)
+    from sqlalchemy.pool import NullPool
+    return create_engine('sqlite://', creator=self, echo=echo, poolclass=NullPool)
 
   def session(self, echo=False):
     """Returns an SQLAlchemy session"""
