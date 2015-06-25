@@ -27,3 +27,4 @@ bob.db.replay
 bob.db.casia_fasd
 bob.example.faceverify
 facereclib
+bob.bio.base

@@ -154,3 +154,6 @@
 [submodule "layers/1/bob.learn.em"]
 	path = layers/1/bob.learn.em
 	url = https://github.com/bioidiap/bob.learn.em
+[submodule "layers/2/bob.bio.base"]
+	path = layers/2/bob.bio.base
+	url = https://github.com/bioidiap/bob.bio.base.git

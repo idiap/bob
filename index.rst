@@ -136,6 +136,8 @@ The Face Recognition Library
 
    layers/2/facereclib/doc/index
 
+   layers/2/bob.bio.base/doc/index
+
 
 
 Modules for Developers
