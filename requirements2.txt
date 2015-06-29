@@ -28,3 +28,7 @@ bob.db.casia_fasd
 bob.example.faceverify
 facereclib
 bob.bio.base
+bob.bio.gmm
+bob.bio.spear
+bob.bio.face
+bob.bio.video

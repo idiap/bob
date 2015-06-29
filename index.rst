@@ -137,6 +137,10 @@ The Face Recognition Library
    layers/2/facereclib/doc/index
 
    layers/2/bob.bio.base/doc/index
+   layers/2/bob.bio.gmm/doc/index
+   layers/2/bob.bio.spear/doc/index
+   layers/2/bob.bio.face/doc/index
+   layers/2/bob.bio.video/doc/index
 
 
 
