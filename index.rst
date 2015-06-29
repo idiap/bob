@@ -128,13 +128,11 @@ Example packages
    layers/2/bob.db.iris/doc/index
    layers/2/bob.example.faceverify/doc/index
 
-The Face Recognition Library
-----------------------------
+Biometric Recognition Packages
+------------------------------
 
 .. toctree::
    :maxdepth: 2
-
-   layers/2/facereclib/doc/index
 
    layers/2/bob.bio.base/doc/index
    layers/2/bob.bio.gmm/doc/index

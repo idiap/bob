@@ -109,9 +109,9 @@ Then, update the following files:
 5. Update the dependency graph::
 
    $ tools/update_dependency_graphs.sh all
-   
+
    The current dependency graph looks like that:
-   
+
    .. image:: https://raw.githubusercontent.com/idiap/bob/master/dependencies.png
       :target: https://raw.githubusercontent.com/idiap/bob/master/dependencies.png
       :width: 50%
@@ -148,6 +148,24 @@ Switch back to the root of the package and re-add the submodule::
   $ cd ../..
   $ git commit -m "Updated bob.foo.bar" layers/2/bob.foo.bar
   $ git push
+
+
+Removing a Package
+------------------
+
+When you are sure that one of the packages is outdated, you might want to remove the package from the index.
+To do so, you need to have to two-stage command sequence::
+
+  $ git submodule deinit layers/2/bob.foo.bar
+  $ git rm layers/2/bob.foo.bar
+
+The first command will delete the contents of layers/2/bob.foo.bar/, while the second will remove the package from the list of packages.
+Afterward, please update the files that you can see in section `Adding a Package` above.
+Finally, commit all the modifications::
+
+  $ git commit -m "Removed bob.foo.bar" layers/2/bob.foo.bar
+  $ git push
+
 
 .. External References
 
