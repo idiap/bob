@@ -21,6 +21,10 @@
 
 from setuptools import setup, find_packages
 
+requeriments = [l.rstrip("\n") for l in open("requirements.txt", 'r').readlines()]
+version      = open("version.txt").read().rstrip()
+
+
 # The only thing we do in this file is to call the setup() function with all
 # parameters that define our package.
 setup(
@@ -28,7 +32,7 @@ setup(
     # This is the basic information about your project. Modify all this
     # information before releasing code publicly.
     name='bob.meta',
-    version='2.0.0a1',
+    version=version,
     description='',
     url='',
     license='GPLv3',
@@ -48,39 +52,7 @@ setup(
     # scripts of this package. Don't worry - You won't need administrative
     # privileges when using buildout.
 
-    install_requires=[
-      "setuptools",
-      "pkgtools",
-      
-      #layer 0  
-      "bob.ap",
-      "bob.blitz",
-      "bob.buildout",
-      "bob.core",
-      "bob.db.base",
-      "bob.extension",
-      "bob.io.base",
-      "bob.math",
-      "bob.measure",
-      "bob.sp",
-
-      #layer 1
-      "bob.io.image",
-      "bob.io.matlab",
-      "bob.io.video",
-      "bob.ip.base",
-      "bob.ip.color",
-      "bob.ip.draw",
-      "bob.ip.gabor",
-      "bob.learn.activation",
-      "bob.learn.boosting",
-      "bob.learn.em",
-      "bob.learn.libsvm",
-      "bob.learn.linear",
-      "bob.learn.mlp"
-
-
-    ],
+    install_requires=requeriments,
 
     # This package is good examples of namespace implementations
     # using several layers. You can check them out here:
@@ -98,13 +70,10 @@ setup(
       [
         'get_versions.py  = bob.meta.script.get_versions:main',
       ],
-      
-
     },
         
-
     classifiers = [
-      'Development Status :: 4 - Beta',
+      'Development Status :: 5 - Production/Stable',
       'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
       'Intended Audience :: Education',
       'Intended Audience :: Science/Research',

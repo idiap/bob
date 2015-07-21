@@ -40,11 +40,9 @@ def get_dependencies():
 def main():
   
   dependencies = get_dependencies()
-  print "install_requires=["
   for d in dependencies:
     versions = get_releases(d)
-    print "  {0} == {1}".format(d,get_max_version(versions))
-  print "],"
+    print "{0} == {1}".format(d,get_max_version(versions))
 
 if __name__ == '__main__':
   main()

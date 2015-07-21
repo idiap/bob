@@ -3,7 +3,7 @@
 .. Mon 20 Jul 2015 16:57:00 CEST
 
 ====================
- Bob Meta Package
+ Bob
 ====================
 
 Bob is a free signal-processing and machine learning toolbox originally
@@ -13,8 +13,6 @@ The toolbox is written in a mix of `Python`_ and `C++`_ and is designed to be
 both efficient and reduce development time. It is composed of a reasonably
 large number of `packages`_ that implement tools for image, audio & video
 processing, machine learning and pattern recognition.
-
-**This is a meta package containing depencies w.r.t the layers 0 and 1 of Bob. The purpose of this package is to make it easy the deployment task in different platforms.**
 
 If just want to use Bob's functionalities on your experiments, you are **not**
 supposed to install this package on your machine, but rather `create your own
@@ -26,18 +24,63 @@ If you are developing Bob packages which are supposed to built along side our
 `nightly build system <https://www.idiap.ch/software/bob/buildbot/waterfall>`_,
 please read on.
 
+
 Installation
 ------------
 
-As per-usual, make sure all external `dependencies`_ are installed on your host
-before trying to compile the whole of Bob. Once all dependencies_ are
-satisfied, you should be able to::
+.. note::
+  If you are reading this page through our GitHub portal and not through PyPI,
+  note **the development tip of the package may not be stable** or become
+  unstable in a matter of moments.
 
-  $ python bootstrap.py
+  Go to `http://pypi.python.org/pypi/bob
+  <http://pypi.python.org/pypi/bob>`_ to download the latest
+  stable version of this package.
+
+There are 2 options you can follow to get this package installed and
+operational on your computer: you can use automatic installers like `pip
+<http://pypi.python.org/pypi/pip/>`_ (or `easy_install
+<http://pypi.python.org/pypi/setuptools>`_) or manually download, unpack and
+use `zc.buildout <http://pypi.python.org/pypi/zc.buildout>`_ to create a
+virtual work environment just for this package.
+
+Using an automatic installer
+============================
+
+Using ``pip`` is the easiest (shell commands are marked with a ``$`` signal)::
+
+  $ pip install bob
+
+You can also do the same with ``easy_install``::
+
+  $ easy_install bob
+
+This will download and install this package plus any other required
+dependencies. It will also verify if the version of Bob you have installed
+is compatible.
+
+This scheme works well with virtual environments by `virtualenv
+<http://pypi.python.org/pypi/virtualenv>`_ or if you have root access to your
+machine. Otherwise, we recommend you use the next option.
+
+Using ``zc.buildout``
+=====================
+
+Download the latest version of this package from `PyPI
+<http://pypi.python.org/pypi/bob>`_ and unpack it in your
+working area. The installation of the toolkit itself uses `buildout
+<http://www.buildout.org/>`_. You don't need to understand its inner workings
+to use this package. Here is a recipe to get you started::
+  
+  $ python bootstrap-buildout.py
   $ ./bin/buildout
 
-You may tweak the options in ``buildout.cfg`` to disable/enable verbosity and
-debug builds, **before you run** ``./bin/buildout``.
+These 2 commands should download and install all non-installed dependencies and
+get you a fully operational test and development environment.
+
+.. note::
+  As per-usual, make sure all external `dependencies`_ are installed on your host
+  before trying to compile the whole of Bob.
 
 
 Documentation
@@ -51,25 +94,19 @@ installation, using Sphinx::
 This shall place in the directory ``sphinx``, the current version for the
 documentation of the package.
 
-Testing
--------
 
-You can run a set of tests using the nose test runner::
+For the maintainers
+-------------------
 
-  $ ./bin/nosetests -sv
+In the next subsections we have instructions for the maintainers of the package.
 
-You can run our documentation tests using sphinx itself::
+Adding a dependency package
+===========================
 
-  $ ./bin/sphinx-build -b doctest . sphinx
-
-Adding a Package
-----------------
-
-   To add a package, just add it in the dependency list.
-
+   
+   To add a package on bob, just append the package name in the file ('requirements.txt').
 
 .. warning::
-
    Before adding a package to this prototype, please ensure that the package:
 
    * contains a README clearly indicating how to install the package (including
@@ -89,20 +126,19 @@ Adding a Package
    mailing list.
 
 
+Updating the dependencies
+=========================
 
-Updating a Package
-------------------
- TODO::
+ If you want to update the version of the dependency packages, run the following commands::
  
- $ ./bin/get_versions.py
+ $ ./bin/get_versions.py > requirements.txt
+ $ git commit requirements.txt -m "Update requeriments" && git push
  
- 
 
-Removing a Package
-------------------
+Removing a dependency package
+=============================
 
-   To add a package, just remove it from the dependency list.
-
+   To remove a package on bob, just append the package name in the file ('requirements.txt').
 
 
 .. External References
