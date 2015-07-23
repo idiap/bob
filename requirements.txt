@@ -1,5 +1,3 @@
-setuptools == 18.0.1
-pkgtools == 0.7.3
 bob.ap == 2.0.3
 bob.blitz == 2.0.6
 bob.buildout == 2.0.6

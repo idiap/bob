@@ -31,13 +31,13 @@ setup(
 
     # This is the basic information about your project. Modify all this
     # information before releasing code publicly.
-    name='bob.meta',
+    name='bob',
     version=version,
     description='',
-    url='',
+    url='http://github.com/bioidiap/bob',
     license='GPLv3',
-    author='Tiago de Freitas Pereira',
-    author_email='tiago.pereira@idiap.ch',
+    author='Andre Anjos',
+    author_email='andre.anjos@idiap.ch',
 
     long_description=open('README.rst').read(),
 
@@ -52,7 +52,7 @@ setup(
     # scripts of this package. Don't worry - You won't need administrative
     # privileges when using buildout.
 
-    install_requires=requeriments,
+    install_requires=["setuptools","pkgtools"] + requeriments,
 
     # This package is good examples of namespace implementations
     # using several layers. You can check them out here:
@@ -68,7 +68,7 @@ setup(
     entry_points={
       'console_scripts':
       [
-        'get_versions.py  = bob.meta.script.get_versions:main',
+        'get_versions.py  = bob.script.get_versions:main',
       ],
     },
         
