@@ -12,8 +12,6 @@ import pkgtools.pypi
 import distutils.version
 import pkg_resources
 
-PKG_NAME = "bob"
-
 def get_releases(package):
   try:
     return pkgtools.pypi.PyPIJson(package).retrieve()['releases'].keys()
@@ -33,13 +31,17 @@ def get_max_version(versions):
     if final: return final[0]
     return v[0]
     
-def get_dependencies():
-  package      = pkg_resources.working_set.by_key[PKG_NAME]
+def get_dependencies(pkg_name="bob"):
+  package      = pkg_resources.working_set.by_key[pkg_name]
   return [str(r) for r in package.requires()]
 
 def main():
   
-  dependencies = get_dependencies()
+  if len(sys.argv) != 2:
+    print "usage: %s <package>" % os.path.basename(sys.argv[0])
+    sys.exit(1)  
+  
+  dependencies = get_dependencies(pkg_name = sys.argv[1])
   for i in range(2,len(dependencies)):
     d = dependencies[i].split("==")[0]
     versions = get_releases(d)
