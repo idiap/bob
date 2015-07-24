@@ -30,5 +30,5 @@ after_success:
 - coveralls --merge=cpp_cov.json
 - wget https://raw.githubusercontent.com/bioidiap/bob.extension/master/scripts/upload-{sphinx,wheel}.sh
 - chmod a+x upload-sphinx.sh upload-wheel.sh
-#- ./upload-sphinx.sh
+##- ./upload-sphinx.sh
 #- ./upload-wheel.sh
