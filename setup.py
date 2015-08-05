@@ -52,7 +52,7 @@ setup(
     # scripts of this package. Don't worry - You won't need administrative
     # privileges when using buildout.
 
-    install_requires=["setuptools==18.0","pkgtools"] + requeriments,
+    install_requires=["setuptools","pkgtools"] + requeriments,
 
     # This package is good examples of namespace implementations
     # using several layers. You can check them out here:
