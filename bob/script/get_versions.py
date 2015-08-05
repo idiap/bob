@@ -5,42 +5,16 @@
 # Lists the final version of a given package in PyPI
 # Uses the package 'pkgtools' for such.
 
-import os
 import sys
-import re
-import pkgtools.pypi
-import distutils.version
-import pkg_resources
-
-def get_releases(package):
-  try:
-    return pkgtools.pypi.PyPIJson(package).retrieve()['releases'].keys()
-  except:
-    return []
-
-def get_max_version(versions):
-
-  try:
-    v = list(reversed(sorted([distutils.version.StrictVersion(k) for k in versions])))
-    final = [k for k in v if not k.prerelease]
-    if final: return final[0]
-    return v[0]
-  except:
-    v = list(reversed(sorted([distutils.version.LooseVersion(k) for k in versions])))
-    final = [k for k in v if not re.search(r'[a-z]', k.vstring)]
-    if final: return final[0]
-    return v[0]
-    
-def get_dependencies(pkg_name="bob"):
-  package      = pkg_resources.working_set.by_key[pkg_name]
-  return [str(r) for r in package.requires()]
+import os
+from bob import get_dependencies, get_releases, get_max_version
 
 def main():
-  
+
   if len(sys.argv) != 2:
     print "usage: %s <package>" % os.path.basename(sys.argv[0])
     sys.exit(1)  
-  
+
   dependencies = get_dependencies(pkg_name = sys.argv[1])
   for i in range(2,len(dependencies)):
     d = dependencies[i].split("==")[0]

@@ -34,13 +34,22 @@ extensions = [
   'matplotlib.sphinxext.plot_directive',
   ]
 
+
+#Hack to download the dependencies
+from bob import get_dependencies
+from bob.download import download_packages
+temp_dir="./temp"
+packages = get_dependencies()
+download_packages(packages[2:], temp_dir)
+
+
 # The viewcode extension appeared only on Sphinx >= 1.0.0
 import sphinx
 if sphinx.__version__ >= "1.0":
   extensions.append('sphinx.ext.viewcode')
 
 # Always includes todos
-todo_include_todos = True
+todo_include_todos = False
 
 # If we are on OSX, the 'dvipng' path maybe different
 dvipng_osx = '/opt/local/libexec/texlive/binaries/dvipng'
@@ -250,4 +259,7 @@ autodoc_default_flags = ['members', 'undoc-members', 'inherited-members', 'show-
 # For inter-documentation mapping:
 from bob.extension.utils import link_documentation
 intersphinx_mapping = link_documentation(additional_packages = ['python', 'numpy', 'scipy', 'gridtk'], requirements_file = None)
+
+#import shutil
+#shutil.rmtree(temp_dir)
 
