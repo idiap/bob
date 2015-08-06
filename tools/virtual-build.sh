@@ -114,7 +114,7 @@ fi
 
 # Installs all components listed the requirements file
 if [ -n "${requirements}" ]; then
-  pip_opt="--verbose --pre"
+  pip_opt="--verbose --pre --egg"
 
   if [ -n "${find_links}" ]; then
     pip_opt="--find-links=${find_links} ${pip_opt}"
