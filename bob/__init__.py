@@ -2,21 +2,15 @@
 __import__('pkg_resources').declare_namespace(__name__)
 
 
-
-"""
 import os
 import pkgtools.pypi
 import distutils.version
 import pkg_resources
 
-def get_url(package_name):
-  "Given a package name get, from PyPI, the URL name"
-  return pkgtools.pypi.PyPIJson(package_name).retrieve()['urls'][0]['url']
-
 def get_config():
-"""
-  #Returns a string containing the configuration information.
-"""
+  """
+  Returns a string containing the configuration information.
+  """
   import bob.extension
   return bob.extension.get_config(__name__)
 
@@ -43,5 +37,4 @@ def get_max_version(versions):
 def get_dependencies(pkg_name="bob"):
   package      = pkg_resources.working_set.by_key[pkg_name]
   return [str(r) for r in package.requires()]
-  
-"""
+
