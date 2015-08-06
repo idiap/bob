@@ -19,7 +19,7 @@ before_install:
 - pip install --find-links https://www.idiap.ch/software/bob/wheels/travis/ --use-wheel sphinx nose numpy==1.9.2 matplotlib coverage cpp-coveralls scipy==0.15.1 nose-exclude
 - pip install --find-links https://www.idiap.ch/software/bob/wheels/travis/ --use-wheel --pre -r requirements.txt coveralls
 install:
-- python bootstrap-buildout.py --setuptools-version 18.0
+- python bootstrap-buildout.py --setuptools-version 17.1
 - CPPFLAGS=--coverage LDFLAGS=--coverage ./bin/buildout buildout:debug=false buildout:develop=. buildout:extensions=bob.buildout buildout:auto-checkout=
 script:
 - ./bin/python -c 'import pkg_resources; from bob import get_config; print(get_config())'
