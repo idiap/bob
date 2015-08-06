@@ -36,9 +36,14 @@ extensions = [
 
 
 #Hack to download the dependencies
-from bob import get_dependencies
-from bob.download import download_packages
+from bob.utils import get_dependencies, download_packages
 temp_dir="./temp"
+try:
+  import shutil
+  shutil.rmtree(temp_dir)
+except:
+  None
+
 packages = get_dependencies()
 download_packages(packages[2:], temp_dir)
 

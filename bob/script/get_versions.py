@@ -7,7 +7,7 @@
 
 import sys
 import os
-from bob import get_dependencies, get_releases, get_max_version
+from bob.utils import get_dependencies, get_releases, get_max_version
 
 def main():
 
