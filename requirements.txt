@@ -22,10 +22,10 @@ bob.learn.libsvm == 2.0.2
 bob.learn.linear == 2.0.4
 bob.learn.mlp == 2.0.4
 bob.db.verification.utils == 2.0.2
-bob.db.iris   == 2.0.2
+bob.db.iris   == 2.0.3
 bob.db.wine   == 2.0.2
 bob.db.mnist  == 2.0.2
 bob.db.atnt   == 2.0.2
-bob.ip.facedetect == 2.0.1
+bob.ip.facedetect == 2.0.2
 bob.ip.optflow.hornschunck == 2.0.3
 bob.ip.optflow.liu == 2.0.4

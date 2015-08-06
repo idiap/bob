@@ -54,6 +54,9 @@ Signal, Audio, Image and Video Processing
    temp/bob.ip.color/doc/index
    temp/bob.ip.draw/doc/index
    temp/bob.ip.gabor/doc/index
+   temp/bob.ip.facedetect/doc/index
+   temp/bob.ip.optflow.liu/doc/index
+   temp/bob.ip.optflow.hornschunck/doc/index      
 
 Machine Learning
 ----------------
@@ -67,6 +70,20 @@ Machine Learning
    temp/bob.learn.libsvm/doc/index
    temp/bob.learn.em/doc/index
    temp/bob.learn.boosting/doc/index
+   
+
+Database Modules
+----------------
+
+.. toctree::
+   :maxdepth: 2
+
+   temp/bob.db.base/doc/index
+   temp/bob.db.mnist/doc/index
+   temp/bob.db.wine/doc/index
+   temp/bob.db.verification.utils/doc/index
+   temp/bob.db.atnt/doc/index
+   
 
 
 Modules for Developers
