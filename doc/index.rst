@@ -56,7 +56,7 @@ Signal, Audio, Image and Video Processing
    temp/bob.ip.gabor/doc/index
    temp/bob.ip.facedetect/doc/index
    temp/bob.ip.optflow.liu/doc/index
-   temp/bob.ip.optflow.hornschunck/doc/index      
+   temp/bob.ip.optflow.hornschunck/doc/index
 
 Machine Learning
 ----------------

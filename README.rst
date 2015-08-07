@@ -2,6 +2,20 @@
 .. Tiago de Freitas Pereira <tiago.pereira@idiap.ch>
 .. Mon 20 Jul 2015 16:57:00 CEST
 
+
+.. image:: http://img.shields.io/badge/docs-stable-yellow.png
+   :target: http://pythonhosted.org/bob/index.html
+.. image:: http://img.shields.io/badge/docs-latest-orange.png
+   :target: https://www.idiap.ch/software/bob/docs/latest/idiap/bob/master/index.html
+.. image:: https://travis-ci.org/bioidiap/bob.learn.em.svg?branch=master
+   :target: https://travis-ci.org/idiap/bob?branch=master
+.. image:: https://img.shields.io/badge/github-master-0000c0.png
+   :target: https://github.com/idiap/bob/tree/master
+.. image:: http://img.shields.io/pypi/v/bob.png
+   :target: https://pypi.python.org/pypi/bob
+.. image:: http://img.shields.io/pypi/dm/bob.png
+   :target: https://pypi.python.org/pypi/bob
+
 ====================
  Bob
 ====================
