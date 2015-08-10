@@ -33,11 +33,11 @@ setup(
     # information before releasing code publicly.
     name='bob',
     version=version,
-    description='',
-    url='http://github.com/bioidiap/bob',
+    description='Bob is a free signal-processing and machine learning toolbox originally developed by the Biometrics group at Idiap Research Institute, in Switzerland.',
+    url='http://idiap.github.io/bob/',
     license='GPLv3',
-    author='Andre Anjos',
-    author_email='andre.anjos@idiap.ch',
+    author='IDIAP Biometrics Group',
+    author_email='biometric@idiap.ch',
 
     long_description=open('README.rst').read(),
 
@@ -74,7 +74,7 @@ setup(
         
     classifiers = [
       'Development Status :: 5 - Production/Stable',
-      'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+      'License :: OSI Approved :: BSD License',
       'Intended Audience :: Education',
       'Intended Audience :: Science/Research',
       'Natural Language :: English',
