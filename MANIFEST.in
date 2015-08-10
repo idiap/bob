@@ -1,5 +1,6 @@
 include README.rst
 include bootstrap.py
 include buildout.cfg
-recursive-include doc *.rst *.png conf.py
+include requirements.txt
+recursive-include doc doc/plot *.rst *.png conf.py *.py *.ico
 
