@@ -2,7 +2,7 @@ language: python
 env:
   global:
   - secure: MTnYx1wJLTvPLBpY4O2Ia8P7RDXA7ICqqCUA6PsE03pSBzhtgXHm41/klnj96FB9EWIHcz4jWjPplgPBeVs+VCyn0NJberi/DVQsSs3KcVroKykVxIduWbvjbmx29QE3Id8RpPOuOr8pmBzeFVzwu7c2vthGjl7H9eJfKU1BphI=
-  - secure: DAvn/jmqqd+HBWjot7v44qw/2sv9wyH5yItGRZu17PaHn75EghL+6xlRz6+/Jm9xT5RR4ulzCke9rFbart7nyayOJRIo9JGO66EDgwQpg91+54cNLy2vwOmn9ZDW2VIEB2mO0qpCjHzZF+oP2q/tjJVfDBKNon1C0wpWfRHm7v0=
+  - secure: MwVYyHzysBxqcaHroOIv09T/ufww8pLG2ZIYGbFEfj4gumPpOIGcn0mFjnFqyQZykK2Epv3Yy0q6ChunhJuIYCv9jpGbMg5oBwV5KnMeyxXeB8EqcRsP+XSEn6Q+TXfZV0K/pjoBEM9uktJWS6EYFjTIEU0eZPgzsxmXrAG/UBI=
   - BOB_UPLOAD_WHEEL=1
 matrix:
   include:
