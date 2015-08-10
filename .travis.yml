@@ -1,8 +1,8 @@
 language: python
 env:
   global:
-  - secure: eVYI9c4v/gdgMu9/HUrdOljH6xoWucjRNlQMfh24LA3g6j1dr52+SdCP59mzFqBiAIR8eBtipIkit23sQDn+ulw3bJSrLszXsWCKGywLVG/6QtgsqN9J17/RbUA2ZnfA86famA6Z4+CtJbW7nQPYidRQshPC85iiekftN9DwdeQ=
-  - secure: a+hf3j24x0fyP8OP/8IiIp5aMn+GfYxf97vWtJV1U76J8eGNLyj+n/AsPx4y6OpRWy2qTf/90W5TxU/ruRxKRl3j78+W2sYCI1LiQIlNlVX6tMrLnm2YS5zvwH3jICCmRUmY7d0Vc5MrqBRoKnmA+1QqyDrdiCjWkNSh6Jcn5KA=
+  - secure: MTnYx1wJLTvPLBpY4O2Ia8P7RDXA7ICqqCUA6PsE03pSBzhtgXHm41/klnj96FB9EWIHcz4jWjPplgPBeVs+VCyn0NJberi/DVQsSs3KcVroKykVxIduWbvjbmx29QE3Id8RpPOuOr8pmBzeFVzwu7c2vthGjl7H9eJfKU1BphI=
+  - secure: DAvn/jmqqd+HBWjot7v44qw/2sv9wyH5yItGRZu17PaHn75EghL+6xlRz6+/Jm9xT5RR4ulzCke9rFbart7nyayOJRIo9JGO66EDgwQpg91+54cNLy2vwOmn9ZDW2VIEB2mO0qpCjHzZF+oP2q/tjJVfDBKNon1C0wpWfRHm7v0=
   - BOB_UPLOAD_WHEEL=1
 matrix:
   include:
