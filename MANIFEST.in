@@ -2,5 +2,6 @@ include README.rst
 include bootstrap.py
 include buildout.cfg
 include requirements.txt
+include version.txt
 recursive-include doc doc/plot *.rst *.png conf.py *.py *.ico
 
