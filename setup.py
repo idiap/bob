@@ -22,8 +22,7 @@
 from setuptools import setup, find_packages
 
 requeriments = [l.rstrip("\n") for l in open("requirements.txt", 'r').readlines()]
-version      = open("version.txt").read().rstrip()
-
+version      = open("version.txt").read().rstrip() 
 
 # The only thing we do in this file is to call the setup() function with all
 # parameters that define our package.
@@ -52,7 +51,7 @@ setup(
     # scripts of this package. Don't worry - You won't need administrative
     # privileges when using buildout.
 
-    install_requires=["setuptools","pkgtools"] + requeriments,
+    install_requires=["setuptools"] + requeriments,
 
     # This package is good examples of namespace implementations
     # using several layers. You can check them out here:
@@ -65,11 +64,12 @@ setup(
     # once you install the package (or run 'bin/buildout'). The order of each
     # entry under 'console_scripts' is like this:
     #   script-name-at-bin-directory = module.at.your.library:function
+
     entry_points={
-      'console_scripts':
-      [
-        'get_versions.py  = bob.script.get_versions:main',
-      ],
+        'console_scripts':
+        [
+          'get_versions.py  = bob.script.get_versions:main',
+        ],
     },
         
     classifiers = [

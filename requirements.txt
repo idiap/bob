@@ -1,6 +1,5 @@
 bob.ap == 2.0.3
 bob.blitz == 2.0.6
-bob.buildout == 2.0.6
 bob.core == 2.0.3
 bob.db.base == 2.0.3
 bob.extension == 2.0.8
