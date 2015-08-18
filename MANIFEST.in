@@ -1,5 +1,5 @@
 include README.rst
-include bootstrap.py
+include bootstrap-buildout.py
 include buildout.cfg
 include requirements.txt
 include version.txt
