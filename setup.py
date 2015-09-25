@@ -65,12 +65,12 @@ setup(
     # entry under 'console_scripts' is like this:
     #   script-name-at-bin-directory = module.at.your.library:function
 
-    entry_points={
-        'console_scripts':
-        [
-          'get_versions.py  = bob.script.get_versions:main',
-        ],
-    },
+    #entry_points={
+    #    'console_scripts':
+    #    [
+    #      'get_versions.py  = bob.script.get_versions:main',
+    #    ],
+    #},
         
     classifiers = [
       'Development Status :: 5 - Production/Stable',
