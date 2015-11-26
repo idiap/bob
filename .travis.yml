@@ -16,14 +16,14 @@ before_install:
 - sudo add-apt-repository -y ppa:biometrics/bob
 - sudo apt-get update -qq
 - sudo apt-get install -qq --force-yes wget git-core pkg-config cmake python-dev python-support liblapack-dev libatlas-base-dev libblitz1-dev libavformat-dev libavcodec-dev libswscale-dev libboost-all-dev libmatio-dev libjpeg8-dev libnetpbm10-dev libpng12-dev libtiff4-dev libgif-dev libhdf5-serial-dev libfftw3-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended libsvm-dev libvl-dev dvipng python-numpy python-scipy dvipng libopencv-dev gfortran
-- pip install --find-links https://www.idiap.ch/software/bob/wheels/travis/ --egg --use-wheel sphinx nose numpy==1.9.2 matplotlib coverage cpp-coveralls scipy==0.15.1 nose-exclude
+- pip install --find-links https://www.idiap.ch/software/bob/wheels/travis/ --egg --use-wheel sphinx nose numpy==1.9.2 matplotlib coverage cpp-coveralls scipy==0.16.1 nose-exclude
 - pip install --find-links https://www.idiap.ch/software/bob/wheels/travis/ --egg --use-wheel --pre -r requirements.txt coveralls
 install:
 - python bootstrap-buildout.py
 - CPPFLAGS=--coverage LDFLAGS=--coverage ./bin/buildout buildout:debug=false buildout:develop=. buildout:extensions=bob.buildout buildout:auto-checkout=
 script:
 - ./bin/python -c 'import pkg_resources; from bob import get_config; print(get_config())'
-- ./bin/coverage run --source=bob ./bin/nosetests bob bob.ip bob.learn.activation bob.learn.mlp bob.learn.libsvm bob.learn.linear bob.learn.em bob.io bob.blitz bob.ap bob.core bob.math bob.sp bob.measure -sv --first-package-wins --exclude-test=base.test.test_gaussianScaleSpace.test_processing --exclude-test=color.test.test_gray --exclude-test=measure.test_error.test_calibration --exclude-test=measure.test_scripts.test_compute_perf --exclude-test=measure.test_scripts.test_compute_perf_5col --exclude-test=measure.test_scripts.test_compute_cmc
+- ./bin/coverage run --source=bob ./bin/nosetests bob bob.ip bob.learn.activation bob.learn.mlp bob.learn.libsvm bob.learn.linear bob.learn.em bob.io bob.blitz bob.ap bob.core bob.math bob.sp bob.measure -sv --first-package-wins
 #- ./bin/sphinx-build -b doctest doc sphinx
 - ./bin/sphinx-build -b html doc sphinx
 after_success:
