@@ -50,27 +50,7 @@ setup(
     # on the current system will be installed locally and only visible to the
     # scripts of this package. Don't worry - You won't need administrative
     # privileges when using buildout.
-
     install_requires=["setuptools"] + requeriments,
-
-    # This package is good examples of namespace implementations
-    # using several layers. You can check them out here:
-    # https://github.com/idiap/bob/wiki/Satellite-Packages
-    namespace_packages = [
-      'bob',
-    ],
-
-    # This entry defines which scripts you will have inside the 'bin' directory
-    # once you install the package (or run 'bin/buildout'). The order of each
-    # entry under 'console_scripts' is like this:
-    #   script-name-at-bin-directory = module.at.your.library:function
-
-    #entry_points={
-    #    'console_scripts':
-    #    [
-    #      'get_versions.py  = bob.script.get_versions:main',
-    #    ],
-    #},
         
     classifiers = [
       'Development Status :: 5 - Production/Stable',

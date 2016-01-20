@@ -1,5 +1,6 @@
-#see http://peak.telecommunity.com/DevCenter/setuptools#namespace-packages
-__import__('pkg_resources').declare_namespace(__name__)
+# see https://docs.python.org/3/library/pkgutil.html
+from pkgutil import extend_path
+__path__ = extend_path(__path__, __name__)
 
 
 def get_config():
