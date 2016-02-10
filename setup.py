@@ -34,7 +34,7 @@ setup(
     version=version,
     description='Bob is a free signal-processing and machine learning toolbox originally developed by the Biometrics group at Idiap Research Institute, in Switzerland.',
     url='http://idiap.github.io/bob/',
-    license='GPLv3',
+    license='BSD',
     author='IDIAP Biometrics Group',
     author_email='biometric@idiap.ch',
 
