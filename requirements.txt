@@ -1,11 +1,12 @@
-bob.extension == 2.0.10
+bob.extension == 2.0.11
 bob.blitz == 2.0.8
-bob.core == 2.0.6
+bob.core == 2.1.0
 bob.io.base == 2.0.7
+bob.io.audio == 2.0.0
 bob.sp == 2.0.4
 bob.ap == 2.0.4
 bob.math == 2.0.3
-bob.measure == 2.0.5
+bob.measure == 2.1.0
 bob.db.base == 2.0.5
 bob.io.image == 2.0.4
 bob.io.video == 2.0.5
@@ -19,7 +20,7 @@ bob.learn.libsvm == 2.0.3
 bob.learn.linear == 2.0.7
 bob.learn.mlp == 2.0.6
 bob.learn.em == 2.0.7
-bob.learn.boosting == 2.0.3
+bob.learn.boosting == 2.0.4
 bob.db.verification.utils == 2.0.3
 bob.db.iris == 2.0.4
 bob.db.wine == 2.0.3
