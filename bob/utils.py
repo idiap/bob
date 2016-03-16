@@ -10,6 +10,13 @@ import pkgtools.pypi
 import distutils.version
 import pkg_resources
 
+def get_config():
+  """
+  Returns a string containing the configuration information.
+  """
+  import bob.extension
+  return bob.extension.get_config(__name__)
+
 
 def get_url(package_name):
   "Given a package name get, from PyPI, the URL name"
