@@ -16,7 +16,7 @@ bob.ip.draw == 2.0.3
 bob.ip.gabor == 2.0.5
 bob.learn.activation == 2.0.4
 bob.learn.libsvm == 2.0.3
-bob.learn.linear == 2.0.7
+bob.learn.linear == 2.0.8
 bob.learn.mlp == 2.0.11
 bob.learn.em == 2.0.8
 bob.learn.boosting == 2.0.7
