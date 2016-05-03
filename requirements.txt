@@ -11,7 +11,7 @@ bob.io.image == 2.0.6
 bob.io.video == 2.0.6
 bob.io.matlab == 2.0.4
 bob.ip.base == 2.0.9
-bob.ip.color == 2.0.4
+bob.ip.color == 2.0.5
 bob.ip.draw == 2.0.3
 bob.ip.gabor == 2.0.5
 bob.learn.activation == 2.0.4
