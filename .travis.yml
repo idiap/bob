@@ -22,7 +22,7 @@ install:
 - python bootstrap-buildout.py
 - CPPFLAGS=--coverage LDFLAGS=--coverage ./bin/buildout buildout:debug=false buildout:develop=. buildout:extensions=bob.buildout buildout:auto-checkout=
 script:
-- ./bin/python -c 'import pkg_resources; from bob.utils import get_config; print(get_config())'
+#- ./bin/python -c 'import pkg_resources; from bob.utils import get_config; print(get_config())'
 - ./bin/coverage run --source=bob ./bin/nosetests bob bob.ip bob.learn.activation bob.learn.mlp bob.learn.libsvm bob.learn.linear bob.learn.em bob.io bob.blitz bob.ap bob.core bob.math bob.sp bob.measure -sv --first-package-wins
 #- ./bin/sphinx-build -b doctest doc sphinx
 - ./bin/sphinx-build -b html doc sphinx
