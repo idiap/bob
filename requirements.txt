@@ -28,4 +28,4 @@ bob.db.mnist == 2.0.3
 bob.db.atnt == 2.0.3
 bob.ip.facedetect == 2.0.7
 bob.ip.optflow.hornschunck == 2.0.7
-bob.ip.optflow.liu == 2.0.7
+bob.ip.optflow.liu == 2.0.6
