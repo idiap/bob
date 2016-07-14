@@ -7,8 +7,8 @@
    :target: http://pythonhosted.org/bob/index.html
 .. image:: http://img.shields.io/badge/docs-latest-orange.png
    :target: https://www.idiap.ch/software/bob/docs/latest/idiap/bob/master/index.html
-.. image:: https://travis-ci.org/bioidiap/bob.learn.em.svg?branch=v2.3.3
-   :target: https://travis-ci.org/idiap/bob?branch=v2.3.3
+.. image:: https://travis-ci.org/bioidiap/bob.learn.em.svg?branch=master
+   :target: https://travis-ci.org/idiap/bob?branch=master
 .. image:: https://img.shields.io/badge/github-master-0000c0.png
    :target: https://github.com/idiap/bob/tree/master
 .. image:: http://img.shields.io/pypi/v/bob.png
