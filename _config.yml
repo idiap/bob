@@ -1,0 +1,5 @@
+gems:
+  - jekyll-redirect-from
+title: Bob - A framework for signal processing and machine learning
+redirect_to:
+  - https://www.idiap.ch/software/bob
