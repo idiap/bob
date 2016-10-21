@@ -1,1 +1,0 @@
-../temp/bob.ip.gabor/doc/plot/similarity.py

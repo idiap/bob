@@ -1,1 +1,0 @@
-../temp/bob.ip.facedetect/doc/plot/detect_single_face.py
